@@ -1,0 +1,110 @@
+import { Component, EventEmitter, Input, Output, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Profile } from '../../../core/services/supabase-types';
+
+@Component({
+    selector: 'app-manage-profile-popup',
+    standalone: true,
+    imports: [CommonModule, ReactiveFormsModule],
+    template: `
+    <div *ngIf="isOpen" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+      <div class="bg-aikido-green border border-white/20 p-6 rounded-2xl w-full max-w-md shadow-2xl relative">
+        <button (click)="onCancel()" class="absolute top-4 right-4 text-white/50 hover:text-white text-2xl">&times;</button>
+        
+        <h2 class="text-2xl font-bold text-white mb-6 text-center">
+          {{ isEditMode ? 'Edit Profile' : 'Add New Profile' }}
+        </h2>
+
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+          <!-- Name -->
+          <div>
+            <label class="block text-white/70 text-sm mb-1">Player Name</label>
+            <input formControlName="name" type="text" class="w-full bg-white/10 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-aikido-red border border-transparent focus:border-transparent">
+          </div>
+
+          <!-- Code -->
+          <div>
+            <label class="block text-white/70 text-sm mb-1">Unique Code</label>
+            <input formControlName="code" type="text" class="w-full bg-white/10 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-aikido-red border border-transparent focus:border-transparent">
+            <p *ngIf="profileForm.get('code')?.touched && profileForm.get('code')?.invalid" class="text-red-400 text-xs mt-1">Code is required (min 3 chars).</p>
+          </div>
+
+          <!-- Status Display (Read Only or Edit?) - Requirement says "Edit Mode allows updating player data". Usually status is auto-updated, but Admin might need to fix it. Let's allowing editing status JSON manually is too hard. Maybe just reset? For now, simplistic fields. -->
+          
+          <div *ngIf="isEditMode" class="bg-black/20 p-4 rounded-lg">
+             <h3 class="text-sm font-bold text-white/50 mb-2">Current Progress (Read Only)</h3>
+             <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                <div class="bg-white/5 p-2 rounded">
+                    <span class="block text-white/50">Learn</span>
+                    <span class="font-mono">{{ initialProfile?.status?.learning || '-' }}</span>
+                </div>
+                <div class="bg-white/5 p-2 rounded">
+                    <span class="block text-white/50">Dev</span>
+                    <span class="font-mono">{{ initialProfile?.status?.developed || '-' }}</span>
+                </div>
+                <div class="bg-white/5 p-2 rounded">
+                    <span class="block text-white/50">Skill</span>
+                    <span class="font-mono">{{ initialProfile?.status?.skilled || '-' }}</span>
+                </div>
+             </div>
+          </div>
+
+          <div class="flex gap-4 mt-4">
+            <button type="button" (click)="onCancel()" class="flex-1 py-3 rounded-full border border-white/20 text-white font-bold hover:bg-white/5">Cancel</button>
+            <button type="submit" [disabled]="profileForm.invalid" class="flex-1 py-3 rounded-full bg-aikido-red text-white font-bold shadow-lg hover:brightness-110 disabled:opacity-50">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `
+})
+export class ManageProfilePopupComponent implements OnInit {
+    @Input() isOpen = false;
+    @Input() initialProfile: Profile | null = null;
+    @Output() close = new EventEmitter<void>();
+    @Output() save = new EventEmitter<Partial<Profile>>();
+
+    private fb = inject(FormBuilder);
+
+    profileForm = this.fb.group({
+        name: ['', Validators.required],
+        code: ['', [Validators.required, Validators.minLength(3)]]
+    });
+
+    get isEditMode() {
+        return !!this.initialProfile;
+    }
+
+    ngOnInit() {
+        // Populate if editing
+        if (this.initialProfile) {
+            this.profileForm.patchValue({
+                name: this.initialProfile.name,
+                code: this.initialProfile.code
+            });
+            // Disable code editing? Often unique IDs shouldn't change, but users might typo. Let's allow edit.
+        }
+    }
+
+    // Handle Input Changes if the component stays alive
+    ngOnChanges() {
+        if (this.isOpen && this.initialProfile) {
+            this.profileForm.patchValue({
+                name: this.initialProfile.name,
+                code: this.initialProfile.code
+            });
+        } else if (this.isOpen && !this.initialProfile) {
+            this.profileForm.reset();
+        }
+    }
+
+    onCancel() {
+        this.close.emit();
+    }
+
+    onSubmit() {
+        if (this.profileForm.invalid) return;
+        this.save.emit(this.profileForm.value as Partial<Profile>);
+    }
+}

@@ -1,0 +1,92 @@
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RoadmapStep } from '../../../core/roadmap/roadmap.data';
+
+@Component({
+    selector: 'app-roadmap-step',
+    standalone: true,
+    imports: [CommonModule],
+    template: `
+    <div class="relative mb-6" [class.opacity-50]="isLocked" [class.pointer-events-none]="isLocked">
+       
+        <!-- Locked Overlay -->
+        <div *ngIf="isLocked" class="absolute inset-0 z-20 flex items-center justify-center">
+            <span class="text-4xl">🔒</span>
+        </div>
+
+        <!-- Header Row: Checkboxes + Title -->
+        <div class="flex items-start justify-between mb-2">
+            
+            <!-- Checkboxes Column -->
+            <div class="flex gap-2">
+                 <div class="flex flex-col items-center gap-1">
+                    <span class="text-[10px] text-white/50 uppercase">Learn</span>
+                    <button (click)="toggle('learning')" class="w-8 h-8 rounded border border-white/20 flex items-center justify-center transition-colors"
+                        [class.bg-white]="checks.learning" [class.text-black]="checks.learning">
+                        <span *ngIf="checks.learning">✔</span>
+                    </button>
+                 </div>
+                 <div class="flex flex-col items-center gap-1">
+                    <span class="text-[10px] text-white/50 uppercase">Dev</span>
+                    <button (click)="toggle('developed')" class="w-8 h-8 rounded border border-white/20 flex items-center justify-center transition-colors"
+                        [class.bg-white]="checks.developed" [class.text-black]="checks.developed">
+                        <span *ngIf="checks.developed">✔</span>
+                    </button>
+                 </div>
+                 <div class="flex flex-col items-center gap-1">
+                    <span class="text-[10px] text-white/50 uppercase">Skill</span>
+                    <button (click)="toggle('skilled')" class="w-8 h-8 rounded border border-white/20 flex items-center justify-center transition-colors"
+                        [class.bg-aikido-red]="checks.skilled" [class.border-aikido-red]="checks.skilled" [class.text-white]="checks.skilled">
+                        <span *ngIf="checks.skilled">✔</span>
+                    </button>
+                 </div>
+            </div>
+
+            <!-- Text Content -->
+            <div class="text-right flex-1 pl-4">
+                <div class="flex justify-end items-center gap-2 mb-1">
+                    <span class="text-xs font-mono text-white/40">{{ step.stepNumber }}</span>
+                    <span *ngIf="isCompleted()" class="text-green-400 text-xs">✓</span>
+                </div>
+                <h3 class="font-bold text-lg leading-tight mb-1">{{ step.stepDetails }}</h3> 
+                <!-- Note: Using 'stepDetails' as the main text per screenshot? Or 'stepName'? 
+                     Screenshot shows "Understanding Body Mechanics..." which is long. 
+                     Prompt JSON has 'stepDetails'. I'll use details. 
+                -->
+                <p class="text-xs text-white/50">{{ step.stepName }}</p>
+            </div>
+            
+            <!-- Arrow Icon -->
+            <div class="ml-2 pt-2 text-white/30">
+                ←
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="h-2 w-full bg-white/10 rounded-full overflow-hidden mt-2">
+            <div class="h-full bg-white/30" [style.width]="step.percentage"></div>
+            <!-- Wait, percentage is % of what? Prompt says "3%". This might be "Global Progress at this step". 
+                 I'll just render it as a label or a bar. -->
+        </div>
+        <div class="text-right text-xs text-white/30 mt-1">{{ step.percentage }} Global</div>
+
+    </div>
+  `
+})
+export class RoadmapStepComponent {
+    @Input({ required: true }) step!: RoadmapStep;
+    @Input() isLocked = false;
+
+    @Input() checks = { learning: false, developed: false, skilled: false };
+
+    @Output() toggleCheck = new EventEmitter<'learning' | 'developed' | 'skilled'>();
+
+    toggle(type: 'learning' | 'developed' | 'skilled') {
+        if (this.isLocked) return;
+        this.toggleCheck.emit(type);
+    }
+
+    isCompleted() {
+        return this.checks.skilled;
+    }
+}
