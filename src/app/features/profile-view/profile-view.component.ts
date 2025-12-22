@@ -10,46 +10,8 @@ import { Profile } from '../../core/services/supabase-types';
   selector: 'app-profile-view',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="min-h-screen bg-aikido-green text-white flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
-      
-      <!-- Greeting -->
-      <div class="mb-12 z-10">
-        <div class="w-32 h-32 rounded-full bg-white/10 mx-auto mb-4 flex items-center justify-center text-4xl font-bold border-4 border-white/5">
-           {{ profile()?.name?.charAt(0) }}
-        </div>
-        <h1 class="text-3xl font-bold mb-1">Hi, {{ profile()?.name }}</h1>
-        <p class="text-white/50 text-sm font-mono tracking-widest">{{ profile()?.code }}</p>
-      </div>
-
-      <!-- Main Status Display (Abstract visual) -->
-      <div class="relative w-64 h-64 mb-16 z-10 flex items-center justify-center">
-         <!-- Outer Ring -->
-         <div class="absolute inset-0 border-8 border-white/5 rounded-full"></div>
-         <!-- Inner Logic would be dynamic CSS based on progress. -->
-         <div class="absolute inset-0 border-8 border-t-aikido-red border-r-aikido-red border-b-transparent border-l-transparent rounded-full rotate-45"></div>
-         
-         <div class="text-center">
-           <span class="block text-4xl font-bold">{{ progressPercentage() }}%</span>
-           <span class="text-xs uppercase tracking-widest text-white/50">Skilled</span>
-         </div>
-      </div>
-
-      <!-- Action -->
-      <button (click)="goToRoadmap()" class="w-full max-w-xs h-16 rounded-full bg-aikido-red text-white font-bold text-xl uppercase tracking-wider shadow-xl hover:scale-105 transition-transform z-10 flex items-center justify-center gap-2">
-        <span>Update Progress</span>
-        <span>→</span>
-      </button>
-
-      <button (click)="logout()" class="mt-8 text-white/30 text-sm hover:text-white transition-colors z-10">Sign Out</button>
-
-      <!-- Decor for visual interest -->
-      <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-         <div class="absolute top-10 right-10 w-64 h-64 bg-aikido-red blur-[100px] rounded-full"></div>
-         <div class="absolute bottom-10 left-10 w-64 h-64 bg-blue-900 blur-[100px] rounded-full"></div>
-      </div>
-    </div>
-  `
+  templateUrl: './profile-view.component.html',
+  styleUrl: './profile-view.component.css'
 })
 export class ProfileViewComponent implements OnInit {
   private auth = inject(AuthService);
