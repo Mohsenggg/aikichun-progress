@@ -19,6 +19,7 @@ export interface Profile {
     name: string
     status: ProfileStatus
     last_update_date: string | null
+    updates_count?: number
     created_at: string
 }
 
@@ -33,6 +34,7 @@ export interface Database {
                     name: string
                     status?: ProfileStatus
                     last_update_date?: string | null
+                    updates_count?: number
                     created_at?: string
                 }
                 Update: {
@@ -41,6 +43,7 @@ export interface Database {
                     name?: string
                     status?: ProfileStatus
                     last_update_date?: string | null
+                    updates_count?: number
                     created_at?: string
                 }
             }

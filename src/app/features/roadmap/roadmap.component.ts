@@ -137,8 +137,9 @@ export class RoadmapComponent implements OnInit {
         const oldStatus = this.originalProfile()!.status;
         const newStatus = this.draftStatus();
         const lastUpdate = this.originalProfile()!.last_update_date;
+        const currentCount = this.originalProfile()!.updates_count || 0;
 
-        const validation = this.roadmapService.validateUpdate(oldStatus, newStatus, lastUpdate);
+        const validation = this.roadmapService.validateUpdate(oldStatus, newStatus, lastUpdate, currentCount);
 
         if (!validation.valid) {
             this.errorMessage.set(validation.message!);
@@ -149,7 +150,8 @@ export class RoadmapComponent implements OnInit {
         // Save to DB (via Service with Logging/Cache)
         const { error } = await this.supabase.updateProfile(this.originalProfile()!.id, {
             status: newStatus,
-            last_update_date: new Date().toISOString()
+            last_update_date: new Date().toISOString(),
+            updates_count: validation.nextUpdateCount
         });
 
         if (error) {
@@ -158,7 +160,12 @@ export class RoadmapComponent implements OnInit {
         } else {
             // Success
             // Update local state is handled by service cache, but we update our signals
-            this.originalProfile.update(p => ({ ...p!, status: newStatus, last_update_date: new Date().toISOString() }));
+            this.originalProfile.update(p => ({
+                ...p!,
+                status: newStatus,
+                last_update_date: new Date().toISOString(),
+                updates_count: validation.nextUpdateCount
+            }));
 
             // Show Success Feedback
             alert('Progress Saved Successfully!');
