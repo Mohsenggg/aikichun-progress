@@ -57,6 +57,8 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   async handleSave(formValue: Partial<Profile>) {
+    
+    
     if (this.selectedProfile()) {
       // Update (Use Service)
       const { error } = await this.supabase.updateProfile(this.selectedProfile()!.id, {
@@ -79,6 +81,23 @@ export class AdminDashboardComponent implements OnInit {
     }
     this.closePopup();
   }
+
+
+
+ async deleteProfile(profile: Profile) {
+  const confirmed = confirm(`Delete profile ${profile.name}?`);
+  if (!confirmed) return;
+
+  const { error } = await this.supabase.deleteProfile(profile.id);
+
+  if (error) {
+    console.error('Admin Delete Error:', error);
+    return;
+  }
+
+  await this.fetchProfiles();
+}
+
 
   logout() {
     this.auth.logout();

@@ -105,6 +105,24 @@ export class SupabaseService {
         return { error: null };
     }
 
+
+    async deleteProfile(profileId: string): Promise<{ error: any }> {
+    this.log('DB DELETE', { profileId });
+
+    const { error } = await this.supabase
+        .from('profiles')
+        .delete()
+        .eq('id', profileId);
+
+    if (error) {
+        console.error('DB Delete Error:', error);
+        return { error };
+    }
+
+    this.log('DB DELETE SUCCESS', `Profile ${profileId} deleted`);
+    return { error: null };
+}
+
     // Admin Method - No persistent cache for list to ensure freshness, but logged
     async getAllProfiles(): Promise<{ data: Profile[] | null; error: any }> {
         this.log('DB FETCH ALL', 'Fetching all profiles for Admin...');
