@@ -1,0 +1,170 @@
+.profile-page {
+    min-height: 100vh;
+    background-color: var(--aikido-green);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.greeting-section {
+    margin-bottom: 3rem;
+    z-index: 10;
+}
+
+.avatar-circle {
+    width: 8rem;
+    height: 8rem;
+    border-radius: 9999px;
+    background-color: var(--white-10);
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.25rem;
+    font-weight: 700;
+    border: 4px solid var(--white-50);
+    /* white/5 approx */
+    /* Note: "white/5" in Tailwind is opacity 0.05. I used white-50 variable which is 0.5. Let's fix. */
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.greeting-title {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.greeting-code {
+    color: var(--white-50);
+    font-size: 0.875rem;
+    font-family: monospace;
+    letter-spacing: 0.1em;
+}
+
+.status-display-container {
+    position: relative;
+    width: 16rem;
+    height: 16rem;
+    margin-bottom: 4rem;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.status-ring-bg {
+    position: absolute;
+    inset: 0;
+    border: 8px solid rgba(255, 255, 255, 0.05);
+    border-radius: 9999px;
+}
+
+.status-ring-progress {
+    position: absolute;
+    inset: 0;
+    border: 8px solid transparent;
+    border-top-color: var(--aikido-red);
+    border-right-color: var(--aikido-red);
+    border-radius: 9999px;
+    transform: rotate(45deg);
+}
+
+.status-text {
+    text-align: center;
+}
+
+.status-percent {
+    display: block;
+    font-size: 2.25rem;
+    font-weight: 700;
+}
+
+.status-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--white-50);
+}
+
+.update-btn {
+    width: 100%;
+    max-width: 20rem;
+    height: 4rem;
+    border-radius: 9999px;
+    background-color: var(--aikido-red);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: transform 0.2s;
+    border: none;
+}
+
+.update-btn:hover {
+    transform: scale(1.05);
+}
+
+.signout-btn {
+    margin-top: 2rem;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.875rem;
+    background: none;
+    border: none;
+    transition: color 0.2s;
+    z-index: 10;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+}
+
+.signout-btn:hover {
+    color: var(--white);
+}
+
+.decor-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+.decor-blob-red {
+    position: absolute;
+    top: 2.5rem;
+    right: 2.5rem;
+    width: 16rem;
+    height: 16rem;
+    background-color: var(--aikido-red);
+    filter: blur(100px);
+    border-radius: 9999px;
+}
+
+.decor-blob-blue {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 2.5rem;
+    width: 16rem;
+    height: 16rem;
+    background-color: #1e3a8a;
+    /* blue-900 */
+    filter: blur(100px);
+    border-radius: 9999px;
+}

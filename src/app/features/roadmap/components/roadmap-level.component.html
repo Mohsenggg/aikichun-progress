@@ -1,10 +1,10 @@
-<div class="mb-8 mt-12">
-    <div class="flex items-center gap-2 mb-4">
-        <span class="text-2xl font-bold text-white">→ Level {{ level.name }}</span>
+<div class="level-container">
+    <div class="level-header">
+        <span class="level-title">→ Level {{ level.name }}</span>
     </div>
 
     <!-- Stats Pill -->
-    <div class="bg-aikido-red inline-block px-4 py-2 rounded-full text-xs font-bold shadow mb-6">
+    <div class="stats-pill">
         Expected Hours: 50 | Steps: {{ level.steps.length }}
     </div>
 

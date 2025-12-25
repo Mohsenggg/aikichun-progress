@@ -1,0 +1,140 @@
+.step-container {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.step-container.locked {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.overlay-locked {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lock-icon {
+    font-size: 2.25rem;
+}
+
+.header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.checkboxes-col {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.check-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.check-label {
+    font-size: 10px;
+    color: var(--white-50);
+    text-transform: uppercase;
+}
+
+.check-btn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--white-20);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    padding: 0;
+    color: transparent;
+}
+
+.check-btn-active-white {
+    background-color: var(--white);
+    color: var(--black);
+}
+
+.check-btn-active-red {
+    background-color: var(--aikido-red);
+    border-color: var(--aikido-red);
+    color: var(--white);
+}
+
+/* Add checkmark styling specifically if needed, but text color handles it */
+
+.text-content {
+    text-align: right;
+    flex: 1;
+    padding-left: 1rem;
+}
+
+.step-meta {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.step-number {
+    font-size: 0.75rem;
+    font-family: monospace;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.completed-mark {
+    color: #4ade80;
+    /* green-400 */
+    font-size: 0.75rem;
+}
+
+.step-details {
+    font-weight: 700;
+    font-size: 1.125rem;
+    line-height: 1.25;
+    margin: 0 0 0.25rem 0;
+}
+
+.step-name {
+    font-size: 0.75rem;
+    color: var(--white-50);
+    margin: 0;
+}
+
+.arrow-icon {
+    margin-left: 0.5rem;
+    padding-top: 0.5rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.progress-bar-container {
+    height: 0.5rem;
+    width: 100%;
+    background-color: var(--white-10);
+    border-radius: 9999px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.global-progress-text {
+    text-align: right;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.3);
+    margin-top: 0.25rem;
+}

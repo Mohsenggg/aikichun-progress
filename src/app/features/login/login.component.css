@@ -1,0 +1,155 @@
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--aikido-green);
+    padding: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.logo-container {
+    margin-bottom: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logo-circle {
+    width: 12rem;
+    height: 12rem;
+    background-color: var(--white-10);
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.logo-text {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--white);
+}
+
+.login-form {
+    width: 100%;
+    max-width: 20rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    z-index: 10;
+}
+
+.code-input {
+    width: 100%;
+    height: 3.5rem;
+    border-radius: 9999px;
+    background-color: var(--white);
+    text-align: center;
+    color: var(--black);
+    font-size: 1.125rem;
+    border: none;
+    outline: none;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+}
+
+.code-input:focus {
+    box-shadow: 0 0 0 2px var(--aikido-red);
+}
+
+.submit-btn {
+    width: 100%;
+    height: 3.5rem;
+    border-radius: 9999px;
+    background-color: var(--aikido-red);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.submit-btn:hover {
+    filter: brightness(1.1);
+}
+
+.submit-btn:active {
+    transform: scale(0.95);
+}
+
+.submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.error-msg {
+    color: #f87171;
+    /* red-400 */
+    text-align: center;
+    font-weight: 600;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .5;
+    }
+}
+
+.footer-socials {
+    position: absolute;
+    bottom: 2rem;
+    display: flex;
+    gap: 1.5rem;
+    z-index: 10;
+}
+
+.social-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-weight: 700;
+}
+
+.social-icon-y {
+    background-color: #dc2626;
+}
+
+/* red-600 */
+.social-icon-tk {
+    background-color: #000000;
+}
+
+.social-icon-ig {
+    background-color: #db2777;
+}
+
+/* pink-600 */
+.social-icon-fb {
+    background-color: #2563eb;
+}
+
+/* blue-600 */

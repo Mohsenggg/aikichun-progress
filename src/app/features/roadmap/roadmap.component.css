@@ -1,0 +1,67 @@
+.roadmap-page {
+    min-height: 100vh;
+    background-color: var(--aikido-green);
+    color: var(--white);
+    padding: 1rem;
+    padding-bottom: 6rem;
+}
+
+.back-btn {
+    margin-bottom: 1rem;
+    color: var(--white-50);
+    background: none;
+    border: none;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+.back-btn:hover {
+    color: var(--white);
+}
+
+.save-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(26, 47, 35, 0.95);
+    /* aikido-green/95 */
+    border-top: 1px solid var(--white-10);
+    padding: 1rem;
+    backdrop-filter: blur(4px);
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.changes-info {
+    font-size: 0.75rem;
+}
+
+.changes-text {
+    display: block;
+    color: var(--white-50);
+}
+
+.error-text {
+    color: #f87171;
+    /* red-400 */
+    font-weight: 700;
+}
+
+.save-btn {
+    background-color: var(--aikido-red);
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+    border: none;
+    color: var(--white);
+}
+
+.save-btn:disabled {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}

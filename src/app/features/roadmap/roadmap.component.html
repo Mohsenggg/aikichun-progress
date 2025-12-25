@@ -1,7 +1,7 @@
-<div class="min-h-screen bg-aikido-green text-white p-4 pb-24">
+<div class="roadmap-page">
 
     <!-- Back Header -->
-    <button (click)="goBack()" class="mb-4 text-white/50 hover:text-white">← Back to Profile</button>
+    <button (click)="goBack()" class="back-btn">← Back to Profile</button>
 
     <!-- Levels Loop -->
     <div *ngFor="let level of roadmapData">
@@ -16,14 +16,12 @@
     </div>
 
     <!-- Sticky Save Bar -->
-    <div
-        class="fixed bottom-0 left-0 w-full bg-aikido-green/95 border-t border-white/10 p-4 backdrop-blur-sm z-50 flex justify-between items-center">
-        <div class="text-xs">
-            <span class="block text-white/50">Changes: {{ changesCount() }}/2</span>
-            <span *ngIf="errorMessage()" class="text-red-400 font-bold">{{ errorMessage() }}</span>
+    <div class="save-bar">
+        <div class="changes-info">
+            <span class="changes-text">Changes: {{ changesCount() }}/2</span>
+            <span *ngIf="errorMessage()" class="error-text">{{ errorMessage() }}</span>
         </div>
-        <button (click)="saveChanges()" [disabled]="!hasChanges() || isSaving()"
-            class="bg-aikido-red px-8 py-3 rounded-full font-bold shadow-lg disabled:opacity-50 disabled:grayscale transition-all">
+        <button (click)="saveChanges()" [disabled]="!hasChanges() || isSaving()" class="save-btn">
             {{ isSaving() ? 'Saving...' : 'Save Progress' }}
         </button>
     </div>
