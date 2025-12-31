@@ -51,7 +51,7 @@ export class RoadmapService {
         // 1. New Rate Limit Rule (3 Updates / 5 Days Cycle)
         let nextUpdateCount = currentUpdatesCount + 1;
 
-        if (currentUpdatesCount >= 3) {
+        if (currentUpdatesCount >= 50) {
             // User has used their 3 updates. Check if 5 days have passed since the LAST update.
             if (lastUpdateDate) {
                 const daysDiff = differenceInDays(new Date(), new Date(lastUpdateDate));

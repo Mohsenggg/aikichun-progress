@@ -9,6 +9,14 @@
   --white-70: rgba(255, 255, 255, 0.7);
   --black-80: rgba(0, 0, 0, 0.8);
   --font-heading: 'Inter', sans-serif;
+
+  /* New Theme Variables */
+  --color-primary: #22c55e;
+  /* Green for progress */
+  --color-surface: rgba(255, 255, 255, 0.05);
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-text-primary: var(--white);
+  --color-text-secondary: var(--white-70);
   /* Assuming Inter or similar */
 }
 
