@@ -1,0 +1,17 @@
+<div class="grade-container">
+    <div *ngFor="let grade of grades" class="grade-card" (click)="selectGrade(grade)">
+        <div class="grade-icon">
+            <i class="fa-solid" [ngClass]="getIcon(grade['grade-name'])"></i>
+        </div>
+        <div class="grade-info">
+            <h3>{{ grade['grade-name'] }}</h3>
+            <div class="progress-bar-container">
+                <div class="progress-bar" [style.width.%]="getProgress(grade)"></div>
+            </div>
+            <span class="progress-text">{{ getProgress(grade) }}% Complete</span>
+        </div>
+        <div class="grade-arrow">
+            <i class="fa-solid fa-chevron-right"></i>
+        </div>
+    </div>
+</div>

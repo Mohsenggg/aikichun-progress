@@ -17,9 +17,15 @@ export class RoadmapStepComponent {
 
     @Output() toggleCheck = new EventEmitter<'learning' | 'developed' | 'skilled'>();
 
+    isDetailsOpen = false;
+
     toggle(type: 'learning' | 'developed' | 'skilled') {
         if (this.isLocked) return;
         this.toggleCheck.emit(type);
+    }
+
+    toggleDetails() {
+        this.isDetailsOpen = !this.isDetailsOpen;
     }
 
     isCompleted() {

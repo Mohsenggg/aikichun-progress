@@ -5,10 +5,10 @@
         <span class="lock-icon">🔒</span>
     </div>
 
-    <!-- Header Row: Checkboxes + Title -->
-    <div class="header-row">
+    <!-- Main Row -->
+    <div class="step-main-row">
 
-        <!-- Checkboxes Column -->
+        <!-- Left: Checkboxes -->
         <div class="checkboxes-col">
             <div class="check-group">
                 <span class="check-label">Learn</span>
@@ -31,26 +31,40 @@
             </div>
         </div>
 
-        <!-- Text Content -->
-        <div class="text-content">
-            <div class="step-meta">
-                <span class="step-number">{{ step.stepNumber }}</span>
-                <span *ngIf="isCompleted()" class="completed-mark">✓</span>
+        <!-- Center: Step Number & Progress -->
+        <div class="step-center">
+            <h2 class="step-code">{{ step.stepNumber }}</h2>
+            <div class="progress-bar-container">
+                <!-- Global Progress for this step is visually small in design, keeping it simple -->
+                <!-- Actually design shows percentage circle? User said "Progress Bars... Show an icon... Display percentage". That was referring to Grades. -->
+                <!-- For steps, design shows just check boxes and code. -->
             </div>
-            <h3 class="step-details">{{ step.stepDetails }}</h3>
-            <p class="step-name">{{ step.stepName }}</p>
         </div>
 
-        <!-- Arrow Icon -->
-        <div class="arrow-icon">
-            ←
+
+        <!-- Right: Details Button -->
+        <div class="step-right">
+            <button class="details-btn" (click)="toggleDetails()">
+                التفاصيل
+            </button>
         </div>
+
     </div>
 
-    <!-- Progress Bar -->
-    <div class="progress-bar-container">
-        <div class="progress-bar-fill" [style.width]="step.percentage"></div>
+    <!-- Details Box (Expanded) -->
+    <div *ngIf="isDetailsOpen" class="details-box">
+        <div class="details-header">
+            <h3>{{ step.stepName }}</h3>
+            <button class="close-details" (click)="toggleDetails()">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+        </div>
+        <p class="details-text">
+            {{ step.stepDetails }}
+        </p>
     </div>
-    <div class="global-progress-text">{{ step.percentage }} Global</div>
+
+    <!-- Global Progress (Optional, keeping at bottom if needed, but reducing noise) -->
+    <!-- <div class="global-progress-text">{{ step.percentage }} Global</div> -->
 
 </div>

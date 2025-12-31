@@ -38,7 +38,7 @@ export class LoginComponent {
         if (this.auth.role() === 'admin') {
           this.router.navigate(['/admin']);
         } else {
-          this.router.navigate(['/profile']); // or /roadmap
+          this.router.navigate(['/roadmap']); // defaults to grade selection
         }
       } else {
         this.errorMessage.set('Invalid Code. Please try again.');

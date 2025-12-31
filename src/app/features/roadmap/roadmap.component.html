@@ -1,28 +1,61 @@
-<div class="roadmap-page">
+<div class="roadmap-wrapper">
 
-    <!-- Back Header -->
-    <button (click)="goBack()" class="back-btn">← Back to Profile</button>
-
-    <!-- Levels Loop -->
-    <div *ngFor="let level of roadmapData">
-        <app-roadmap-level [level]="level">
-            <!-- Steps Loop -->
-            <div *ngFor="let step of level.steps">
-                <app-roadmap-step [step]="step" [isLocked]="getVisibility(step.stepNumber) === 'locked'"
-                    [checks]="getChecks(step.stepNumber)"
-                    (toggleCheck)="handleToggle(step.stepNumber, $event)"></app-roadmap-step>
-            </div>
-        </app-roadmap-level>
-    </div>
-
-    <!-- Sticky Save Bar -->
-    <div class="save-bar">
-        <div class="changes-info">
-            <span class="changes-text">Changes: {{ changesCount() }}/2</span>
-            <span *ngIf="errorMessage()" class="error-text">{{ errorMessage() }}</span>
+    <!-- Top Bar: Save Button & Status (Global) -->
+    <div class="top-bar">
+        <!-- Back Logic handled by sub-components or here? -->
+        <!-- We use individual Back buttons in sub-views usually. Top bar is mostly for global actions -->
+        <div class="status-indicator">
+            <span *ngIf="hasChanges()" class="unsaved-dot">● Unsaved Changes</span>
         </div>
-        <button (click)="saveChanges()" [disabled]="!hasChanges() || isSaving()" class="save-btn">
-            {{ isSaving() ? 'Saving...' : 'Save Progress' }}
-        </button>
+        <div class="actions">
+            <button *ngIf="hasChanges()" class="save-btn" (click)="saveChanges()" [disabled]="isSaving()">
+                {{ isSaving() ? 'Saving...' : 'Save Progress' }}
+            </button>
+        </div>
     </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage()" class="error-banner">
+        {{ errorMessage() }}
+    </div>
+
+    <!-- View Switcher -->
+    <div [ngSwitch]="currentView()">
+
+        <!-- 1. GRADES VIEW -->
+        <app-grade-selection *ngSwitchCase="'GRADES'" [grades]="roadmapData" [status]="draftStatus()"
+            (gradeSelected)="selectGrade($event)">
+        </app-grade-selection>
+
+        <!-- 2. SECTIONS VIEW -->
+        <app-section-selection *ngSwitchCase="'SECTIONS'" [grade]="selectedGrade()!"
+            (sectionSelected)="selectSection($event)" (back)="goBackToGrades()">
+        </app-section-selection>
+
+        <!-- 3. LEVELS VIEW -->
+        <app-level-selection *ngSwitchCase="'LEVELS'" [section]="selectedSection()!"
+            (levelSelected)="selectLevel($event)" (back)="goBackToSections()">
+        </app-level-selection>
+
+        <!-- 4. STEPS VIEW -->
+        <div *ngSwitchCase="'STEPS'" class="steps-view-container">
+
+            <div class="steps-header">
+                <button class="back-btn" (click)="goBackToLevels()">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Levels
+                </button>
+            </div>
+
+            <app-roadmap-level [level]="selectedLevel()!">
+                <app-roadmap-step *ngFor="let step of selectedLevel()!.steps" [step]="step"
+                    [isLocked]="getVisibility(step.stepNumber) !== 'opened'" [checks]="getChecks(step.stepNumber)"
+                    (toggleCheck)="handleToggle(step.stepNumber, $event)">
+                </app-roadmap-step>
+            </app-roadmap-level>
+
+        </div>
+
+    </div>
+
 </div>
+<!-- Sticky Save Bar -->

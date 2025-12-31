@@ -1,0 +1,36 @@
+<div class="level-select-container">
+    <div class="header">
+        <button class="back-btn" (click)="back.emit()">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+        <h2>{{ section['section-name'] }} Levels</h2>
+    </div>
+
+    <div class="levels-grid">
+        <button *ngFor="let level of section.levels" class="level-card" [disabled]="level.steps.length === 0"
+            [class.disabled]="level.steps.length === 0" (click)="selectLevel(level)">
+
+            <div class="level-icon">
+                <!-- Generic icon or specific based on name? Alpha/Beta/Omega greek letters? -->
+                <span *ngIf="level.name.includes('Alpha')">α</span>
+                <span *ngIf="level.name.includes('Beta')">β</span>
+                <span *ngIf="level.name.includes('Omega')">Ω</span>
+                <span
+                    *ngIf="!level.name.includes('Alpha') && !level.name.includes('Beta') && !level.name.includes('Omega')">L{{level.level}}</span>
+            </div>
+
+            <div class="level-info">
+                <h3>{{ level.name }}</h3>
+                <p>{{ level.steps.length }} Steps</p>
+            </div>
+
+            <div class="level-arrow" *ngIf="level.steps.length > 0">
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+            <div class="lock-icon" *ngIf="level.steps.length === 0">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+
+        </button>
+    </div>
+</div>

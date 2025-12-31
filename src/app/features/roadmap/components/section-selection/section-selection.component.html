@@ -1,0 +1,23 @@
+<div class="section-container">
+    <div class="header">
+        <button class="back-btn" (click)="back.emit()">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+        <h2>{{ grade['grade-name'] }} Sections</h2>
+    </div>
+
+    <div class="sections-grid">
+        <div *ngFor="let section of grade.sections" class="section-card" (click)="selectSection(section)">
+            <div class="section-icon">
+                <i class="fa-solid" [ngClass]="getIcon(section['section-name'])"></i>
+            </div>
+            <div class="section-info">
+                <h3>{{ section['section-name'] }}</h3>
+                <p>{{ section.levels.length }} Levels</p>
+            </div>
+            <div class="section-arrow">
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+        </div>
+    </div>
+</div>

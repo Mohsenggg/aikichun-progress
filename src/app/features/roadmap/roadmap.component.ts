@@ -5,13 +5,27 @@ import { RoadmapService } from '../../core/roadmap/roadmap.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { Profile, ProfileStatus } from '../../core/services/supabase-types';
+import { RoadmapGrade, RoadmapSection, RoadmapLevel } from '../../core/roadmap/roadmap.data';
+
+import { GradeSelectionComponent } from './components/grade-selection/grade-selection.component';
+import { SectionSelectionComponent } from './components/section-selection/section-selection.component';
+import { LevelSelectionComponent } from './components/level-selection/level-selection.component';
 import { RoadmapLevelComponent } from './components/roadmap-level.component';
 import { RoadmapStepComponent } from './components/roadmap-step.component';
+
+type ViewState = 'GRADES' | 'SECTIONS' | 'LEVELS' | 'STEPS';
 
 @Component({
     selector: 'app-roadmap',
     standalone: true,
-    imports: [CommonModule, RoadmapLevelComponent, RoadmapStepComponent],
+    imports: [
+        CommonModule,
+        GradeSelectionComponent,
+        SectionSelectionComponent,
+        LevelSelectionComponent,
+        RoadmapLevelComponent,
+        RoadmapStepComponent
+    ],
     templateUrl: './roadmap.component.html',
     styleUrl: './roadmap.component.css'
 })
@@ -24,12 +38,15 @@ export class RoadmapComponent implements OnInit {
     roadmapData = this.roadmapService.getRoadmap();
     allSteps = this.roadmapService.getAllSteps();
 
-    // State
+    // Navigation State
+    currentView = signal<ViewState>('GRADES');
+    selectedGrade = signal<RoadmapGrade | null>(null);
+    selectedSection = signal<RoadmapSection | null>(null);
+    selectedLevel = signal<RoadmapLevel | null>(null);
+
+    // Profile State
     originalProfile = signal<Profile | null>(null);
-
-    // Draft Status (Modified by user interactions)
     draftStatus = signal<ProfileStatus>({ learning: null, developed: null, skilled: null });
-
     isSaving = signal(false);
     errorMessage = signal('');
 
@@ -41,46 +58,56 @@ export class RoadmapComponent implements OnInit {
         return orig.learning !== draft.learning || orig.developed !== draft.developed || orig.skilled !== draft.skilled;
     });
 
-    changesCount = computed(() => {
-        // Just visually showing count for debugging/user feedback
-        // Real validation happens in Service
-        return 0; // TODO: Implement display logic if needed
-    });
-
     async ngOnInit() {
         const user = this.auth.currentUser();
         if (user) {
-            // Fetch fresh or from cache
             const { data } = await this.supabase.getProfile(user.id);
             if (data) {
                 this.originalProfile.set(data);
-                // Deep copy status
                 this.draftStatus.set({ ...data.status });
             }
         }
     }
 
-    goBack() {
-        this.router.navigate(['/profile']);
+    // Navigation Methods
+    selectGrade(grade: RoadmapGrade) {
+        this.selectedGrade.set(grade);
+        this.currentView.set('SECTIONS');
     }
 
+    selectSection(section: RoadmapSection) {
+        this.selectedSection.set(section);
+        this.currentView.set('LEVELS');
+    }
+
+    selectLevel(level: RoadmapLevel) {
+        this.selectedLevel.set(level);
+        this.currentView.set('STEPS');
+    }
+
+    goBackToGrades() {
+        this.selectedGrade.set(null);
+        this.currentView.set('GRADES');
+    }
+
+    goBackToSections() {
+        this.selectedSection.set(null);
+        this.currentView.set('SECTIONS');
+    }
+
+    goBackToLevels() {
+        this.selectedLevel.set(null);
+        this.currentView.set('LEVELS');
+    }
+
+    // Progress Logic
     getVisibility(stepNumber: string) {
-        // Visibility is calculated based on DRAFT status (optimistic UI)? 
-        // Or Original? 
-        // Requirement: "User updates progress by checking boxes. User can have only 3 opened steps ahead of their *current progress*."
-        // If they check a box, does it unlock the next one immediately?
-        // Let's use draftStatus for immediate feedback.
         return this.roadmapService.getVisibilityState(stepNumber, this.draftStatus());
     }
 
     getChecks(stepNumber: string) {
         const s = this.draftStatus();
-        // Helper to see if this step is "covered" by the current learning/dev/skilled pointer
-        // We need to know the index
         const stepIdx = this.getStepIdx(stepNumber);
-
-        // Check is true if the current status index >= this step index
-        // e.g. If status.learning is step 5, then step 3 learning is checked.
         const lIdx = this.getStepIdx(s.learning);
         const dIdx = this.getStepIdx(s.developed);
         const sIdx = this.getStepIdx(s.skilled);
@@ -95,25 +122,9 @@ export class RoadmapComponent implements OnInit {
     handleToggle(stepNumber: string, type: 'learning' | 'developed' | 'skilled') {
         const current = this.draftStatus();
         const stepIdx = this.getStepIdx(stepNumber);
-
-        // Logic: Checking a box sets the status to THAT step (if it's an advance).
-        // Unchecking? If they uncheck step 5, status drops to step 4.
-        // To keep simple: Clicking a box SETS the pointer to this step.
-        // If they click an already checked box (meaning it's the current pointer), maybe toggle off (step - 1)?
-
-        // Let's implement "Set to this level".
-        // If I click "Learning" on Step 5. status.learning = "SG-05".
-
         const newStatus = { ...current };
-
-        // Toggling logic
-        // If checking a box that is ALREADY covered by a higher step? 
-        // e.g. Learning is at Step 8, I click Step 3 Learning. Nothing happens (it's already done).
-
-        // If I click the exact current tip? e.g. Learning is Step 5. I click Step 5 Learning.
-        // Provide "Uncheck" behavior -> Set to Step 4.
-
         const currentPointer = newStatus[type];
+
         if (currentPointer === stepNumber) {
             // Uncheck -> revert to previous step
             if (stepIdx > 0) {
@@ -122,7 +133,6 @@ export class RoadmapComponent implements OnInit {
                 newStatus[type] = null;
             }
         } else {
-            // Advance (or Regression provided it's clickable)
             newStatus[type] = stepNumber;
         }
 
@@ -147,7 +157,6 @@ export class RoadmapComponent implements OnInit {
             return;
         }
 
-        // Save to DB (via Service with Logging/Cache)
         const { error } = await this.supabase.updateProfile(this.originalProfile()!.id, {
             status: newStatus,
             last_update_date: new Date().toISOString(),
@@ -155,23 +164,17 @@ export class RoadmapComponent implements OnInit {
         });
 
         if (error) {
-            // Service already logs error, but we show UI feedback
             this.errorMessage.set(`Save Failed: ${error.message}`);
         } else {
-            // Success
-            // Update local state is handled by service cache, but we update our signals
             this.originalProfile.update(p => ({
                 ...p!,
                 status: newStatus,
                 last_update_date: new Date().toISOString(),
                 updates_count: validation.nextUpdateCount
             }));
-
-            // Show Success Feedback
             alert('Progress Saved Successfully!');
-            this.goBack();
+            // Stay on current view or go back? Usually stay to let them continue or leave explicitly.
         }
-
         this.isSaving.set(false);
     }
 

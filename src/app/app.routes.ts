@@ -14,11 +14,7 @@ export const routes: Routes = [
         data: { expectedRole: 'admin' },
         loadChildren: () => import('./features/admin-profiles/admin-profiles.routes').then(m => m.ADMIN_ROUTES)
     },
-    {
-        path: 'profile',
-        canActivate: [authGuard],
-        loadComponent: () => import('./features/profile-view/profile-view.component').then(m => m.ProfileViewComponent)
-    },
+
     {
         path: 'roadmap',
         canActivate: [authGuard],

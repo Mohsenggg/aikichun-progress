@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ROADMAP_DATA, RoadmapLevel, RoadmapStep } from './roadmap.data';
+import { ROADMAP_DATA, RoadmapLevel, RoadmapStep, RoadmapGrade } from './roadmap.data';
 import { ProfileStatus } from '../services/supabase-types';
 import { differenceInDays } from 'date-fns';
 
@@ -9,8 +9,12 @@ import { differenceInDays } from 'date-fns';
 export class RoadmapService {
     readonly roadmap = ROADMAP_DATA;
 
-    // Flattened steps for easier calculation
-    private readonly allSteps = this.roadmap.flatMap(l => l.steps);
+    // Flattened steps for easier calculation (Grade -> Section -> Level -> Step)
+    private readonly allSteps = this.roadmap.flatMap(grade =>
+        grade.sections.flatMap(section =>
+            section.levels.flatMap(level => level.steps)
+        )
+    );
 
     getRoadmap() {
         return this.roadmap;
@@ -98,5 +102,31 @@ export class RoadmapService {
             return newIdx - oldIdx;
         }
         return 0; // Negative or same doesn't count as "Checking a box" (unchecking is free?)
+    }
+
+    /**
+     * Calculates the progress percentage for a specific grade.
+     */
+    getGradeProgress(grade: RoadmapGrade, status: ProfileStatus): number {
+        // 1. Get all steps in this grade
+        const gradeSteps = grade.sections.flatMap(s => s.levels.flatMap(l => l.steps));
+        if (gradeSteps.length === 0) return 0;
+
+        // 2. Get current user progress index
+        const currentIndex = this.getMaxProgressIndex(status);
+
+        // 3. Count how many steps in this Grade are <= currentIndex
+        // We know logical order is preserved in allSteps.
+        // We need to map grade steps to their global indices.
+        let completedCount = 0;
+
+        gradeSteps.forEach(step => {
+            const globalIndex = this.getStepIndex(step.stepNumber);
+            if (globalIndex !== -1 && globalIndex <= currentIndex) {
+                completedCount++;
+            }
+        });
+
+        return Math.round((completedCount / gradeSteps.length) * 100);
     }
 }

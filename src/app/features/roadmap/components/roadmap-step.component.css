@@ -1,6 +1,12 @@
 .step-container {
     position: relative;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    background-color: var(--color-surface);
+    /* Assuming base surface color */
+    /* If Figma shows steps are just rows inside a level card? */
+    /* Actually screenshot shows steps are distinct blocks separated by spacing. */
+    border-radius: var(--radius-md);
+    /* border: 1px solid var(--white-10);  Optional borders */
 }
 
 .step-container.locked {
@@ -15,17 +21,24 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: rgba(0, 0, 0, 0, 0.1);
+    /* Subtle dim */
 }
 
 .lock-icon {
-    font-size: 2.25rem;
+    font-size: 1.5rem;
+    color: var(--white-50);
 }
 
-.header-row {
+.step-main-row {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
-    margin-bottom: 0.5rem;
+    padding: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    /* Slight highlight */
+    border-radius: var(--radius-md);
+    gap: 1rem;
 }
 
 .checkboxes-col {
@@ -37,11 +50,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.2rem;
 }
 
 .check-label {
-    font-size: 10px;
+    font-size: 0.65rem;
     color: var(--white-50);
     text-transform: uppercase;
 }
@@ -49,92 +62,124 @@
 .check-btn {
     width: 2rem;
     height: 2rem;
-    border-radius: 0.25rem;
+    border-radius: 4px;
+    /* Square per Figma */
     border: 1px solid var(--white-20);
     background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s;
-    padding: 0;
+    cursor: pointer;
+    transition: all 0.2s;
     color: transparent;
 }
 
 .check-btn-active-white {
     background-color: var(--white);
     color: var(--black);
+    border-color: var(--white);
 }
 
 .check-btn-active-red {
-    background-color: var(--aikido-red);
-    border-color: var(--aikido-red);
+    background-color: #22c55e;
+    /* Figma shows GREEN for completed/skill? Screenshot shows green. Swapping from Red to Green. */
+    /* Wait, user request says "Green Squares". */
+    border-color: #22c55e;
     color: var(--white);
 }
 
-/* Add checkmark styling specifically if needed, but text color handles it */
-
-.text-content {
-    text-align: right;
+.step-center {
     flex: 1;
-    padding-left: 1rem;
-}
-
-.step-meta {
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.25rem;
+    justify-content: center;
 }
 
-.step-number {
-    font-size: 0.75rem;
-    font-family: monospace;
-    color: rgba(255, 255, 255, 0.4);
-}
-
-.completed-mark {
-    color: #4ade80;
-    /* green-400 */
-    font-size: 0.75rem;
-}
-
-.step-details {
+.step-code {
+    font-size: 1.5rem;
     font-weight: 700;
-    font-size: 1.125rem;
-    line-height: 1.25;
-    margin: 0 0 0.25rem 0;
-}
-
-.step-name {
-    font-size: 0.75rem;
-    color: var(--white-50);
+    color: var(--white-80);
     margin: 0;
+    letter-spacing: 0.05em;
 }
 
-.arrow-icon {
-    margin-left: 0.5rem;
-    padding-top: 0.5rem;
-    color: rgba(255, 255, 255, 0.3);
+.step-right {
+    flex-shrink: 0;
 }
 
-.progress-bar-container {
-    height: 0.5rem;
-    width: 100%;
-    background-color: var(--white-10);
-    border-radius: 9999px;
-    overflow: hidden;
+.details-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--white-20);
+    color: var(--white-80);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    font-family: inherit;
+    /* Ensure arabic font works */
+}
+
+.details-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+}
+
+/* Details Box */
+.details-box {
+    background-color: var(--white);
+    color: var(--black);
+    padding: 1rem;
     margin-top: 0.5rem;
+    border-radius: var(--radius-md);
+    animation: slideDown 0.2s ease-out;
 }
 
-.progress-bar-fill {
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.3);
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.global-progress-text {
+.details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 0.5rem;
+}
+
+.details-header h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    color: #1a2f23;
+    /* Dark green text */
     text-align: right;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.3);
-    margin-top: 0.25rem;
+    width: 100%;
+    /* Arabic Alignment */
+    direction: rtl;
+}
+
+.close-details {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.details-text {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #4a4a4a;
+    text-align: right;
+    direction: rtl;
 }

@@ -13,7 +13,7 @@
         <input type="text" formControlName="code" placeholder="Type Your Code" class="code-input" />
 
         <button type="submit" [disabled]="isLoading() || loginForm.invalid" class="submit-btn">
-            {{ isLoading() ? 'Checking...' : 'Enter' }}
+            {{ isLoading() ? 'Checking...' : 'Update Progress' }}
         </button>
 
         <p *ngIf="errorMessage()" class="error-msg">
