@@ -33,11 +33,16 @@ export class LoginComponent {
 
     try {
       const success = await this.auth.login(code);
+      console.log('Login success:', success); // DEBUG
+      console.log('Current Role:', this.auth.role()); // DEBUG
+
       if (success) {
         // Redirect logic based on role
         if (this.auth.role() === 'admin') {
+          console.log('Redirecting to /admin'); // DEBUG
           this.router.navigate(['/admin']);
         } else {
+          console.log('Redirecting to /roadmap'); // DEBUG
           this.router.navigate(['/roadmap']); // defaults to grade selection
         }
       } else {
