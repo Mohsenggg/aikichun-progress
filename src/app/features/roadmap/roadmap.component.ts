@@ -100,9 +100,11 @@ export class RoadmapComponent implements OnInit {
         this.currentView.set('LEVELS');
     }
 
-    // Progress Logic
+
+
+     // Progress Logic
     getVisibility(stepNumber: string) {
-        return this.roadmapService.getVisibilityState(stepNumber, this.draftStatus());
+        return this.roadmapService.getVisibilityState(stepNumber, this.originalProfile()?.status || { learning: null, developed: null, skilled: null });
     }
 
     getChecks(stepNumber: string) {

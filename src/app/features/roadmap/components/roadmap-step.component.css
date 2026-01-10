@@ -20,7 +20,7 @@
     z-index: 20;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     background-color: rgba(0, 0, 0, 0, 0.1);
     /* Subtle dim */
 }
@@ -28,6 +28,8 @@
 .lock-icon {
     font-size: 1.5rem;
     color: var(--white-50);
+    margin-left: 25%; /* Moves icon 25% from left edge */
+
 }
 
 .step-main-row {
