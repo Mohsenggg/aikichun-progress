@@ -1,18 +1,31 @@
 <div class="roadmap-wrapper">
 
-    <!-- Top Bar: Save Button & Status (Global) -->
-    <div class="top-bar">
-        <!-- Back Logic handled by sub-components or here? -->
-        <!-- We use individual Back buttons in sub-views usually. Top bar is mostly for global actions -->
-        <div class="status-indicator">
-            <span *ngIf="hasChanges()" class="unsaved-dot">● Unsaved Changes</span>
+    <!-- Figma Header: Logo & User Info -->
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="assets/aikichun-logo.png" alt="Aikichun Logo" class="main-logo">
         </div>
-        <div class="actions">
-            <button *ngIf="hasChanges()" class="save-btn" (click)="saveChanges()" [disabled]="isSaving()">
-                {{ isSaving() ? 'Saving...' : 'Save Progress' }}
-            </button>
+
+        <div class="user-controls">
+            <div class="user-info">
+                <i class="fa-solid fa-circle-user avatar-icon"></i>
+                <div class="user-details">
+                    <span class="user-name">{{ userName() }}</span>
+                    <button class="logout-link" (click)="logout()">Log Out</button>
+                </div>
+            </div>
         </div>
-    </div>
+
+        <!-- Global Save/Changes Indicator -->
+        <div class="global-actions">
+            <div *ngIf="hasChanges()" class="unsaved-status">
+                <span class="unsaved-dot">●</span>
+                <button class="save-button" (click)="saveChanges()" [disabled]="isSaving()">
+                    {{ isSaving() ? 'Saving...' : 'Save' }}
+                </button>
+            </div>
+        </div>
+    </header>
 
     <!-- Error Message -->
     <div *ngIf="errorMessage()" class="error-banner">

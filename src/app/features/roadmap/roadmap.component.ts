@@ -49,6 +49,7 @@ export class RoadmapComponent implements OnInit {
     draftStatus = signal<ProfileStatus>({ learning: null, developed: null, skilled: null });
     isSaving = signal(false);
     errorMessage = signal('');
+    userName = computed(() => this.originalProfile()?.name || 'Player');
 
     // Computed
     hasChanges = computed(() => {
@@ -178,6 +179,10 @@ export class RoadmapComponent implements OnInit {
             // Stay on current view or go back? Usually stay to let them continue or leave explicitly.
         }
         this.isSaving.set(false);
+    }
+
+    logout() {
+        this.auth.logout();
     }
 
     private getStepIdx(num: string | null) {
