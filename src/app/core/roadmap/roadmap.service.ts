@@ -1,27 +1,111 @@
-import { Injectable } from '@angular/core';
-import { ROADMAP_DATA, RoadmapLevel, RoadmapStep, RoadmapGrade } from './roadmap.data';
+import { ROADMAP_DATA, RoadmapLevel, RoadmapStep, RoadmapGrade, DbRoadmapStep } from './roadmap.data';
 import { ProfileStatus } from '../services/supabase-types';
 import { differenceInDays } from 'date-fns';
+import { SupabaseService } from '../services/supabase.service';
+import { Injectable, signal, computed, inject } from '@angular/core';
 
 @Injectable({
     providedIn: 'root'
 })
 export class RoadmapService {
-    readonly roadmap = ROADMAP_DATA;
+    private supabase = inject(SupabaseService);
+
+    private _roadmap = signal<RoadmapGrade[]>(ROADMAP_DATA);
+    readonly roadmap = this._roadmap.asReadonly();
 
     // Flattened steps for easier calculation (Grade -> Section -> Level -> Step)
-    private readonly allSteps = this.roadmap.flatMap(grade =>
-        grade.sections.flatMap(section =>
-            section.levels.flatMap(level => level.steps)
+    readonly allSteps = computed(() =>
+        this._roadmap().flatMap(grade =>
+            grade.sections.flatMap(section =>
+                section.levels.flatMap(level => level.steps)
+            )
         )
     );
 
+    constructor() {
+        // Automatically load from DB on init
+        this.loadRoadmap().catch(err => console.error('Failed to load roadmap:', err));
+    }
+
+    async loadRoadmap() {
+        const { data, error } = await this.supabase.client
+            .from('roadmap_steps') // Assuming table name is roadmap_steps
+            .select('*')
+            .order('gradeNumber', { ascending: true })
+            .order('sectionNumber', { ascending: true })
+            .order('levelNumber', { ascending: true })
+            .order('stepNumber', { ascending: true });
+
+        if (error) {
+            console.error('Error fetching roadmap:', error);
+            return;
+        }
+
+        if (data && data.length > 0) {
+            const hierarchicalData = this.transformDbToRoadmap(data as DbRoadmapStep[]);
+            this._roadmap.set(hierarchicalData);
+        }
+    }
+
+    private transformDbToRoadmap(dbSteps: DbRoadmapStep[]): RoadmapGrade[] {
+        const gradesMap = new Map<number, RoadmapGrade>();
+
+        dbSteps.forEach(db => {
+            // 1. Get or Create Grade
+            if (!gradesMap.has(db.gradeNumber)) {
+                gradesMap.set(db.gradeNumber, {
+                    grade: db.gradeNumber,
+                    "grade-name": db.gradeName,
+                    sections: []
+                });
+            }
+            const grade = gradesMap.get(db.gradeNumber)!;
+
+            // 2. Get or Create Section
+            let section = grade.sections.find(s => s.section === db.sectionNumber);
+            if (!section) {
+                section = {
+                    section: db.sectionNumber,
+                    "section-name": db.sectionName,
+                    levels: []
+                };
+                grade.sections.push(section);
+                // Keep sections sorted by number
+                grade.sections.sort((a, b) => a.section - b.section);
+            }
+
+            // 3. Get or Create Level
+            let level = section.levels.find(l => l.level === db.levelNumber);
+            if (!level) {
+                level = {
+                    level: db.levelNumber,
+                    name: db.levelName,
+                    steps: []
+                };
+                section.levels.push(level);
+                // Keep levels sorted by number
+                section.levels.sort((a, b) => a.level - b.level);
+            }
+
+            // 4. Add Step
+            level.steps.push({
+                stepNumber: db.stepNumber,
+                stepName: db.stepName,
+                stepDetails: db.stepDetails,
+                percentage: db.spercentages
+            });
+        });
+
+        // Convert Map to Array and sort by grade number
+        return Array.from(gradesMap.values()).sort((a, b) => a.grade - b.grade);
+    }
+
     getRoadmap() {
-        return this.roadmap;
+        return this._roadmap();
     }
 
     getAllSteps() {
-        return this.allSteps;
+        return this.allSteps();
     }
 
     /**
@@ -32,7 +116,8 @@ export class RoadmapService {
         const currentIndex = this.getMaxProgressIndex(status);
         const visibleLimit = currentIndex + 3;
 
-        const stepIndex = this.allSteps.findIndex(s => s.stepNumber === stepNumber);
+        const allSteps = this.allSteps();
+        const stepIndex = allSteps.findIndex(s => s.stepNumber === stepNumber);
         if (stepIndex === -1) return 'locked'; // Data mismatch
 
         return stepIndex <= visibleLimit ? 'opened' : 'locked';
@@ -91,7 +176,7 @@ export class RoadmapService {
 
     private getStepIndex(stepNumber: string | null): number {
         if (!stepNumber) return -1;
-        return this.allSteps.findIndex(s => s.stepNumber === stepNumber);
+        return this.allSteps().findIndex(s => s.stepNumber === stepNumber);
     }
 
     private getStepDistance(oldStep: string | null, newStep: string | null): number {

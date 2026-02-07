@@ -5,6 +5,20 @@ export interface RoadmapStep {
     percentage: string;
 }
 
+export interface DbRoadmapStep {
+    id?: number; // Optional if you have an ID column
+    stepName: string;
+    stepNumber: string;
+    stepDetails: string;
+    spercentages: string; // The user used 'spercentages'
+    levelName: string;
+    levelNumber: number;
+    sectionName: string;
+    sectionNumber: number;
+    gradeName: string;
+    gradeNumber: number;
+}
+
 export interface RoadmapLevel {
     level: number;
     name: string;
@@ -34,7 +48,7 @@ export const ROADMAP_DATA: RoadmapGrade[] = [
             {
                 section: 1,
                 "section-name": "Striker",
-                 levels: [
+                levels: [
                     {
                         level: 1,
                         name: "Omega SG1O",

@@ -35,8 +35,8 @@ export class RoadmapComponent implements OnInit {
     private supabase = inject(SupabaseService);
     private router = inject(Router);
 
-    roadmapData = this.roadmapService.getRoadmap();
-    allSteps = this.roadmapService.getAllSteps();
+    roadmapData = this.roadmapService.roadmap;
+    allSteps = this.roadmapService.allSteps;
 
     // Navigation State
     currentView = signal<ViewState>('GRADES');
@@ -102,7 +102,7 @@ export class RoadmapComponent implements OnInit {
 
 
 
-     // Progress Logic
+    // Progress Logic
     getVisibility(stepNumber: string) {
         return this.roadmapService.getVisibilityState(stepNumber, this.originalProfile()?.status || { learning: null, developed: null, skilled: null });
     }
@@ -130,7 +130,7 @@ export class RoadmapComponent implements OnInit {
         if (currentPointer === stepNumber) {
             // Uncheck -> revert to previous step
             if (stepIdx > 0) {
-                newStatus[type] = this.allSteps[stepIdx - 1].stepNumber;
+                newStatus[type] = this.allSteps()[stepIdx - 1].stepNumber;
             } else {
                 newStatus[type] = null;
             }
@@ -182,6 +182,6 @@ export class RoadmapComponent implements OnInit {
 
     private getStepIdx(num: string | null) {
         if (!num) return -1;
-        return this.allSteps.findIndex(s => s.stepNumber === num);
+        return this.allSteps().findIndex(s => s.stepNumber === num);
     }
 }

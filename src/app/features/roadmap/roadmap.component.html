@@ -23,7 +23,7 @@
     <div [ngSwitch]="currentView()">
 
         <!-- 1. GRADES VIEW -->
-        <app-grade-selection *ngSwitchCase="'GRADES'" [grades]="roadmapData" [status]="draftStatus()"
+        <app-grade-selection *ngSwitchCase="'GRADES'" [grades]="roadmapData()" [status]="draftStatus()"
             (gradeSelected)="selectGrade($event)">
         </app-grade-selection>
 
