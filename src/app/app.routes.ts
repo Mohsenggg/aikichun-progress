@@ -13,6 +13,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/register/register.component').then(m => m.RegisterComponent)
     },
     {
+        path: 'otp',
+        loadComponent: () => import('./features/otp-verification/otp-verification.component').then(m => m.OtpVerificationComponent)
+    },
+    {
         path: 'admin',
         canActivate: [roleGuard],
         data: { expectedRole: 'admin' },

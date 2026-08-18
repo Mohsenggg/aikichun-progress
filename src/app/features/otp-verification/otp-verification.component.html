@@ -1,0 +1,146 @@
+<div class="otp-page">
+  <div class="otp-card">
+    <!-- Progress Indicator -->
+    <div class="progress-bar">
+      <div class="progress-circle" [class.active]="step() >= 1" [class.completed]="step() > 1">
+        @if (step() > 1) {
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="check-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+        } @else {
+          <span>1</span>
+        }
+      </div>
+      <div class="progress-line" [class.filled]="step() > 1"></div>
+      <div class="progress-circle" [class.active]="step() >= 2">
+        <span>2</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Email -->
+    @if (step() === 1 && !verified()) {
+      <div class="step-content animate-in">
+        <h1 class="step-title">Verify your email</h1>
+        <p class="step-subtitle">We'll send a verification code to your email.</p>
+
+        <form [formGroup]="emailForm" (ngSubmit)="onSendOtp()" class="otp-form">
+          <div class="form-field">
+            <label class="field-label">Email</label>
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="you@example.com"
+              class="field-input"
+              (input)="clearError()"
+              [class.field-error]="emailForm.controls.email.touched && emailForm.controls.email.invalid"
+            />
+            @if (emailForm.controls.email.touched && emailForm.controls.email.invalid) {
+              <span class="field-error-text">Please enter a valid email address.</span>
+            }
+          </div>
+
+          @if (errorMessage()) {
+            <div class="error-box">{{ errorMessage() }}</div>
+          }
+
+          <button
+            type="submit"
+            [disabled]="emailForm.invalid || isLoading()"
+            class="btn-primary"
+          >
+            @if (isLoading()) {
+              <span class="spinner"></span>
+              Sending...
+            } @else {
+              Send OTP
+            }
+          </button>
+        </form>
+      </div>
+    }
+
+    <!-- Step 2: OTP -->
+    @if (step() === 2 && !verified()) {
+      <div class="step-content animate-in">
+        <h1 class="step-title">Enter verification code</h1>
+        <p class="step-subtitle">
+          We sent a verification code to <strong>{{ emailValue }}</strong>
+        </p>
+
+        <!-- OTP Input Boxes -->
+        <div class="otp-input-group">
+          @for (digit of otpDigits(); track $index) {
+            <input
+              #otpInput
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              [value]="digit"
+              (input)="onOtpInput($event, $index)"
+              (keydown)="onOtpKeydown($event, $index)"
+              (paste)="onOtpPaste($event)"
+              (focus)="onOtpFocus($event)"
+              class="otp-box"
+              [class.otp-box-filled]="digit !== ''"
+            />
+          }
+        </div>
+
+        @if (errorMessage()) {
+          <div class="error-box">{{ errorMessage() }}</div>
+        }
+
+        <div class="otp-actions">
+          <button
+            type="button"
+            (click)="onVerifyOtp()"
+            [disabled]="!isOtpComplete || isLoading()"
+            class="btn-primary"
+          >
+            @if (isLoading()) {
+              <span class="spinner"></span>
+              Verifying...
+            } @else {
+              Verify OTP
+            }
+          </button>
+
+          <button
+            type="button"
+            (click)="goToEmailStep()"
+            [disabled]="isLoading()"
+            class="btn-secondary"
+          >
+            Back
+          </button>
+
+          <button
+            type="button"
+            (click)="onResendOtp()"
+            [disabled]="countdown() > 0 || isLoading()"
+            class="btn-link"
+          >
+            @if (countdown() > 0) {
+              Resend code in {{ countdown() }}s
+            } @else {
+              Resend OTP
+            }
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Success State -->
+    @if (verified()) {
+      <div class="step-content animate-in success-state">
+        <div class="success-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h1 class="step-title">Email verified successfully.</h1>
+        <p class="step-subtitle">Your email <strong>{{ emailValue }}</strong> has been verified.</p>
+      </div>
+    }
+  </div>
+</div>
