@@ -1,146 +1,166 @@
-<div class="otp-page">
-  <div class="otp-card">
+<div class="min-h-screen flex items-center justify-center bg-base-100 p-4">
+  <div class="w-full max-w-sm">
     <!-- Progress Indicator -->
-    <div class="progress-bar">
-      <div class="progress-circle" [class.active]="step() >= 1" [class.completed]="step() > 1">
+    <div class="flex items-center justify-center mb-8">
+      <div class="otp-progress-circle"
+           [class.otp-progress-active]="step() >= 1"
+           [class.otp-progress-done]="step() > 1">
         @if (step() > 1) {
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="check-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
           </svg>
         } @else {
           <span>1</span>
         }
       </div>
-      <div class="progress-line" [class.filled]="step() > 1"></div>
-      <div class="progress-circle" [class.active]="step() >= 2">
+      <div class="otp-progress-line" [class.otp-progress-line-done]="step() > 1"></div>
+      <div class="otp-progress-circle"
+           [class.otp-progress-active]="step() >= 2">
         <span>2</span>
       </div>
     </div>
 
-    <!-- Step 1: Email -->
-    @if (step() === 1 && !verified()) {
-      <div class="step-content animate-in">
-        <h1 class="step-title">Verify your email</h1>
-        <p class="step-subtitle">We'll send a verification code to your email.</p>
+    <div class="card bg-base-200 shadow-xl border border-base-content/10">
+      <div class="card-body p-6 sm:p-8">
 
-        <form [formGroup]="emailForm" (ngSubmit)="onSendOtp()" class="otp-form">
-          <div class="form-field">
-            <label class="field-label">Email</label>
-            <input
-              type="email"
-              formControlName="email"
-              placeholder="you@example.com"
-              class="field-input"
-              (input)="clearError()"
-              [class.field-error]="emailForm.controls.email.touched && emailForm.controls.email.invalid"
-            />
-            @if (emailForm.controls.email.touched && emailForm.controls.email.invalid) {
-              <span class="field-error-text">Please enter a valid email address.</span>
-            }
+        <!-- Step 1: Email -->
+        @if (step() === 1 && !verified()) {
+          <div class="animate-in flex flex-col gap-5">
+            <div class="text-center">
+              <h2 class="card-title text-xl justify-center">Verify your email</h2>
+              <p class="text-sm text-base-content/50 mt-1">We'll send a verification code to your email.</p>
+            </div>
+
+            <form [formGroup]="emailForm" (ngSubmit)="onSendOtp()" class="flex flex-col gap-4">
+              <div class="form-control">
+                <label class="label"><span class="label-text">Email</span></label>
+                <input
+                  type="email"
+                  formControlName="email"
+                  placeholder="you@example.com"
+                  class="input input-bordered w-full"
+                  (input)="clearError()"
+                />
+                @if (emailForm.controls.email.touched && emailForm.controls.email.invalid) {
+                  <label class="label">
+                    <span class="label-text-alt text-error">Please enter a valid email address.</span>
+                  </label>
+                }
+              </div>
+
+              @if (errorMessage()) {
+                <div class="alert alert-error text-sm py-2">
+                  <span>{{ errorMessage() }}</span>
+                </div>
+              }
+
+              <button
+                type="submit"
+                [disabled]="emailForm.invalid || isLoading()"
+                class="btn btn-primary w-full text-primary-content"
+              >
+                @if (isLoading()) {
+                  <span class="loading loading-spinner loading-sm"></span>
+                  Sending...
+                } @else {
+                  Send OTP
+                }
+              </button>
+            </form>
           </div>
-
-          @if (errorMessage()) {
-            <div class="error-box">{{ errorMessage() }}</div>
-          }
-
-          <button
-            type="submit"
-            [disabled]="emailForm.invalid || isLoading()"
-            class="btn-primary"
-          >
-            @if (isLoading()) {
-              <span class="spinner"></span>
-              Sending...
-            } @else {
-              Send OTP
-            }
-          </button>
-        </form>
-      </div>
-    }
-
-    <!-- Step 2: OTP -->
-    @if (step() === 2 && !verified()) {
-      <div class="step-content animate-in">
-        <h1 class="step-title">Enter verification code</h1>
-        <p class="step-subtitle">
-          We sent a verification code to <strong>{{ emailValue }}</strong>
-        </p>
-
-        <!-- OTP Input Boxes -->
-        <div class="otp-input-group">
-          @for (digit of otpDigits(); track $index) {
-            <input
-              #otpInput
-              type="text"
-              inputmode="numeric"
-              maxlength="1"
-              [value]="digit"
-              (input)="onOtpInput($event, $index)"
-              (keydown)="onOtpKeydown($event, $index)"
-              (paste)="onOtpPaste($event)"
-              (focus)="onOtpFocus($event)"
-              class="otp-box"
-              [class.otp-box-filled]="digit !== ''"
-            />
-          }
-        </div>
-
-        @if (errorMessage()) {
-          <div class="error-box">{{ errorMessage() }}</div>
         }
 
-        <div class="otp-actions">
-          <button
-            type="button"
-            (click)="onVerifyOtp()"
-            [disabled]="!isOtpComplete || isLoading()"
-            class="btn-primary"
-          >
-            @if (isLoading()) {
-              <span class="spinner"></span>
-              Verifying...
-            } @else {
-              Verify OTP
+        <!-- Step 2: OTP -->
+        @if (step() === 2 && !verified()) {
+          <div class="animate-in flex flex-col gap-5">
+            <div class="text-center">
+              <h2 class="card-title text-xl justify-center">Enter verification code</h2>
+              <p class="text-sm text-base-content/50 mt-1">
+                We sent a verification code to <span class="text-base-content font-medium">{{ emailValue }}</span>
+              </p>
+            </div>
+
+            <!-- OTP Input Boxes -->
+            <div class="flex gap-2.5 sm:gap-3 justify-center">
+              @for (digit of otpDigits(); track $index) {
+                <input
+                  #otpInput
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="1"
+                  [value]="digit"
+                  (input)="onOtpInput($event, $index)"
+                  (keydown)="onOtpKeydown($event, $index)"
+                  (paste)="onOtpPaste($event)"
+                  (focus)="onOtpFocus($event)"
+                  class="otp-box input input-bordered text-center text-xl font-semibold"
+                  [class.input-primary]="digit !== ''"
+                />
+              }
+            </div>
+
+            @if (errorMessage()) {
+              <div class="alert alert-error text-sm py-2">
+                <span>{{ errorMessage() }}</span>
+              </div>
             }
-          </button>
 
-          <button
-            type="button"
-            (click)="goToEmailStep()"
-            [disabled]="isLoading()"
-            class="btn-secondary"
-          >
-            Back
-          </button>
+            <div class="flex flex-col gap-3 items-center">
+              <button
+                type="button"
+                (click)="onVerifyOtp()"
+                [disabled]="!isOtpComplete || isLoading()"
+                class="btn btn-primary w-full text-primary-content"
+              >
+                @if (isLoading()) {
+                  <span class="loading loading-spinner loading-sm"></span>
+                  Verifying...
+                } @else {
+                  Verify OTP
+                }
+              </button>
 
-          <button
-            type="button"
-            (click)="onResendOtp()"
-            [disabled]="countdown() > 0 || isLoading()"
-            class="btn-link"
-          >
-            @if (countdown() > 0) {
-              Resend code in {{ countdown() }}s
-            } @else {
-              Resend OTP
-            }
-          </button>
-        </div>
+              <button
+                type="button"
+                (click)="goToEmailStep()"
+                [disabled]="isLoading()"
+                class="btn btn-outline w-full"
+              >
+                Back
+              </button>
+
+              <button
+                type="button"
+                (click)="onResendOtp()"
+                [disabled]="countdown() > 0 || isLoading()"
+                class="btn btn-ghost btn-sm text-primary"
+              >
+                @if (countdown() > 0) {
+                  Resend code in {{ countdown() }}s
+                } @else {
+                  Resend OTP
+                }
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Success State -->
+        @if (verified()) {
+          <div class="animate-in flex flex-col items-center gap-4 py-4 text-center">
+            <div class="text-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 class="card-title text-xl">Email verified successfully.</h2>
+            <p class="text-sm text-base-content/50">
+              Your email <span class="text-base-content font-medium">{{ emailValue }}</span> has been verified.
+            </p>
+          </div>
+        }
+
       </div>
-    }
-
-    <!-- Success State -->
-    @if (verified()) {
-      <div class="step-content animate-in success-state">
-        <div class="success-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <h1 class="step-title">Email verified successfully.</h1>
-        <p class="step-subtitle">Your email <strong>{{ emailValue }}</strong> has been verified.</p>
-      </div>
-    }
+    </div>
   </div>
 </div>
