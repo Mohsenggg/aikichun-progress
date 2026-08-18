@@ -29,6 +29,7 @@ export class RegisterComponent {
   idPhotoFile: File | null = null;
   profilePhotoError = signal('');
   idPhotoError = signal('');
+  showPassword = signal(false);
 
   countryCodes = [
     { value: '+20', label: '🇪🇬 +20', country: 'Egypt' },
