@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { RegistrationService } from '../../core/services/registration.service';
-import { ProgressIndicatorComponent } from './progress-indicator.component';
+import { ProgressIndicatorComponent } from './components/progress-indicator.component';
 
 @Component({
   selector: 'app-register',
