@@ -1,0 +1,170 @@
+{
+  "$schema": "AikichunProgress architecture map",
+  "generated": "2026-08-10",
+  "project": {
+    "name": "aikichun-progress",
+    "displayName": "AikichunProgress",
+    "description": "Wing Chun (Aikichun) student-progress tracker",
+    "type": "Angular 18 SPA, 100% standalone components, no NgModules",
+    "generatedWith": "Angular CLI 18.2.9",
+    "primaryLanguage": "Arabic (UI content); English (grade names, percentages)",
+    "backend": "Supabase (data)",
+    "hosting": "Firebase Hosting (static, SPA rewrite)"
+  },
+  "stack": {
+    "framework": "Angular ^18.2.0",
+    "language": "TypeScript ~5.5.2",
+    "stateManagement": "Angular signals (signal/computed) + inject()",
+    "backendClient": "@supabase/supabase-js ^2.89.0",
+    "routing": "@angular/router (lazy loadComponent)",
+    "forms": "@angular/forms ReactiveFormsModule",
+    "icons": "@fortawesome/fontawesome-free ^7.1.0",
+    "utilities": "date-fns ^4.1.0",
+    "styling": "Vanilla CSS + CSS variables (Tailwind installed but NOT used)",
+    "tests": "Karma + Jasmine (Chrome launcher)"
+  },
+  "scripts": {
+    "start": "ng serve (dev server on :4200)",
+    "build": "ng build (production build to dist/aikichun-progress)",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test (Karma/Jasmine, requires Chrome)",
+    "typecheck": "npx tsc -p tsconfig.app.json --noEmit (no lint/formatter configured)"
+  },
+  "buildConfig": {
+    "builder": "@angular-devkit/build-angular:application",
+    "outputPath": "dist/aikichun-progress",
+    "defaultConfiguration": "production",
+    "styles": ["src/styles.css", "node_modules/@fortawesome/fontawesome-free/css/all.min.css"],
+    "budgets": { "initial": { "warning": "500kB", "error": "1MB" } }
+  },
+  "entryFlow": [
+    "src/main.ts (bootstrapApplication)",
+    "src/app/app.config.ts (providers: router, http, animations)",
+    "src/app/app.component.ts (AppComponent = <router-outlet>)",
+    "src/app/app.routes.ts (lazy routes)"
+  ],
+  "routing": {
+    "base": "/",
+    "routes": [
+      { "path": "", "redirectTo": "/login", "fullMatch": true },
+      {
+        "path": "/login",
+        "component": "features/login/login.component.ts",
+        "guard": "none",
+        "description": "Code login (admin or student)"
+      },
+      {
+        "path": "/admin",
+        "component": "features/admin-profiles/admin-profiles.routes.ts -> AdminDashboardComponent",
+        "guard": "roleGuard (expectedRole: admin)",
+        "description": "Admin dashboard: list/create/edit/delete profiles"
+      },
+      {
+        "path": "/roadmap",
+        "component": "features/roadmap/roadmap.component.ts",
+        "guard": "authGuard",
+        "description": "Student roadmap with grade/section/level/step navigation"
+      },
+      { "path": "**", "redirectTo": "/login" }
+    ]
+  },
+  "directoryMap": {
+    "src/main.ts": "App bootstrap entry",
+    "src/app/app.config.ts": "Root DI providers + router",
+    "src/app/app.routes.ts": "Route table",
+    "src/app/core/": {
+      "auth/auth.service.ts": "Code-based auth (ADMIN123 / profiles.code), localStorage 'aikichun_code', role signal",
+      "guards/auth.guard.ts": "Functional authGuard -> /login",
+      "guards/role.guard.ts": "Functional roleGuard (admin)",
+      "roadmap/roadmap.data.ts": "Static ROADMAP_DATA + types (RoadmapGrade/Section/Level/Step, DbRoadmapStep)",
+      "roadmap/roadmap.service.ts": "Loads roadmap_steps from DB on init, visibility/lock, validateUpdate, getGradeProgress",
+      "services/supabase.service.ts": "Supabase client + profile CRUD + in-memory profileCache",
+      "services/supabase-types.ts": "Profile, ProfileStatus, Json, Database types"
+    },
+    "src/app/features/login/": "login.component.ts (ReactiveForms code form)",
+    "src/app/features/roadmap/": {
+      "roadmap.component.ts": "ViewState machine GRADES/SECTIONS/LEVELS/STEPS, draft status, save",
+      "components/grade-selection/": "dumb: grade grid + progress bars",
+      "components/section-selection/": "dumb: section list",
+      "components/level-selection/": "dumb: level list",
+      "components/roadmap-level.component.ts": "dumb: renders level",
+      "components/roadmap-step.component.ts": "dumb: step card with 3 checkboxes + details"
+    },
+    "src/app/features/admin-profiles/": {
+      "admin-profiles.routes.ts": "ADMIN_ROUTES",
+      "admin-dashboard/admin-dashboard.component.ts": "profiles CRUD UI + getHighestStatus",
+      "components/manage-profile-popup.component.ts": "add/edit popup (name/code only)"
+    },
+    "src/environments/environment.ts": "Supabase URL + publishable key (committed, single file)"
+  },
+  "auth": {
+    "type": "Code-based (NOT Supabase auth)",
+    "adminCode": "ADMIN123 (hardcoded in auth.service.ts)",
+    "studentLogin": "profiles.code column match",
+    "session": "localStorage key 'aikichun_code'; restored in AuthService constructor",
+    "roles": ["admin", "user", "guest"]
+  },
+  "dataModel": {
+    "profiles": {
+      "columns": ["id", "code", "name", "status{learning,developed,skilled}", "last_update_date", "updates_count", "created_at"],
+      "status": "3 pointers holding stepNumbers (max = progress index)"
+    },
+    "roadmap_steps": {
+      "columns": ["gradeNumber", "gradeName", "sectionNumber", "sectionName", "levelNumber", "levelName", "stepNumber", "stepName", "stepDetails", "spercentages"],
+      "note": "DB column is 'spercentages' (typo, intentional) -> mapped to 'percentage' in RoadmapStep"
+    },
+    "roadmapHierarchy": "Grade (1-4) -> Section -> Level (Alpha/Beta/Omega) -> Step",
+    "grades": ["PROTECTOR", "FIGHTER", "WARRIOR", "MASTER"],
+    "sections": ["Striker", "Grappler", "Bladesman", "Grounder"],
+    "grade4Sections": ["Mastery"],
+    "roadmapLoading": "RoadmapService constructor loads roadmap_steps ordered by grade/section/level/step and replaces static ROADMAP_DATA if rows exist"
+  },
+  "businessRules": {
+    "lock": {
+      "name": "getVisibilityState",
+      "rule": "user can view up to 3 steps ahead of max progress index"
+    },
+    "saveValidation": {
+      "name": "validateUpdate",
+      "rateLimit": "gates on updates_count >= 50, 5-day wait since last_update_date to reset cycle (code comment says '3 updates' - mismatch exists)",
+      "quantityRule": "max 2 checkbox moves (forward progress) per save"
+    },
+    "progress": "getGradeProgress counts a grade's steps at or below the max pointer index (percentage rounded)"
+  },
+  "uiFlow": {
+    "roadmap": "GRADES -> SECTIONS -> LEVELS -> STEPS with back navigation; dumb selection components emit @Output events; logic in roadmap.component.ts"
+  },
+  "styling": {
+    "approach": "Vanilla CSS + CSS variables in src/styles.css",
+    "tokens": {
+      "aikido-green": "#1a2f23",
+      "aikido-red": "#d92027",
+      "color-primary": "#22c55e"
+    },
+    "tailwind": "Installed and configured but NOT used (no @tailwind/@apply anywhere)"
+  },
+  "deployment": {
+    "ci": "GitHub Actions (.github/workflows/)",
+    "onPushMaster": "npm ci && npm run build -> Firebase Hosting live channel",
+    "onPR": "preview build via action-hosting-deploy",
+    "firebaseProject": "aikichun-progress",
+    "firebaseConfig": "firebase.json: public=dist/aikichun-progress/browser, rewrite ** -> /index.html (SPA)"
+  },
+  "gotchas": [
+    "environment.ts is committed with Supabase URL + publishable key; no environment.prod.ts (production: false always)",
+    "Supabase client uses persistSession: false to avoid NavigatorLock dev issues - keep it",
+    "SupabaseService keeps an in-memory profileCache (Map); clearCache() on logout",
+    "Admin edit popup only updates name/code, not status",
+    "Only test is app.component.spec.ts and it asserts on a removed <h1> - stale, expect ng test failures",
+    "Keep stepNumber values (e.g. SG1-01, SG1-A48) unchanged - they are primary keys for lock/progress logic",
+    "SupabaseService logs DB actions with styled console prefix [DB ...]"
+  ],
+  "sourceFileCount": {
+    "total": 37,
+    "components": 12,
+    "services": 3,
+    "guards": 2,
+    "routes": 2,
+    "config": 4
+  }
+}

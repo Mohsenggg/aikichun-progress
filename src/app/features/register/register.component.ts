@@ -1,9 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { RegistrationService } from '../../core/services/registration.service';
 import { ProgressIndicatorComponent } from './components/progress-indicator.component';
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 @Component({
   selector: 'app-register',
@@ -25,6 +27,18 @@ export class RegisterComponent {
 
   profilePhotoFile: File | null = null;
   idPhotoFile: File | null = null;
+  profilePhotoError = signal('');
+  idPhotoError = signal('');
+
+  countryCodes = [
+    { value: '+20', label: '🇪🇬 +20', country: 'Egypt' },
+    { value: '+1', label: '🇺🇸 +1', country: 'USA' },
+    { value: '+44', label: '🇬🇧 +44', country: 'UK' },
+    { value: '+966', label: '🇸🇦 +966', country: 'Saudi Arabia' },
+    { value: '+971', label: '🇦🇪 +971', country: 'UAE' },
+    { value: '+49', label: '🇩🇪 +49', country: 'Germany' },
+    { value: '+33', label: '🇫🇷 +33', country: 'France' },
+  ];
 
   branchOptions = [
     { value: 'SIX_OF_OCTOBER', label: '6th of October' },
@@ -38,12 +52,14 @@ export class RegisterComponent {
   form = this.fb.group({
     fullName: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
     dateOfBirth: ['', Validators.required],
     profession: ['', Validators.required],
     branch: ['', Validators.required],
-    phoneNumber: ['', Validators.required],
-    phoneNumberEmergency: ['', Validators.required],
+    phoneCountryCode: ['+20', Validators.required],
+    phoneNumber: ['', [Validators.required, Validators.pattern(/^\d{7,15}$/)]],
+    emergencyPhoneCountryCode: ['+20', Validators.required],
+    phoneNumberEmergency: ['', [Validators.required, Validators.pattern(/^\d{7,15}$/)]],
     hasCondition: [false],
     medicalNotes: [''],
     subStartMonth: ['', Validators.required],
@@ -83,6 +99,21 @@ export class RegisterComponent {
   get isFirstStep() { return this.step() === 1; }
   get isLastStep() { return this.step() === this.totalSteps; }
 
+  get passwordControl(): AbstractControl | null {
+    return this.form.get('password');
+  }
+
+  get passwordErrors(): string[] {
+    const ctrl = this.passwordControl;
+    if (!ctrl || !ctrl.errors || !ctrl.touched) return [];
+    const e = ctrl.errors as ValidationErrors;
+    const msgs: string[] = [];
+    if (e['required']) msgs.push('Password is required');
+    if (e['minlength']) msgs.push('At least 8 characters');
+    if (e['pattern']) msgs.push('Must include 1 uppercase letter and 1 digit');
+    return msgs;
+  }
+
   nextStep() {
     if (this.step() < this.totalSteps && this.isCurrentStepValid) {
       this.step.update(s => s + 1);
@@ -95,14 +126,39 @@ export class RegisterComponent {
     }
   }
 
+  private validateFileSize(file: File): boolean {
+    if (file.size > MAX_FILE_SIZE) {
+      return false;
+    }
+    return true;
+  }
+
   onProfilePhotoSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    this.profilePhotoFile = input.files?.[0] ?? null;
+    const file = input.files?.[0] ?? null;
+    this.profilePhotoError.set('');
+
+    if (file && !this.validateFileSize(file)) {
+      this.profilePhotoError.set('File must be under 5 MB');
+      input.value = '';
+      this.profilePhotoFile = null;
+      return;
+    }
+    this.profilePhotoFile = file;
   }
 
   onIdPhotoSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    this.idPhotoFile = input.files?.[0] ?? null;
+    const file = input.files?.[0] ?? null;
+    this.idPhotoError.set('');
+
+    if (file && !this.validateFileSize(file)) {
+      this.idPhotoError.set('File must be under 5 MB');
+      input.value = '';
+      this.idPhotoFile = null;
+      return;
+    }
+    this.idPhotoFile = file;
   }
 
   onSubmit() {
@@ -113,6 +169,8 @@ export class RegisterComponent {
     this.successMessage.set('');
 
     const v = this.form.value;
+    const fullPhone = `${v.phoneCountryCode}${v.phoneNumber}`;
+    const fullEmergencyPhone = `${v.emergencyPhoneCountryCode}${v.phoneNumberEmergency}`;
 
     this.registrationService.register(
       {
@@ -122,8 +180,8 @@ export class RegisterComponent {
         dateOfBirth: v.dateOfBirth!,
         profession: v.profession!,
         branch: v.branch!,
-        phoneNumber: v.phoneNumber!,
-        phoneNumberEmergency: v.phoneNumberEmergency!,
+        phoneNumber: fullPhone,
+        phoneNumberEmergency: fullEmergencyPhone,
         hasChronicConditionOrInjury: v.hasCondition ?? false,
         medicalNotes: v.medicalNotes || undefined,
         subscriptionStartMonth: v.subStartMonth!,

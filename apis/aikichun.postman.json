@@ -1,0 +1,340 @@
+{
+    "info": {
+        "name": "My Project",
+        "description": "",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Aikichun",
+            "description": "",
+            "item": [
+                {
+                    "name": "login",
+                    "description": "",
+                    "event": [],
+                    "auth": {},
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI3YjQ5NzRjMS0yM2FkLTQyN2EtYTNiYy0yMTZmMTIxNGU5ZjQiLCJlbWFpbCI6ImthcmVlbUBtYWlsLmNvbSIsImlhdCI6MTc4Njg5MjAzNCwiZXhwIjoxNzg2OTM1MjM0fQ.6CQxLQ08tjUU9VZv6B_o6N2cszTftt9ukxtiALa51n9mLZID6gP_rtVGMDaijL_Xxl0brJoHWt_YLEFdfcNfWQ",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n  \"email\": \"2a7422da7c@emailinbo.live\",\r\n  \"password\": \"2A7422da7c!\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "header": [],
+                        "url": {
+                            "raw": "api/v1/auth/login",
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "login"
+                            ],
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "response": [],
+                    "protocolProfileBehavior": {
+                        "strictSSL": false,
+                        "followRedirects": true
+                    }
+                },
+                {
+                    "name": "Register",
+                    "description": "",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    ""
+                                ],
+                                "type": "text/javascript",
+                                "packages": {}
+                            }
+                        }
+                    ],
+                    "auth": {},
+                    "request": {
+                        "auth": {},
+                        "method": "POST",
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "fullName",
+                                    "value": "TESTUSER",
+                                    "type": "text",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "email",
+                                    "value": "2a7422da7c@emailinbo.live",
+                                    "type": "text",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "password",
+                                    "value": "2A7422da7c!",
+                                    "type": "text",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "dateOfBirth",
+                                    "value": "2000-01-01",
+                                    "type": "text",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "profession",
+                                    "value": "Engineer",
+                                    "type": "text",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "branch",
+                                    "value": "SIX_OF_OCTOBER",
+                                    "type": "text",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "phoneNumber",
+                                    "value": "+201234567890",
+                                    "type": "text",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "phoneNumberEmergency",
+                                    "value": "+201234567891",
+                                    "type": "text",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "hasChronicConditionOrInjury",
+                                    "value": "false",
+                                    "type": "text",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "MedicalNotes",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "subscriptionStartMonth",
+                                    "value": "1",
+                                    "type": "text",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "subscriptionStartYear",
+                                    "value": "2026",
+                                    "type": "text",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "profilePhoto",
+                                    "value": "file://D:\\Kareem Khater\\Freelancer\\Aikichun-System\\OIP.jpg",
+                                    "type": "file",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "idPhoto",
+                                    "value": "file://D:\\Kareem Khater\\Freelancer\\Aikichun-System\\OIP.jpg",
+                                    "type": "file",
+                                    "disabled": false
+                                }
+                            ]
+                        },
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:8080/api/v1/auth/register",
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "register"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "protocol": "http",
+                            "port": "8080",
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "response": [],
+                    "protocolProfileBehavior": {
+                        "strictSSL": false,
+                        "followRedirects": true
+                    }
+                },
+                {
+                    "name": "logout",
+                    "description": "",
+                    "event": [],
+                    "auth": {},
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NTQ5YTQ0Yi1lN2E4LTRiY2UtYmIwOC03YzdjYWEzMmE4NjciLCJlbWFpbCI6Ik9tYXJAbWFpbC5jb20iLCJpYXQiOjE3ODY5NTE0MTIsImV4cCI6MTc4Njk5NDYxMn0.1XTQaOpEWAAZBFRayYY9eXYkj93a7SBbvNA50I0jNVOGQJAxHYT59je0KkQ9tau3jt1l_tn2bGNuGg0KlhIQWQ",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "body": {},
+                        "header": [],
+                        "url": {
+                            "raw": "api/v1/auth/logout",
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "logout"
+                            ],
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "response": [],
+                    "protocolProfileBehavior": {
+                        "strictSSL": false,
+                        "followRedirects": true
+                    }
+                },
+                {
+                    "name": "send-otp",
+                    "description": "",
+                    "event": [],
+                    "auth": {},
+                    "request": {
+                        "auth": {
+                            "type": "noauth",
+                            "noauth": []
+                        },
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n  \"email\": \"2a7422da7c@emailinbo.live\",\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "header": [],
+                        "url": {
+                            "raw": "api/v1/auth/send-otp",
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "send-otp"
+                            ],
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "response": [],
+                    "protocolProfileBehavior": {
+                        "strictSSL": false,
+                        "followRedirects": true
+                    }
+                },
+                {
+                    "name": "verify-otp",
+                    "description": "",
+                    "event": [],
+                    "auth": {},
+                    "request": {
+                        "auth": {
+                            "type": "noauth",
+                            "noauth": []
+                        },
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n  \"email\": \"2a7422da7c@emailinbo.live\",\r\n  \"otp\": \"200104\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "header": [],
+                        "url": {
+                            "raw": "api/v1/auth/verify-otp",
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "verify-otp"
+                            ],
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "response": [],
+                    "protocolProfileBehavior": {
+                        "strictSSL": false,
+                        "followRedirects": true
+                    }
+                }
+            ],
+            "event": [
+                {
+                    "listen": "prerequest",
+                    "script": {
+                        "exec": [],
+                        "type": "text/javascript",
+                        "packages": {}
+                    }
+                },
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [],
+                        "type": "text/javascript",
+                        "packages": {}
+                    }
+                }
+            ],
+            "auth": {}
+        }
+    ],
+    "variable": [],
+    "event": [],
+    "auth": {}
+}

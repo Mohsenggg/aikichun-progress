@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AikichunProgress — Architecture Map</title>
+<style>
+  :root {
+    --green: #1a2f23;
+    --green-2: #22392b;
+    --green-3: #2d4a38;
+    --red: #d92027;
+    --primary: #22c55e;
+    --white: #ffffff;
+    --muted: #b7c4bb;
+    --border: rgba(255, 255, 255, 0.1);
+    --surface: rgba(255, 255, 255, 0.05);
+    --mono: ui-monospace, SFMono-Regular, Consolas, "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--green);
+    color: var(--white);
+    line-height: 1.55;
+  }
+  header.top {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(26, 47, 35, 0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  header.top .logo {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--red);
+    display: grid; place-items: center; font-weight: 800; color: #fff;
+  }
+  header.top h1 { margin: 0; font-size: 18px; letter-spacing: 0.5px; }
+  header.top .sub { color: var(--muted); font-size: 12.5px; }
+  nav.tabs {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto;
+  }
+  nav.tabs a {
+    color: var(--muted); text-decoration: none; font-size: 12.5px;
+    padding: 5px 10px; border: 1px solid var(--border); border-radius: 999px;
+    transition: all .15s;
+  }
+  nav.tabs a:hover { color: #fff; border-color: var(--primary); }
+  main { max-width: 1200px; margin: 0 auto; padding: 28px 24px 80px; }
+  section.arch { margin-bottom: 44px; scroll-margin-top: 80px; }
+  section.arch h2 {
+    font-size: 15px; text-transform: uppercase; letter-spacing: 2px;
+    color: var(--primary); margin: 0 0 14px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .card, .kv {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px;
+  }
+  .card h3 { margin: 0 0 6px; font-size: 13.5px; color: var(--primary); font-weight: 600; }
+  .card p, .card ul { margin: 0; font-size: 13px; color: var(--muted); }
+  .card ul { padding-left: 18px; }
+  .card code, .kv code { font-family: var(--mono); font-size: 12px; background: rgba(34,197,94,0.12); color: #86efac; padding: 1px 5px; border-radius: 4px; word-break: break-all; }
+  .kv { display: grid; grid-template-columns: 200px 1fr; gap: 4px 14px; font-size: 13px; }
+  .kv .k { color: var(--muted); }
+  .kv .v { color: #e8f0ea; }
+  .kv code { font-size: 12px; }
+  .mono { font-family: var(--mono); font-size: 12.5px; }
+  .flow { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; }
+  .flow .node {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 12px; font-size: 12.5px; min-width: 150px;
+  }
+  .flow .node b { display: block; font-size: 13px; color: var(--white); }
+  .flow .node span { color: var(--muted); font-size: 11.5px; font-family: var(--mono); }
+  .flow .arrow { align-self: center; color: var(--primary); font-weight: 700; }
+  .tree { font-family: var(--mono); font-size: 12.5px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; overflow-x: auto; }
+  .tree .dir { color: #86efac; }
+  .tree .file { color: #e8f0ea; }
+  .tree .cmt { color: #6b8a76; }
+  .tree .lvl0 { padding-left: 0; }
+  .tree .lvl1 { padding-left: 18px; }
+  .tree .lvl2 { padding-left: 36px; }
+  .tree .lvl3 { padding-left: 54px; }
+  .tree .lvl4 { padding-left: 72px; }
+  .tree .line { padding: 2px 0; white-space: nowrap; }
+  .pill { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); margin-right: 4px; }
+  .pill.route { color: #86efac; border-color: rgba(34,197,94,.4); }
+  .pill.guard { color: #fbbf24; border-color: rgba(251,191,36,.4); }
+  .pill.bad { color: var(--red); border-color: rgba(217,32,39,.5); }
+  .pill.good { color: #86efac; border-color: rgba(34,197,94,.4); }
+  .route-row { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; margin-bottom: 8px; }
+  .route-row code { font-family: var(--mono); font-size: 12.5px; color: #e8f0ea; }
+  .route-row .desc { color: var(--muted); font-size: 12.5px; width: 100%; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; border-top: 1px solid var(--border); }
+  a { color: #86efac; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="logo">AK</div>
+  <div>
+    <h1>AikichunProgress — Architecture Map</h1>
+    <div class="sub" id="head-sub">Angular 18 standalone SPA · Supabase · Firebase Hosting</div>
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+</header>
+
+<main id="content"></main>
+
+<footer>
+  Self-contained page — data embedded inline and mirrored in <a href="architecture.json">architecture.json</a>.<br>
+  Generated from the live codebase · OpenCode architecture-map task · 2026-08-10
+</footer>
+
+<script id="arch-data" type="application/json">
+{
+  "project": {
+    "name": "aikichun-progress",
+    "displayName": "AikichunProgress",
+    "description": "Wing Chun (Aikichun) student-progress tracker",
+    "type": "Angular 18 SPA, 100% standalone components, no NgModules",
+    "generatedWith": "Angular CLI 18.2.9",
+    "primaryLanguage": "Arabic (UI content); English (grade names, percentages)",
+    "backend": "Supabase (data)",
+    "hosting": "Firebase Hosting (static, SPA rewrite)"
+  },
+  "stack": {
+    "framework": "Angular ^18.2.0",
+    "language": "TypeScript ~5.5.2",
+    "stateManagement": "Angular signals (signal/computed) + inject()",
+    "backendClient": "@supabase/supabase-js ^2.89.0",
+    "routing": "@angular/router (lazy loadComponent)",
+    "forms": "@angular/forms ReactiveFormsModule",
+    "icons": "@fortawesome/fontawesome-free ^7.1.0",
+    "utilities": "date-fns ^4.1.0",
+    "styling": "Vanilla CSS + CSS variables (Tailwind installed but NOT used)",
+    "tests": "Karma + Jasmine (Chrome launcher)"
+  },
+  "scripts": {
+    "start": "ng serve (dev server on :4200)",
+    "build": "ng build (production build to dist/aikichun-progress)",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test (Karma/Jasmine, requires Chrome)",
+    "typecheck": "npx tsc -p tsconfig.app.json --noEmit (no lint/formatter configured)"
+  },
+  "buildConfig": {
+    "builder": "@angular-devkit/build-angular:application",
+    "outputPath": "dist/aikichun-progress",
+    "defaultConfiguration": "production",
+    "styles": ["src/styles.css", "node_modules/@fortawesome/fontawesome-free/css/all.min.css"],
+    "budgets": { "initial": { "warning": "500kB", "error": "1MB" } }
+  },
+  "entryFlow": [
+    "src/main.ts -> bootstrapApplication(AppComponent, appConfig)",
+    "src/app/app.config.ts -> provideRouter(routes), provideHttpClient, provideAnimationsAsync",
+    "src/app/app.component.ts -> AppComponent = <router-outlet> only",
+    "src/app/app.routes.ts -> lazy route table"
+  ],
+  "routing": {
+    "base": "/",
+    "routes": [
+      { "path": "", "guard": "none", "component": "redirectTo /login (full match)", "description": "Default entry" },
+      { "path": "/login", "guard": "none", "component": "features/login/login.component.ts (lazy)", "description": "Code login for admin or student" },
+      { "path": "/admin", "guard": "roleGuard (expectedRole: admin)", "component": "features/admin-profiles/admin-profiles.routes.ts -> AdminDashboardComponent", "description": "Admin dashboard: list / create / edit / delete profiles" },
+      { "path": "/roadmap", "guard": "authGuard", "component": "features/roadmap/roadmap.component.ts (lazy)", "description": "Student roadmap: Grade -> Section -> Level -> Step" },
+      { "path": "**", "guard": "none", "component": "redirectTo /login", "description": "Fallback" }
+    ]
+  },
+  "directoryMap": {
+    "src/main.ts": "App bootstrap entry",
+    "src/app/app.config.ts": "Root DI providers + router",
+    "src/app/app.routes.ts": "Route table",
+    "src/app/core/": {
+      "auth/auth.service.ts": "Code-based auth: ADMIN123 admin / profiles.code student, localStorage 'aikichun_code', role signal",
+      "guards/auth.guard.ts": "Functional authGuard -> redirect /login",
+      "guards/role.guard.ts": "Functional roleGuard (admin role check)",
+      "roadmap/roadmap.data.ts": "Static ROADMAP_DATA + types (RoadmapGrade/Section/Level/Step, DbRoadmapStep)",
+      "roadmap/roadmap.service.ts": "Loads roadmap_steps from Supabase on init; visibility/lock, validateUpdate, getGradeProgress",
+      "services/supabase.service.ts": "Supabase client + profile CRUD + in-memory profileCache Map",
+      "services/supabase-types.ts": "Profile, ProfileStatus, Json, Database types"
+    },
+    "src/app/features/login/": "login.component.ts (ReactiveForms code form)",
+    "src/app/features/roadmap/": {
+      "roadmap.component.ts": "ViewState machine GRADES/SECTIONS/LEVELS/STEPS, draftStatus, saveChanges",
+      "components/grade-selection/": "dumb: grade grid + progress bars (getGradeProgress)",
+      "components/section-selection/": "dumb: section list",
+      "components/level-selection/": "dumb: level list",
+      "components/roadmap-level.component.ts": "dumb: renders a level",
+      "components/roadmap-step.component.ts": "dumb: step card, 3 checkboxes, expandable details"
+    },
+    "src/app/features/admin-profiles/": {
+      "admin-profiles.routes.ts": "ADMIN_ROUTES ('' -> AdminDashboard)",
+      "admin-dashboard/admin-dashboard.component.ts": "Profile CRUD UI + getHighestStatus",
+      "components/manage-profile-popup.component.ts": "Add/edit popup (name + code only)"
+    },
+    "src/environments/environment.ts": "Supabase URL + publishable key (committed, single file)"
+  },
+  "auth": {
+    "type": "Code-based (NOT Supabase auth)",
+    "adminCode": "ADMIN123 (hardcoded in auth.service.ts)",
+    "studentLogin": "profiles.code column match",
+    "session": "localStorage key 'aikichun_code'; restored in AuthService constructor",
+    "roles": ["admin", "user", "guest"],
+    "supabaseClientOptions": "persistSession: false (avoids NavigatorLock dev issues — keep it)"
+  },
+  "dataModel": {
+    "profiles": {
+      "columns": ["id", "code", "name", "status{learning,developed,skilled}", "last_update_date", "updates_count", "created_at"],
+      "note": "status = 3 pointers holding stepNumbers; max pointer = progress index"
+    },
+    "roadmap_steps": {
+      "columns": ["gradeNumber", "gradeName", "sectionNumber", "sectionName", "levelNumber", "levelName", "stepNumber", "stepName", "stepDetails", "spercentages"],
+      "note": "DB column is 'spercentages' (typo, intentional) -> mapped to 'percentage' in RoadmapStep"
+    },
+    "roadmapHierarchy": "Grade (1-4) -> Section -> Level (Alpha/Beta/Omega) -> Step",
+    "grades": ["PROTECTOR", "FIGHTER", "WARRIOR", "MASTER"],
+    "sections": ["Striker", "Grappler", "Bladesman", "Grounder"],
+    "grade4Sections": ["Mastery"],
+    "roadmapLoading": "RoadmapService constructor loads roadmap_steps ordered by grade/section/level/step and replaces static ROADMAP_DATA if rows exist"
+  },
+  "businessRules": {
+    "lock": {
+      "name": "getVisibilityState",
+      "rule": "user can view up to 3 steps ahead of their max progress index; beyond = locked"
+    },
+    "saveValidation": {
+      "name": "validateUpdate",
+      "rateLimit": "gates on updates_count >= 50, then waits 5 days since last_update_date to reset the cycle (code comment says '3 updates' — mismatch exists)",
+      "quantityRule": "max 2 checkbox moves (forward progress only) per save"
+    },
+    "progress": "getGradeProgress counts a grade's steps at or below the max pointer index; result rounded to percentage"
+  },
+  "uiFlow": {
+    "roadmapViewState": "GRADES -> SECTIONS -> LEVELS -> STEPS with back-navigation",
+    "pattern": "Selection components are dumb (@Input/@Output); navigation + progress logic live in roadmap.component.ts / RoadmapService"
+  },
+  "styling": {
+    "approach": "Vanilla CSS + CSS variables in src/styles.css",
+    "tokens": {
+      "aikido-green": "#1a2f23",
+      "aikido-red": "#d92027",
+      "color-primary": "#22c55e"
+    },
+    "tailwind": "Installed and configured (tailwind.config.js) but NOT used — no @tailwind/@apply anywhere; do not add Tailwind classes"
+  },
+  "deployment": {
+    "ci": "GitHub Actions (.github/workflows/)",
+    "onPushMaster": "npm ci && npm run build -> Firebase Hosting live channel",
+    "onPR": "preview deploy via FirebaseExtended/action-hosting-deploy",
+    "firebaseProject": "aikichun-progress",
+    "firebaseConfig": "firebase.json: public=dist/aikichun-progress/browser, rewrite ** -> /index.html (SPA)"
+  },
+  "gotchas": [
+    "environment.ts is committed with Supabase URL + publishable key (not a secret); single file, no environment.prod.ts — production flag stays false",
+    "Supabase client uses persistSession: false to avoid NavigatorLock issues — keep it",
+    "SupabaseService keeps an in-memory profileCache (Map); clearCache() on logout",
+    "Admin edit popup only updates name/code, NOT status",
+    "Only test file is app.component.spec.ts and it asserts on a removed <h1> — stale, expect ng test failures",
+    "Keep stepNumber values (e.g. SG1-01, SG1-A48) unchanged — primary keys for lock/progress logic",
+    "SupabaseService logs DB actions with a styled console prefix [DB ...]"
+  ],
+  "sourceFileCount": {
+    "total": 37,
+    "components": 12,
+    "services": 3,
+    "guards": 2,
+    "routes": 2,
+    "config": 4
+  }
+}
+</script>
+
+<script>
+(function () {
+  var data = JSON.parse(document.getElementById('arch-data').textContent);
+  var content = document.getElementById('content');
+  var tabs = document.getElementById('tabs');
+  var SECTION_ORDER = ['stack', 'scripts', 'buildConfig', 'entryFlow', 'routing', 'directoryMap', 'auth', 'dataModel', 'businessRules', 'uiFlow', 'styling', 'deployment', 'gotchas'];
+  var SECTION_LABELS = {
+    stack: 'Stack', scripts: 'Commands', buildConfig: 'Build config', entryFlow: 'Entry flow',
+    routing: 'Routing', directoryMap: 'Directory map', auth: 'Auth', dataModel: 'Data model',
+    businessRules: 'Business rules', uiFlow: 'UI flow', styling: 'Styling', deployment: 'Deployment', gotchas: 'Gotchas'
+  };
+  var esc = function (s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  };
+  var code = function (s) { return '<code>' + esc(s) + '</code>'; };
+
+  function renderKv(obj) {
+    var out = '<div class="kv">';
+    Object.keys(obj).forEach(function (k) {
+      var v = obj[k];
+      if (v === null || v === undefined || v === '') return;
+      out += '<span class="k">' + esc(k) + '</span>';
+      if (Array.isArray(v)) {
+        out += '<span class="v">' + v.map(function (x) { return code(x); }).join(' ') + '</span>';
+      } else if (typeof v === 'object') {
+        out += '<span class="v">' + renderInline(v) + '</span>';
+      } else {
+        out += '<span class="v">' + code(v) + '</span>';
+      }
+    });
+    return out + '</div>';
+  }
+
+  function renderInline(obj) {
+    return Object.keys(obj).map(function (k) { return esc(k) + ': ' + code(obj[k]); }).join(' · ');
+  }
+
+  function renderRoutes(routes) {
+    var out = '';
+    routes.forEach(function (r) {
+      out += '<div class="route-row"><span class="pill route">' + esc(r.path) + '</span>';
+      if (r.guard) out += '<span class="pill guard">' + esc(r.guard) + '</span>';
+      out += code(r.component) + '<span class="desc">' + esc(r.description || '') + '</span></div>';
+    });
+    return out;
+  }
+
+  function renderTree(obj, depth) {
+    var out = '';
+    Object.keys(obj).forEach(function (k) {
+      var v = obj[k];
+      var pad = 'lvl' + Math.min(depth, 4);
+      var isDir = (typeof v === 'object' && v !== null);
+      out += '<div class="line ' + pad + '">';
+      if (isDir) out += '<span class="dir">' + esc(k) + '</span>';
+      else out += '<span class="file">' + esc(k) + '</span><span class="cmt">' + (v ? ' — ' + esc(v) : '') + '</span>';
+      out += '</div>';
+      if (isDir) out += renderTree(v, depth + 1);
+    });
+    return out;
+  }
+
+  function renderCardList(arr) {
+    var out = '<div class="cards">';
+    arr.forEach(function (item) {
+      out += '<div class="card">';
+      if (item.name) out += '<h3>' + esc(item.name) + '</h3>';
+      if (item.rule) out += '<p>' + code(item.rule) + '</p>';
+      if (item.note) out += '<p>' + code(item.note) + '</p>';
+      out += '</div>';
+    });
+    return out + '</div>';
+  }
+
+  function renderFlow(arr) {
+    var out = '<div class="flow">';
+    arr.forEach(function (item, i) {
+      if (i > 0) out += '<span class="arrow">→</span>';
+      var parts = item.split(' -> ');
+      out += '<div class="node"><b>' + esc(parts[0]) + '</b>';
+      for (var j = 1; j < parts.length; j++) out += '<span>' + esc(parts[j]) + '</span>';
+      out += '</div>';
+    });
+    return out + '</div>';
+  }
+
+  function renderSection(key) {
+    var label = SECTION_LABELS[key] || key;
+    var v = data[key];
+    if (!v) return '';
+    var html = '<section class="arch" id="sec-' + key + '"><h2>' + esc(label) + '</h2>';
+    if (Array.isArray(v)) {
+      html += /->/.test(v.join(' ')) ? renderFlow(v) : renderCardList(v.map(function (x) { return { name: x }; }));
+    } else if (key === 'routing') {
+      html += '<p class="pill">base: ' + esc(v.base) + '</p>' + renderRoutes(v.routes);
+    } else if (key === 'directoryMap') {
+      html += '<div class="tree">' + renderTree(v, 0) + '</div>';
+    } else if (key === 'businessRules') {
+      html += '<div class="cards">';
+      Object.keys(v).forEach(function (k) {
+        var r = v[k];
+        html += '<div class="card"><h3>' + esc(k) + '</h3>';
+        Object.keys(r).forEach(function (kk) { html += '<p>' + esc(kk) + ': ' + code(r[kk]) + '</p>'; });
+        html += '</div>';
+      });
+      html += '</div>';
+    } else if (key === 'stack' || key === 'auth' || key === 'dataModel' || key === 'deployment' || key === 'styling' || key === 'scripts' || key === 'buildConfig' || key === 'sourceFileCount') {
+      html += renderKv(v);
+    } else if (key === 'gotchas') {
+      html += '<div class="cards">' + v.map(function (g) { return '<div class="card"><p>' + esc(g) + '</p></div>'; }).join('') + '</div>';
+    } else {
+      html += '<div class="card"><pre class="mono">' + esc(JSON.stringify(v, null, 2)) + '</pre></div>';
+    }
+    html += '</section>';
+    return html;
+  }
+
+  // Header meta from project
+  var p = data.project;
+  document.getElementById('head-sub').textContent = p.type + ' · ' + p.backend + ' · ' + p.hosting;
+
+  // Tabs
+  SECTION_ORDER.forEach(function (key) {
+    var a = document.createElement('a');
+    a.href = '#sec-' + key;
+    a.textContent = SECTION_LABELS[key];
+    tabs.appendChild(a);
+  });
+
+  // Hero project card
+  var hero = '<section class="arch" id="sec-project"><h2>Project</h2>' + renderKv(p) + '</section>';
+  content.insertAdjacentHTML('beforeend', hero);
+
+  // Sections
+  SECTION_ORDER.forEach(function (key) {
+    content.insertAdjacentHTML('beforeend', renderSection(key));
+  });
+})();
+</script>
+</body>
+</html>

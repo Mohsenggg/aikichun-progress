@@ -17,7 +17,7 @@
 
           <div class="form-control">
             <label class="label"><span class="label-text">Full Name</span></label>
-            <input type="text" formControlName="fullName" placeholder="Kareem Khater" class="input input-bordered w-full" />
+            <input type="text" formControlName="fullName" placeholder="Your Name" class="input input-bordered w-full" />
           </div>
 
           <div class="form-control">
@@ -27,7 +27,16 @@
 
           <div class="form-control">
             <label class="label"><span class="label-text">Password</span></label>
-            <input type="password" formControlName="password" placeholder="Min. 6 characters" class="input input-bordered w-full" />
+            <input type="password" formControlName="password" placeholder="Min 8 chars, 1 uppercase, 1 digit" class="input input-bordered w-full" />
+            @if (passwordErrors.length > 0) {
+              <label class="label">
+                <span class="label-text-alt text-error flex flex-col gap-0.5">
+                  @for (err of passwordErrors; track err) {
+                    <span>{{ err }}</span>
+                  }
+                </span>
+              </label>
+            }
           </div>
         </div>
       }
@@ -66,12 +75,28 @@
 
           <div class="form-control">
             <label class="label"><span class="label-text">Phone Number</span></label>
-            <input type="tel" formControlName="phoneNumber" placeholder="+20..." class="input input-bordered w-full" />
+            <div class="join w-full">
+              <select formControlName="phoneCountryCode" class="select select-bordered join-item w-28">
+                @for (code of countryCodes; track code.value) {
+                  <option [value]="code.value">{{ code.label }}</option>
+                }
+              </select>
+              <input type="tel" formControlName="phoneNumber" placeholder="01234567890" class="input input-bordered join-item flex-1" />
+            </div>
+            <label class="label"><span class="label-text-alt">e.g. +20 01234567890</span></label>
           </div>
 
           <div class="form-control">
             <label class="label"><span class="label-text">Emergency Phone Number</span></label>
-            <input type="tel" formControlName="phoneNumberEmergency" placeholder="+20..." class="input input-bordered w-full" />
+            <div class="join w-full">
+              <select formControlName="emergencyPhoneCountryCode" class="select select-bordered join-item w-28">
+                @for (code of countryCodes; track code.value) {
+                  <option [value]="code.value">{{ code.label }}</option>
+                }
+              </select>
+              <input type="tel" formControlName="phoneNumberEmergency" placeholder="01234567890" class="input input-bordered join-item flex-1" />
+            </div>
+            <label class="label"><span class="label-text-alt">e.g. +20 01234567890</span></label>
           </div>
 
           <div class="form-control">
@@ -120,11 +145,23 @@
           <div class="form-control">
             <label class="label"><span class="label-text">Profile Photo</span></label>
             <input type="file" accept="image/*" (change)="onProfilePhotoSelected($event)" class="file-input file-input-bordered w-full" />
+            <label class="label">
+              <span class="label-text-alt">Max 5 MB — JPG, PNG</span>
+            </label>
+            @if (profilePhotoError()) {
+              <label class="label"><span class="label-text-alt text-error">{{ profilePhotoError() }}</span></label>
+            }
           </div>
 
           <div class="form-control">
             <label class="label"><span class="label-text">ID Photo</span></label>
             <input type="file" accept="image/*" (change)="onIdPhotoSelected($event)" class="file-input file-input-bordered w-full" />
+            <label class="label">
+              <span class="label-text-alt">Max 5 MB — JPG, PNG</span>
+            </label>
+            @if (idPhotoError()) {
+              <label class="label"><span class="label-text-alt text-error">{{ idPhotoError() }}</span></label>
+            }
           </div>
         </div>
       }
