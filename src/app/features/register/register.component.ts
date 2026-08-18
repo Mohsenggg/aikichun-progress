@@ -1,9 +1,8 @@
-import { Component, inject, signal, ViewChild, ElementRef } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
+import { RegistrationService } from '../../core/services/registration.service';
 import { ProgressIndicatorComponent } from './progress-indicator.component';
 
 @Component({
@@ -15,7 +14,7 @@ import { ProgressIndicatorComponent } from './progress-indicator.component';
 })
 export class RegisterComponent {
   private fb = inject(FormBuilder);
-  private http = inject(HttpClient);
+  private registrationService = inject(RegistrationService);
   private router = inject(Router);
 
   step = signal(1);
@@ -23,9 +22,6 @@ export class RegisterComponent {
   isLoading = signal(false);
   errorMessage = signal('');
   successMessage = signal('');
-
-  @ViewChild('profilePhotoInput') profilePhotoInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('idPhotoInput') idPhotoInput!: ElementRef<HTMLInputElement>;
 
   profilePhotoFile: File | null = null;
   idPhotoFile: File | null = null;
@@ -117,41 +113,33 @@ export class RegisterComponent {
     this.successMessage.set('');
 
     const v = this.form.value;
-    const fd = new FormData();
-    fd.append('fullName', v.fullName!);
-    fd.append('email', v.email!);
-    fd.append('password', v.password!);
-    fd.append('dateOfBirth', v.dateOfBirth!);
-    fd.append('profession', v.profession!);
-    fd.append('branch', v.branch!);
-    fd.append('phoneNumber', v.phoneNumber!);
-    fd.append('phoneNumberEmergency', v.phoneNumberEmergency!);
-    fd.append('hasChronicConditionOrInjury', String(v.hasCondition ?? false));
 
-    if (v.hasCondition && v.medicalNotes) {
-      fd.append('MedicalNotes', v.medicalNotes);
-    }
-
-    fd.append('subscriptionStartMonth', v.subStartMonth!);
-    fd.append('subscriptionStartYear', v.subStartYear!);
-
-    if (this.profilePhotoFile) {
-      fd.append('profilePhoto', this.profilePhotoFile);
-    }
-    if (this.idPhotoFile) {
-      fd.append('idPhoto', this.idPhotoFile);
-    }
-
-    this.http.post(`${environment.backendApiUrl}/api/v1/auth/register`, fd)
-      .subscribe({
-        next: () => {
-          this.successMessage.set('Registration successful! Redirecting to login...');
-          setTimeout(() => this.router.navigate(['/login']), 2000);
-        },
-        error: (err) => {
-          this.errorMessage.set(err.error?.message || 'Registration failed. Please try again.');
-          this.isLoading.set(false);
-        }
-      });
+    this.registrationService.register(
+      {
+        fullName: v.fullName!,
+        email: v.email!,
+        password: v.password!,
+        dateOfBirth: v.dateOfBirth!,
+        profession: v.profession!,
+        branch: v.branch!,
+        phoneNumber: v.phoneNumber!,
+        phoneNumberEmergency: v.phoneNumberEmergency!,
+        hasChronicConditionOrInjury: v.hasCondition ?? false,
+        medicalNotes: v.medicalNotes || undefined,
+        subscriptionStartMonth: v.subStartMonth!,
+        subscriptionStartYear: v.subStartYear!,
+      },
+      this.profilePhotoFile,
+      this.idPhotoFile
+    ).subscribe({
+      next: () => {
+        this.successMessage.set('Registration successful! Redirecting to login...');
+        setTimeout(() => this.router.navigate(['/login']), 2000);
+      },
+      error: (err) => {
+        this.errorMessage.set(err.error?.message || 'Registration failed. Please try again.');
+        this.isLoading.set(false);
+      }
+    });
   }
 }
