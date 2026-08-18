@@ -2,23 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-
-export interface RegisterPayload {
-  fullName: string;
-  email: string;
-  password: string;
-  dateOfBirth: string;
-  profession: string;
-  branch: string;
-  phoneNumber: string;
-  phoneNumberEmergency: string;
-  hasChronicConditionOrInjury: boolean;
-  medicalNotes?: string;
-  subscriptionStartMonth: string;
-  subscriptionStartYear: string;
-  profilePhoto?: File;
-  idPhoto?: File;
-}
+import { RegisterPayload } from './registration-types';
 
 @Injectable({
   providedIn: 'root'
