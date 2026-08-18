@@ -1,6 +1,6 @@
 export const environment = {
-    production: false,
-    supabaseUrl: 'https://dhansjngjelbmqayvckq.supabase.co',
-    supabaseKey: 'sb_publishable_JDTnqdE7a1Mu6KlTgMKF3A_DCO-aJCy'
-
+  production: false,
+  supabaseUrl: 'https://izuvoipcgmzezyzvmfon.supabase.co',
+  supabaseKey: 'sb_publishable_rkO1BZtNPNuTm9hIHWMd-w_FYUY-MjH',
+  backendApiUrl: 'http://localhost:8080',
 };

@@ -1,0 +1,173 @@
+<div class="register-page">
+  <div class="register-card bg-base-200 rounded-box shadow-xl">
+    <!-- Logo -->
+    <div class="flex justify-center mb-2">
+      <img src="/assets/aikichun-logo.png" alt="Aikichun" class="w-24 h-auto" />
+    </div>
+
+    <!-- Progress Indicator -->
+    <app-progress-indicator [currentStep]="step()" [totalSteps]="totalSteps" class="mb-6" />
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+
+      <!-- Step 1: Account -->
+      @if (step() === 1) {
+        <div class="flex flex-col gap-4 animate-in">
+          <h2 class="card-title text-lg justify-center">Account</h2>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text">Full Name</span></label>
+            <input type="text" formControlName="fullName" placeholder="John Doe" class="input input-bordered w-full" />
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text">Email</span></label>
+            <input type="email" formControlName="email" placeholder="you@example.com" class="input input-bordered w-full" />
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text">Password</span></label>
+            <input type="password" formControlName="password" placeholder="Min. 6 characters" class="input input-bordered w-full" />
+          </div>
+        </div>
+      }
+
+      <!-- Step 2: Personal Information -->
+      @if (step() === 2) {
+        <div class="flex flex-col gap-4 animate-in">
+          <h2 class="card-title text-lg justify-center">Personal Information</h2>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text">Date of Birth</span></label>
+            <input type="date" formControlName="dateOfBirth" class="input input-bordered w-full" />
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text">Profession</span></label>
+            <input type="text" formControlName="profession" placeholder="e.g. Engineer" class="input input-bordered w-full" />
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text">Branch</span></label>
+            <select formControlName="branch" class="select select-bordered w-full">
+              <option value="" disabled>Select a branch</option>
+              @for (branch of branchOptions; track branch.value) {
+                <option [value]="branch.value">{{ branch.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      }
+
+      <!-- Step 3: Contact & Health -->
+      @if (step() === 3) {
+        <div class="flex flex-col gap-4 animate-in">
+          <h2 class="card-title text-lg justify-center">Contact &amp; Health</h2>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text">Phone Number</span></label>
+            <input type="tel" formControlName="phoneNumber" placeholder="+20..." class="input input-bordered w-full" />
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text">Emergency Phone Number</span></label>
+            <input type="tel" formControlName="phoneNumberEmergency" placeholder="+20..." class="input input-bordered w-full" />
+          </div>
+
+          <div class="form-control">
+            <label class="label cursor-pointer justify-start gap-3">
+              <input type="checkbox" formControlName="hasCondition" class="checkbox checkbox-primary" />
+              <span class="label-text">Has chronic condition or injury?</span>
+            </label>
+          </div>
+
+          @if (form.controls.hasCondition.value) {
+            <div class="form-control animate-in">
+              <label class="label"><span class="label-text">Medical Notes</span></label>
+              <textarea formControlName="medicalNotes" rows="3" placeholder="Describe any conditions or injuries..." class="textarea textarea-bordered w-full"></textarea>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Step 4: Membership & Documents -->
+      @if (step() === 4) {
+        <div class="flex flex-col gap-4 animate-in">
+          <h2 class="card-title text-lg justify-center">Membership &amp; Documents</h2>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="form-control">
+              <label class="label"><span class="label-text">Start Month</span></label>
+              <select formControlName="subStartMonth" class="select select-bordered w-full">
+                <option value="" disabled>Month</option>
+                @for (m of monthOptions; track m.value) {
+                  <option [value]="m.value">{{ m.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-control">
+              <label class="label"><span class="label-text">Start Year</span></label>
+              <select formControlName="subStartYear" class="select select-bordered w-full">
+                <option value="" disabled>Year</option>
+                @for (y of yearOptions; track y.value) {
+                  <option [value]="y.value">{{ y.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text">Profile Photo</span></label>
+            <input type="file" accept="image/*" (change)="onProfilePhotoSelected($event)" class="file-input file-input-bordered w-full" />
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text">ID Photo</span></label>
+            <input type="file" accept="image/*" (change)="onIdPhotoSelected($event)" class="file-input file-input-bordered w-full" />
+          </div>
+        </div>
+      }
+
+      <!-- Error / Success Messages -->
+      @if (errorMessage()) {
+        <div class="alert alert-error text-sm">
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+      @if (successMessage()) {
+        <div class="alert alert-success text-sm">
+          <span>{{ successMessage() }}</span>
+        </div>
+      }
+
+      <!-- Navigation Buttons -->
+      <div class="flex gap-3 mt-2">
+        @if (!isFirstStep) {
+          <button type="button" (click)="prevStep()" class="btn btn-outline flex-1">
+            Back
+          </button>
+        }
+
+        @if (!isLastStep) {
+          <button type="button" (click)="nextStep()" [disabled]="!isCurrentStepValid" class="btn btn-primary flex-1 text-white">
+            Next
+          </button>
+        } @else {
+          <button type="submit" [disabled]="form.invalid || isLoading()" class="btn btn-primary flex-1 text-white">
+            @if (isLoading()) {
+              <span class="loading loading-spinner loading-sm"></span>
+            }
+            Register
+          </button>
+        }
+      </div>
+
+      <!-- Login Link -->
+      <p class="text-center text-sm mt-1">
+        Already have an account?
+        <a routerLink="/login" class="link link-primary">Login</a>
+      </p>
+    </form>
+  </div>
+</div>

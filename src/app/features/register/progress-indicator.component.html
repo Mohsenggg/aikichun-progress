@@ -1,0 +1,10 @@
+<ul class="steps steps-horizontal w-full">
+  @for (step of steps; track step) {
+    <li
+      class="step"
+      [class.step-primary]="isCompleted(step) || isActive(step)"
+    >
+      <span class="step-label hidden sm:inline">{{ stepLabels[step - 1] }}</span>
+    </li>
+  }
+</ul>

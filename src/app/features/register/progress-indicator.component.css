@@ -1,0 +1,13 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.steps-horizontal {
+  --step-size: 2rem;
+}
+
+.step-label {
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
