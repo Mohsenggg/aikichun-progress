@@ -1,7 +1,7 @@
 import { Component, inject, signal, ViewChildren, QueryList, ElementRef, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { OtpAuthService } from '../auth/otp-auth.service';
+import { OtpAuthService } from '../../auth/otp-auth.service';
 
 @Component({
   selector: 'app-otp-verification',

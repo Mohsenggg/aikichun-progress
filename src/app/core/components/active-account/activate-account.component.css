@@ -17,8 +17,16 @@
 .activate-card {
   width: 100%;
   max-width: 24rem;
-  padding: 2rem;
+  padding: 1rem;
   animation: fadeSlideIn 0.3s ease-out;
+}
+
+@media (min-width: 640px) {
+  .activate-card { padding: 1.5rem; }
+}
+
+@media (min-width: 768px) {
+  .activate-card { padding: 2rem; }
 }
 
 @keyframes fadeSlideIn {

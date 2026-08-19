@@ -163,3 +163,40 @@
 .icon-btn:hover {
     background-color: var(--white-20);
 }
+
+@media (max-width: 600px) {
+    .admin-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .title {
+        font-size: 1.2rem;
+    }
+
+    .logout-btn {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem;
+    }
+
+    .stats-bar {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .icon-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .profile-card {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .profile-name {
+        font-size: 1rem;
+    }
+}

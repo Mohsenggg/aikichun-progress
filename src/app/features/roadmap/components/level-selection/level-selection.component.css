@@ -112,3 +112,38 @@
     margin-left: auto;
     color: var(--color-text-secondary);
 }
+
+@media (max-width: 600px) {
+    .level-select-container {
+        gap: 1rem;
+        padding: 0.5rem;
+    }
+
+    .header h2 {
+        font-size: 1.1rem;
+    }
+
+    .level-card {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .level-info h3 {
+        font-size: 1rem;
+    }
+
+    .level-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+
+    .back-btn {
+        min-height: 44px;
+        min-width: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem;
+    }
+}

@@ -1,50 +1,66 @@
-<div role="group" aria-label="Email verification" class="flex flex-col gap-4">
+<div role="group" aria-label="Email verification" class="flex flex-col gap-6 px-4 sm:px-0">
 
   <!-- Step 1: Email -->
   @if (step() === 1) {
-    <div class="animate-in flex flex-col gap-4">
+    <div class="animate-in flex flex-col gap-6">
       <div class="text-center">
-        <h2 class="text-lg font-bold">Verify your email</h2>
-        <p class="text-sm text-base-content/50 mt-1">We'll send a verification code to your email.</p>
+        <div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary/10 mb-3 sm:mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 sm:h-8 sm:w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h2 class="text-lg sm:text-xl font-bold">Verify your email</h2>
+        <p class="text-sm text-base-content/60 mt-2 max-w-xs mx-auto">We'll send a verification code to your email address.</p>
       </div>
 
       <form [formGroup]="emailForm" (ngSubmit)="onSendOtp()" class="flex flex-col gap-4">
         <div class="form-control">
-          <label class="label"><span class="label-text">Email</span></label>
+          <label class="label"><span class="label-text font-medium">Email address</span></label>
           <input
             type="email"
             formControlName="email"
             placeholder="you@example.com"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full input-lg"
+            [class.input-error]="emailForm.controls.email.touched && emailForm.controls.email.invalid"
           />
           @if (emailForm.controls.email.touched && emailForm.controls.email.invalid) {
             <label class="label">
-              <span class="label-text-alt text-error">Please enter a valid email address.</span>
+              <span class="label-text-alt text-error flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                Please enter a valid email address
+              </span>
             </label>
           }
         </div>
 
         @if (errorMessage()) {
-          <div class="alert alert-error text-sm py-2">
+          <div class="alert alert-error text-sm py-3 animate-in" role="alert">
             <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none"
                  viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <span>{{ errorMessage() }}</span>
+            <span class="flex-1">{{ errorMessage() }}</span>
+            <button type="button" (click)="errorMessage.set('')" class="btn btn-ghost btn-xs btn-circle" aria-label="Dismiss error">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         }
 
         <button
           type="submit"
           [disabled]="emailForm.invalid || isLoading()"
-          class="btn btn-primary w-full text-primary-content"
+          class="btn btn-primary w-full text-primary-content btn-lg"
         >
           @if (isLoading()) {
             <span class="loading loading-spinner loading-sm"></span>
-            Sending...
+            <span>Sending code...</span>
           } @else {
-            Send OTP
+            <span>Send verification code</span>
           }
         </button>
       </form>
@@ -53,11 +69,16 @@
 
   <!-- Step 2: OTP -->
   @if (step() === 2) {
-    <div class="animate-in flex flex-col gap-4">
+    <div class="animate-in flex flex-col gap-6">
       <div class="text-center">
-        <h2 class="text-lg font-bold">Enter verification code</h2>
-        <p class="text-sm text-base-content/50 mt-1">
-          We sent a code to <span class="text-base-content font-medium">{{ emailValue }}</span>
+        <div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary/10 mb-3 sm:mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 sm:h-8 sm:w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </div>
+        <h2 class="text-lg sm:text-xl font-bold">Enter verification code</h2>
+        <p class="text-sm text-base-content/60 mt-2">
+          We sent a 6-digit code to <span class="text-base-content font-semibold">{{ emailValue }}</span>
         </p>
       </div>
 
@@ -72,42 +93,49 @@
             [value]="digit"
             [attr.aria-label]="'Digit ' + ($index + 1) + ' of 6'"
             [class.filled]="digit !== ''"
+            [class.error]="errorMessage() !== ''"
             (input)="onOtpInput($event, $index)"
             (keydown)="onOtpKeydown($event, $index)"
             (paste)="onOtpPaste($event)"
             (focus)="onOtpFocus($event)"
             class="otp-box"
+            autocomplete="one-time-code"
           />
         }
       </div>
 
       <!-- Error -->
       @if (errorMessage()) {
-        <div class="alert alert-error text-sm py-2 shake">
+        <div class="alert alert-error text-sm py-3 shake" role="alert">
           <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none"
                viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
-          <span>{{ errorMessage() }}</span>
+          <span class="flex-1">{{ errorMessage() }}</span>
+          <button type="button" (click)="errorMessage.set('')" class="btn btn-ghost btn-xs btn-circle" aria-label="Dismiss error">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       }
 
       <!-- Success -->
       @if (isSuccess()) {
-        <div class="alert alert-success text-sm py-2 animate-in">
+        <div class="alert alert-success text-sm py-3 animate-in" role="status">
           <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none"
                viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
-          <span>Account verified successfully!</span>
+          <span class="flex-1">Account verified successfully!</span>
         </div>
       }
 
       <!-- Countdown Progress Bar -->
       @if (countdown() > 0) {
-        <div class="flex flex-col gap-1.5">
+        <div class="flex flex-col gap-2">
           <div class="countdown-bar-track">
             <div
               class="countdown-bar-fill"
@@ -115,21 +143,30 @@
               [style.width.%]="countdownPercent"
             ></div>
           </div>
-          <p class="text-center text-xs" [ngClass]="isCountdownUrgent ? 'text-error' : 'text-base-content/50'">
-            Code expires in <span class="font-semibold">{{ countdownFormatted }}</span>
+          <p class="text-center text-xs" [ngClass]="isCountdownUrgent ? 'text-error font-medium' : 'text-base-content/60'">
+            @if (isCountdownUrgent) {
+              <span class="flex items-center justify-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                </svg>
+                Code expires in <span class="font-bold">{{ countdownFormatted }}</span>
+              </span>
+            } @else {
+              Code expires in <span class="font-medium">{{ countdownFormatted }}</span>
+            }
           </p>
         </div>
       }
 
       <!-- Expired -->
       @if (countdown() === 0 && !isSuccess()) {
-        <div class="alert alert-warning text-sm py-2">
+        <div class="alert alert-warning text-sm py-3" role="alert">
           <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none"
                viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
           </svg>
-          <span>Code expired. Please resend to get a new one.</span>
+          <span class="flex-1">Code expired. Please resend to get a new one.</span>
         </div>
       }
 
@@ -138,18 +175,18 @@
         type="button"
         (click)="onVerifyOtp()"
         [disabled]="!isOtpComplete || isLoading() || countdown() === 0 || isSuccess()"
-        class="btn btn-primary w-full text-primary-content"
+        class="btn btn-primary w-full text-primary-content btn-lg"
       >
         @if (isLoading()) {
           <span class="loading loading-spinner loading-sm"></span>
-          Verifying...
+          <span>Verifying...</span>
         } @else if (isSuccess()) {
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
           </svg>
-          Verified
+          <span>Verified</span>
         } @else {
-          Verify OTP
+          <span>Verify code</span>
         }
       </button>
 
@@ -160,12 +197,17 @@
           (click)="onResendOtp()"
           [disabled]="countdown() > 0 || isLoading() || isSuccess()"
           class="btn btn-ghost btn-sm"
-          [ngClass]="countdown() === 0 ? 'text-primary' : 'text-base-content/30'"
+          [ngClass]="countdown() === 0 ? 'text-primary font-medium' : 'text-base-content/40'"
         >
         @if (countdown() > 0) {
-          Resend code in {{ countdown() }}s
+          <span>Resend code in {{ countdown() }}s</span>
         } @else {
-          Resend OTP
+          <span class="flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Resend code
+          </span>
         }
         </button>
       </div>

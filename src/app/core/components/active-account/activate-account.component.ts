@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { OtpVerificationComponent } from '../otp-verification.component';
+import { OtpVerificationComponent } from '../otp-verification/otp-verification.component';
 
 @Component({
   selector: 'app-activate-account',

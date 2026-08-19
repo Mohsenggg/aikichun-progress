@@ -11,7 +11,6 @@ export type UserRole = 'admin' | 'user' | 'guest';
 
 const ADMIN_CODE = 'ADMIN123';
 const TOKEN_KEY = 'aikichun_token';
-const USER_KEY = 'aikichun_user';
 
 @Injectable({
     providedIn: 'root'
@@ -48,7 +47,6 @@ export class AuthService {
         this._token.set(response.token);
         this._backendUser.set(response.user);
         localStorage.setItem(TOKEN_KEY, response.token);
-        localStorage.setItem(USER_KEY, JSON.stringify(response.user));
 
         if (response.user.role === 'ADMIN') {
             this._role.set('admin');
@@ -105,29 +103,16 @@ export class AuthService {
         this._role.set('guest');
         this._token.set(null);
         localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
         localStorage.removeItem('aikichun_code');
         this.router.navigate(['/login']);
     }
 
     private restoreSession() {
         const token = localStorage.getItem(TOKEN_KEY);
-        const userJson = localStorage.getItem(USER_KEY);
 
-        if (token && userJson) {
-            try {
-                const user: PublicUserDto = JSON.parse(userJson);
-                this._token.set(token);
-                this._backendUser.set(user);
-                if (user.role === 'ADMIN') {
-                    this._role.set('admin');
-                } else {
-                    this._role.set('user');
-                }
-            } catch {
-                localStorage.removeItem(TOKEN_KEY);
-                localStorage.removeItem(USER_KEY);
-            }
+        if (token) {
+            this._token.set(token);
+            this._role.set('user');
             return;
         }
 

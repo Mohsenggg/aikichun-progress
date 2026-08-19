@@ -94,3 +94,32 @@
     margin-left: auto;
     color: var(--color-text-secondary);
 }
+
+@media (max-width: 600px) {
+    .section-container {
+        gap: 1rem;
+        padding: 0.5rem;
+    }
+
+    .header h2 {
+        font-size: 1.1rem;
+    }
+
+    .sections-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .section-card {
+        padding: 1rem;
+    }
+
+    .back-btn {
+        min-height: 44px;
+        min-width: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem;
+    }
+}
