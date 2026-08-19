@@ -1,0 +1,11 @@
+<div class="activate-overlay">
+  <div class="activate-card bg-base-200 rounded-box shadow-xl">
+    <div class="flex justify-center mb-2">
+      <img src="/assets/aikichun-logo.png" alt="Aikichun" class="w-20 h-auto" />
+    </div>
+
+    <app-otp-verification
+      [email]="email"
+      (verified)="verified.emit()" />
+  </div>
+</div>

@@ -1,29 +1,67 @@
 <div class="login-page">
-    <!-- Background/Logo Placeholder -->
-    <div class="logo-container">
-        <!-- Logo Image Placeholder -->
-        <!-- Logo Image -->
-        <img src="/assets/aikichun-logo.png" alt="Aikichun Logo" class="nav-logo" />
-    </div>
+    <div class="login-card">
+        <!-- Logo -->
+        <div class="logo-container">
+            <img src="/assets/aikichun-logo.png" alt="Aikichun Logo" class="nav-logo" />
+        </div>
 
-    <!-- Form -->
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-        <input type="text" formControlName="code" placeholder="Type Your Code" class="code-input" />
+        <!-- Form -->
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+            <div class="form-control">
+                <label class="label"><span class="label-text">Email</span></label>
+                <input
+                    type="email"
+                    formControlName="email"
+                    placeholder="you@example.com"
+                    class="input input-bordered w-full"
+                />
+            </div>
 
-        <button type="submit" [disabled]="isLoading() || loginForm.invalid" class="submit-btn">
-            {{ isLoading() ? 'Checking...' : 'Update Progress' }}
-        </button>
+            <div class="form-control">
+                <label class="label"><span class="label-text">Password</span></label>
+                <input
+                    type="password"
+                    formControlName="password"
+                    placeholder="Your password"
+                    class="input input-bordered w-full"
+                />
+            </div>
 
-        <p *ngIf="errorMessage()" class="error-msg">
-            {{ errorMessage() }}
+            <button
+                type="submit"
+                [disabled]="isLoading() || loginForm.invalid"
+                class="btn btn-primary w-full text-white"
+            >
+                @if (isLoading()) {
+                    <span class="loading loading-spinner loading-sm"></span>
+                }
+                Login
+            </button>
+
+            @if (errorMessage()) {
+                <div class="alert alert-error text-sm">
+                    <span>{{ errorMessage() }}</span>
+                </div>
+            }
+        </form>
+
+        <p class="text-center text-sm mt-4">
+            Don't have an account?
+            <a routerLink="/register" class="link link-primary">Register</a>
         </p>
-    </form>
 
-    <!-- Footer Socials -->
-    <div class="footer-socials">
-        <div class="social-icon social-icon-y">Y</div>
-        <div class="social-icon social-icon-tk">Tk</div>
-        <div class="social-icon social-icon-ig">Ig</div>
-        <div class="social-icon social-icon-fb">Fb</div>
+        <!-- Footer Socials -->
+        <div class="footer-socials">
+            <div class="social-icon social-icon-y">Y</div>
+            <div class="social-icon social-icon-tk">Tk</div>
+            <div class="social-icon social-icon-ig">Ig</div>
+            <div class="social-icon social-icon-fb">Fb</div>
+        </div>
     </div>
 </div>
+
+@if (showActivatePopup()) {
+    <app-activate-account
+        [email]="activateEmail()"
+        (verified)="onAccountVerified()" />
+}

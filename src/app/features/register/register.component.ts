@@ -3,27 +3,22 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { RegistrationService } from '../../core/services/registration.service';
-import { OtpAuthService } from '../../core/auth/otp-auth.service';
 import { ProgressIndicatorComponent } from './components/progress-indicator.component';
-import { OtpVerificationComponent } from './components/otp-verification.component';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, ProgressIndicatorComponent, OtpVerificationComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, ProgressIndicatorComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })
 export class RegisterComponent {
   private fb = inject(FormBuilder);
   private registrationService = inject(RegistrationService);
-  private otpAuth = inject(OtpAuthService);
   private router = inject(Router);
 
-  view = signal<'register' | 'otp'>('register');
-  registeredEmail = signal('');
   step = signal(1);
   totalSteps = 4;
   isLoading = signal(false);
@@ -197,33 +192,12 @@ export class RegisterComponent {
       this.idPhotoFile
     ).subscribe({
       next: () => {
-        const email = v.email!;
-        this.otpAuth.sendOtp(email).subscribe({
-          next: () => {
-            this.registeredEmail.set(email);
-            this.view.set('otp');
-            this.isLoading.set(false);
-          },
-          error: () => {
-            this.registeredEmail.set(email);
-            this.view.set('otp');
-            this.isLoading.set(false);
-          }
-        });
+        this.router.navigate(['/login']);
       },
       error: (err) => {
         this.errorMessage.set(err.error?.message || 'Registration failed. Please try again.');
         this.isLoading.set(false);
       }
     });
-  }
-
-  onOtpVerified() {
-    this.router.navigate(['/login']);
-  }
-
-  onOtpBack() {
-    this.view.set('register');
-    this.errorMessage.set('');
   }
 }

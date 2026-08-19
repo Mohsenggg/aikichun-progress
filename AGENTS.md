@@ -11,8 +11,8 @@ Angular 18 standalone SPA ("AikichunProgress") — a Wing Chun student-progress 
 
 ## Architecture
 - 100% standalone components, no NgModules. Entry: `src/main.ts` → `app.config.ts` → `AppComponent` (only `<router-outlet>`).
-- Routes in `src/app/app.routes.ts`: `/login` (lazy, no guard), `/admin` (lazy, `roleGuard` expects `admin`), `/roadmap` (lazy, `authGuard`). Guards in `src/app/core/guards/`.
-- Layering: `src/app/core/` = services/guards/roadmap data; `src/app/features/` = `login`, `roadmap`, `admin-profiles`. All state via `signal`/`computed` + `inject()`; guards are functional.
+- Routes in `src/app/app.routes.ts`: `/login` (lazy, no guard), `/register` (lazy, no guard), `/admin` (lazy, `roleGuard` expects `admin`), `/roadmap` (lazy, `authGuard`). Guards in `src/app/core/guards/`.
+- Layering: `src/app/core/` = services/guards/roadmap data; `src/app/features/` = `login`, `register`, `roadmap`, `admin-profiles`. All state via `signal`/`computed` + `inject()`; guards are functional.
 - Supabase wiring in `src/app/core/services/supabase.service.ts`. Credentials are committed in `src/environments/environment.ts` (URL + publishable key — not a secret; single file, no `.prod`).
 - Auth is code-based, NOT Supabase auth: `ADMIN123` hardcoded admin code; students log in with a `code` in the `profiles` table; session restored from localStorage key `aikichun_code`.
 - Supabase client uses `persistSession: false` to avoid NavigatorLock issues — keep it.
@@ -29,7 +29,8 @@ Angular 18 standalone SPA ("AikichunProgress") — a Wing Chun student-progress 
 - Progress: the 3 pointers `status.learning/developed/skilled` hold `stepNumber`s; `getGradeProgress` counts a grade's steps at or below the max pointer index.
 
 ## Style & gotchas
-- Styling is vanilla CSS + CSS variables in `src/styles.css` (aikido-green `#1a2f23`, aikido-red `#d92027`). Tailwind is installed and configured but NOT used (no `@tailwind`/`@apply` anywhere) — do not add Tailwind classes.
+- Styling is vanilla CSS + CSS variables in `src/styles.css` (aikido-green `#1a2f23`, aikido-red `#d92027`). Tailwind directives exist in `styles.css` but no Tailwind utility classes are used in login/roadmap/admin templates — do not add them there. The `register` feature uses DaisyUI component classes (`btn`, `input`, `alert`); keep that contained to register only.
+- Template syntax: login/roadmap/admin use `*ngIf`/`*ngFor` (CommonModule). Register uses `@if`/`@for` (Angular 17+ built-in). New components should use the `@if`/`@for` syntax.
 - Roadmap UI is a `ViewState` machine: GRADES → SECTIONS → LEVELS → STEPS with back-navigation; selection components are dumb (@Input/@Output), progress logic lives in `roadmap.component.ts` / `RoadmapService`.
 - `SupabaseService` keeps an in-memory `profileCache` (Map); `clearCache()` on logout. Admin edits only update `name`/`code` (popup), not `status`.
 - Most content is Arabic; percentages and grade names are English. Keep `stepNumber` values (e.g. `SG1-01`, `SG1-A48`) unchanged — they are the primary keys used for lock/progress logic.

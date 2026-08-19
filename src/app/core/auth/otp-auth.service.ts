@@ -2,8 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SendOtpRequest, VerifyOtpRequest } from '../models/auth.models';
+import {environment} from '../../../environments/environment';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1/auth';
+const API_BASE_URL = `${environment.backendApiUrl}/api/v1/auth`;
 
 @Injectable({
   providedIn: 'root'

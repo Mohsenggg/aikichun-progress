@@ -1,13 +1,14 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
+import { ActivateAccountComponent } from '../../core/components/activate-account.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, ActivateAccountComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -18,9 +19,12 @@ export class LoginComponent {
 
   isLoading = signal(false);
   errorMessage = signal('');
+  showActivatePopup = signal(false);
+  activateEmail = signal('');
 
   loginForm = this.fb.group({
-    code: ['', [Validators.required, Validators.minLength(3)]]
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
   async onSubmit() {
@@ -29,30 +33,36 @@ export class LoginComponent {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    const code = this.loginForm.value.code!.trim();
+    const { email, password } = this.loginForm.value;
 
     try {
-      const success = await this.auth.login(code);
-      console.log('Login success:', success); // DEBUG
-      console.log('Current Role:', this.auth.role()); // DEBUG
+      const response = await this.auth.loginWithEmail(email!, password!);
 
-      if (success) {
-        // Redirect logic based on role
-        if (this.auth.role() === 'admin') {
-          console.log('Redirecting to /admin'); // DEBUG
-          this.router.navigate(['/admin']);
-        } else {
-          console.log('Redirecting to /roadmap'); // DEBUG
-          this.router.navigate(['/roadmap']); // defaults to grade selection
-        }
-      } else {
-        this.errorMessage.set('Invalid Code. Please try again.');
+      if (response.user.accountStatus === 'PENDING_VERIFICATION') {
+        this.activateEmail.set(response.user.email);
+        this.showActivatePopup.set(true);
+        this.isLoading.set(false);
+        return;
       }
-    } catch (err) {
-      this.errorMessage.set('Connection Error.');
-      console.error(err);
+
+      if (this.auth.role() === 'admin') {
+        this.router.navigate(['/admin']);
+      } else {
+        this.router.navigate(['/roadmap']);
+      }
+    } catch (err: any) {
+      this.errorMessage.set(err.error?.message || 'Invalid email or password.');
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  onAccountVerified() {
+    this.showActivatePopup.set(false);
+    if (this.auth.role() === 'admin') {
+      this.router.navigate(['/admin']);
+    } else {
+      this.router.navigate(['/roadmap']);
     }
   }
 }

@@ -1,7 +1,7 @@
 import { Component, inject, signal, ViewChildren, QueryList, ElementRef, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { OtpAuthService } from '../../../core/auth/otp-auth.service';
+import { OtpAuthService } from '../auth/otp-auth.service';
 
 @Component({
   selector: 'app-otp-verification',
@@ -206,7 +206,7 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
 
   private startCountdown() {
     this.stopCountdown();
-    this.countdown.set(300);
+    this.countdown.set(60);
     this.countdownInterval = setInterval(() => {
       const current = this.countdown();
       if (current <= 1) {
