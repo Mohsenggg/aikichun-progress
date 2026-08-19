@@ -1,12 +1,12 @@
 import { Component, inject, signal, ViewChildren, QueryList, ElementRef, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { OtpAuthService } from '../auth/otp-auth.service';
 
 @Component({
   selector: 'app-otp-verification',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [NgClass, ReactiveFormsModule],
   templateUrl: './otp-verification.component.html',
   styleUrl: './otp-verification.component.css'
 })
@@ -22,6 +22,8 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
   isLoading = signal(false);
   errorMessage = signal('');
   countdown = signal(0);
+  isShaking = signal(false);
+  isSuccess = signal(false);
 
   @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
@@ -62,6 +64,21 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
 
   get otpValue(): string {
     return this.otpDigits().join('');
+  }
+
+  get countdownFormatted(): string {
+    const total = this.countdown();
+    const m = Math.floor(total / 60);
+    const s = total % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  }
+
+  get countdownPercent(): number {
+    return (this.countdown() / 60) * 100;
+  }
+
+  get isCountdownUrgent(): boolean {
+    return this.countdown() > 0 && this.countdown() <= 15;
   }
 
   onSendOtp() {
@@ -148,7 +165,7 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
   }
 
   onVerifyOtp() {
-    if (!this.isOtpComplete || this.isLoading()) return;
+    if (!this.isOtpComplete || this.isLoading() || this.countdown() === 0) return;
 
     this.isLoading.set(true);
     this.errorMessage.set('');
@@ -156,11 +173,13 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
     this.otpAuth.verifyOtp(this.emailValue, this.otpValue).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.verified.emit();
+        this.isSuccess.set(true);
+        setTimeout(() => this.verified.emit(), 800);
       },
       error: (err) => {
         this.isLoading.set(false);
         this.errorMessage.set(err.error?.message || 'Invalid or expired OTP. Please try again.');
+        this.triggerShake();
         this.clearOtp();
       }
     });
@@ -193,8 +212,9 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
     setTimeout(() => this.focusOtpInput(0), 0);
   }
 
-  clearError() {
-    this.errorMessage.set('');
+  private triggerShake() {
+    this.isShaking.set(true);
+    setTimeout(() => this.isShaking.set(false), 500);
   }
 
   private focusOtpInput(index: number) {

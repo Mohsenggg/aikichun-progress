@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { RegistrationService } from '../../core/services/registration.service';
-import { ProgressIndicatorComponent } from './components/progress-indicator.component';
+import { ProgressIndicatorComponent } from './components/progress-indicator/progress-indicator.component';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 

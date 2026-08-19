@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
-import { ActivateAccountComponent } from '../../core/components/activate-account.component';
+import { ActivateAccountComponent } from '../../core/components/active-account/activate-account.component';
 
 @Component({
   selector: 'app-login',
