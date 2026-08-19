@@ -88,7 +88,17 @@ export class AuthService {
         return this._token();
     }
 
-    logout() {
+    async logout(): Promise<void> {
+        const token = this._token();
+        if (token) {
+            try {
+                await firstValueFrom(
+                    this.http.post(`${this.apiUrl}/logout`, {}, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    })
+                );
+            } catch { /* backend may have already invalidated — proceed anyway */ }
+        }
         this.supabase.clearCache();
         this._currentUser.set(null);
         this._backendUser.set(null);

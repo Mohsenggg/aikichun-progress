@@ -21,6 +21,7 @@ export class LoginComponent {
   errorMessage = signal('');
   showActivatePopup = signal(false);
   activateEmail = signal('');
+  showPassword = signal(false);
 
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
