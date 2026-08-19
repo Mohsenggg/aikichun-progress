@@ -1,8 +1,7 @@
-import { Component, inject, signal, ViewChildren, QueryList, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, ViewChildren, QueryList, ElementRef, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { OtpAuthService } from '../../core/auth/otp-auth.service';
+import { OtpAuthService } from '../../../core/auth/otp-auth.service';
 
 @Component({
   selector: 'app-otp-verification',
@@ -14,15 +13,15 @@ import { OtpAuthService } from '../../core/auth/otp-auth.service';
 export class OtpVerificationComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private otpAuth = inject(OtpAuthService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+
+  @Input() email = '';
+  @Output() verified = new EventEmitter<void>();
+  @Output() backClicked = new EventEmitter<void>();
 
   step = signal(1);
   isLoading = signal(false);
   errorMessage = signal('');
-  successMessage = signal('');
   countdown = signal(0);
-  verified = signal(false);
 
   @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
@@ -35,9 +34,8 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
 
   ngOnInit() {
-    const email = this.route.snapshot.queryParams['email'];
-    if (email) {
-      this.emailForm.patchValue({ email });
+    if (this.email) {
+      this.emailForm.patchValue({ email: this.email });
       this.step.set(2);
       this.startCountdown();
       setTimeout(() => this.focusOtpInput(0), 100);
@@ -158,10 +156,7 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
     this.otpAuth.verifyOtp(this.emailValue, this.otpValue).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.verified.set(true);
-        this.successMessage.set('Email verified successfully.');
-        // TODO: Navigate to the next route
-        // this.router.navigate(['/register']);
+        this.verified.emit();
       },
       error: (err) => {
         this.isLoading.set(false);
@@ -189,11 +184,8 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
     });
   }
 
-  goToEmailStep() {
-    this.step.set(1);
-    this.errorMessage.set('');
-    this.successMessage.set('');
-    this.clearOtp();
+  onBack() {
+    this.backClicked.emit();
   }
 
   clearOtp() {

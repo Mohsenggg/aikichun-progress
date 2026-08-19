@@ -5,223 +5,232 @@
       <img src="/assets/aikichun-logo.png" alt="Aikichun" class="w-24 h-auto" />
     </div>
 
-    <!-- Progress Indicator -->
-    <app-progress-indicator [currentStep]="step()" [totalSteps]="totalSteps" class="mb-6" />
+    @if (view() === 'register') {
+      <!-- Progress Indicator -->
+      <app-progress-indicator [currentStep]="step()" [totalSteps]="totalSteps" class="mb-6" />
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
 
-      <!-- Step 1: Account -->
-      @if (step() === 1) {
-        <div class="flex flex-col gap-4 animate-in">
-          <h2 class="card-title text-lg justify-center">Account</h2>
+        <!-- Step 1: Account -->
+        @if (step() === 1) {
+          <div class="flex flex-col gap-4 animate-in">
+            <h2 class="card-title text-lg justify-center">Account</h2>
 
-          <div class="form-control">
-            <label class="label"><span class="label-text">Full Name</span></label>
-            <input type="text" formControlName="fullName" placeholder="Your Name" class="input input-bordered w-full" />
-          </div>
-
-          <div class="form-control">
-            <label class="label"><span class="label-text">Email</span></label>
-            <input type="email" formControlName="email" placeholder="you@example.com" class="input input-bordered w-full" />
-          </div>
-
-          <div class="form-control">
-            <label class="label"><span class="label-text">Password</span></label>
-            <div class="join w-full">
-              <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" placeholder="Min 8 chars, 1 uppercase, 1 digit" class="input input-bordered join-item flex-1" />
-              <button type="button" (click)="showPassword.set(!showPassword())" class="btn btn-outline join-item px-3">
-                @if (showPassword()) {
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
-                } @else {
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
-                }
-              </button>
+            <div class="form-control">
+              <label class="label"><span class="label-text">Full Name</span></label>
+              <input type="text" formControlName="fullName" placeholder="Your Name" class="input input-bordered w-full" />
             </div>
-            @if (passwordErrors.length > 0) {
-              <label class="label">
-                <span class="label-text-alt text-error flex flex-col gap-0.5">
-                  @for (err of passwordErrors; track err) {
-                    <span>{{ err }}</span>
+
+            <div class="form-control">
+              <label class="label"><span class="label-text">Email</span></label>
+              <input type="email" formControlName="email" placeholder="you@example.com" class="input input-bordered w-full" />
+            </div>
+
+            <div class="form-control">
+              <label class="label"><span class="label-text">Password</span></label>
+              <div class="join w-full">
+                <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" placeholder="Min 8 chars, 1 uppercase, 1 digit" class="input input-bordered join-item flex-1" />
+                <button type="button" (click)="showPassword.set(!showPassword())" class="btn btn-outline join-item px-3">
+                  @if (showPassword()) {
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
+                  } @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
                   }
-                </span>
-              </label>
-            }
-          </div>
-        </div>
-      }
-
-      <!-- Step 2: Personal Information -->
-      @if (step() === 2) {
-        <div class="flex flex-col gap-4 animate-in">
-          <h2 class="card-title text-lg justify-center">Personal Information</h2>
-
-          <div class="form-control">
-            <label class="label"><span class="label-text">Date of Birth</span></label>
-            <input type="date" formControlName="dateOfBirth" class="input input-bordered w-full" />
-          </div>
-
-          <div class="form-control">
-            <label class="label"><span class="label-text">Profession</span></label>
-            <input type="text" formControlName="profession" placeholder="e.g. Engineer" class="input input-bordered w-full" />
-          </div>
-
-          <div class="form-control">
-            <label class="label"><span class="label-text">Branch</span></label>
-            <select formControlName="branch" class="select select-bordered w-full">
-              <option value="" disabled>Select a branch</option>
-              @for (branch of branchOptions; track branch.value) {
-                <option [value]="branch.value">{{ branch.label }}</option>
+                </button>
+              </div>
+              @if (passwordErrors.length > 0) {
+                <label class="label">
+                  <span class="label-text-alt text-error flex flex-col gap-0.5">
+                    @for (err of passwordErrors; track err) {
+                      <span>{{ err }}</span>
+                    }
+                  </span>
+                </label>
               }
-            </select>
+            </div>
           </div>
-        </div>
-      }
+        }
 
-      <!-- Step 3: Contact & Health -->
-      @if (step() === 3) {
-        <div class="flex flex-col gap-4 animate-in">
-          <h2 class="card-title text-lg justify-center">Contact &amp; Health</h2>
+        <!-- Step 2: Personal Information -->
+        @if (step() === 2) {
+          <div class="flex flex-col gap-4 animate-in">
+            <h2 class="card-title text-lg justify-center">Personal Information</h2>
 
-          <div class="form-control">
-            <label class="label"><span class="label-text">Phone Number</span></label>
-            <div class="join w-full">
-              <select formControlName="phoneCountryCode" class="select select-bordered join-item w-28">
-                @for (code of countryCodes; track code.value) {
-                  <option [value]="code.value">{{ code.label }}</option>
+            <div class="form-control">
+              <label class="label"><span class="label-text">Date of Birth</span></label>
+              <input type="date" formControlName="dateOfBirth" class="input input-bordered w-full" />
+            </div>
+
+            <div class="form-control">
+              <label class="label"><span class="label-text">Profession</span></label>
+              <input type="text" formControlName="profession" placeholder="e.g. Engineer" class="input input-bordered w-full" />
+            </div>
+
+            <div class="form-control">
+              <label class="label"><span class="label-text">Branch</span></label>
+              <select formControlName="branch" class="select select-bordered w-full">
+                <option value="" disabled>Select a branch</option>
+                @for (branch of branchOptions; track branch.value) {
+                  <option [value]="branch.value">{{ branch.label }}</option>
                 }
               </select>
-              <input type="tel" formControlName="phoneNumber" placeholder="01234567890" class="input input-bordered join-item flex-1" />
             </div>
-            @if (form.controls.phoneNumber.touched && form.controls.phoneNumber.invalid) {
-              <label class="label"><span class="label-text-alt text-error">Enter a valid phone number (7-15 digits)</span></label>
-            } @else {
-              <label class="label"><span class="label-text-alt">e.g. +20 01234567890</span></label>
+          </div>
+        }
+
+        <!-- Step 3: Contact & Health -->
+        @if (step() === 3) {
+          <div class="flex flex-col gap-4 animate-in">
+            <h2 class="card-title text-lg justify-center">Contact &amp; Health</h2>
+
+            <div class="form-control">
+              <label class="label"><span class="label-text">Phone Number</span></label>
+              <div class="join w-full">
+                <select formControlName="phoneCountryCode" class="select select-bordered join-item w-28">
+                  @for (code of countryCodes; track code.value) {
+                    <option [value]="code.value">{{ code.label }}</option>
+                  }
+                </select>
+                <input type="tel" formControlName="phoneNumber" placeholder="01234567890" class="input input-bordered join-item flex-1" />
+              </div>
+              @if (form.controls.phoneNumber.touched && form.controls.phoneNumber.invalid) {
+                <label class="label"><span class="label-text-alt text-error">Enter a valid phone number (7-15 digits)</span></label>
+              } @else {
+                <label class="label"><span class="label-text-alt">e.g. +20 01234567890</span></label>
+              }
+            </div>
+
+            <div class="form-control">
+              <label class="label"><span class="label-text">Emergency Phone Number</span></label>
+              <div class="join w-full">
+                <select formControlName="emergencyPhoneCountryCode" class="select select-bordered join-item w-28">
+                  @for (code of countryCodes; track code.value) {
+                    <option [value]="code.value">{{ code.label }}</option>
+                  }
+                </select>
+                <input type="tel" formControlName="phoneNumberEmergency" placeholder="01234567890" class="input input-bordered join-item flex-1" />
+              </div>
+              @if (form.controls.phoneNumberEmergency.touched && form.controls.phoneNumberEmergency.invalid) {
+                <label class="label"><span class="label-text-alt text-error">Enter a valid phone number (7-15 digits)</span></label>
+              } @else {
+                <label class="label"><span class="label-text-alt">e.g. +20 01234567890</span></label>
+              }
+            </div>
+
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input type="checkbox" formControlName="hasCondition" class="checkbox checkbox-primary" />
+                <span class="label-text">Has chronic condition or injury?</span>
+              </label>
+            </div>
+
+            @if (form.controls.hasCondition.value) {
+              <div class="form-control animate-in">
+                <label class="label"><span class="label-text">Medical Notes</span></label>
+                <textarea formControlName="medicalNotes" rows="3" placeholder="Describe any conditions or injuries..." class="textarea textarea-bordered w-full"></textarea>
+              </div>
             }
           </div>
+        }
 
-          <div class="form-control">
-            <label class="label"><span class="label-text">Emergency Phone Number</span></label>
-            <div class="join w-full">
-              <select formControlName="emergencyPhoneCountryCode" class="select select-bordered join-item w-28">
-                @for (code of countryCodes; track code.value) {
-                  <option [value]="code.value">{{ code.label }}</option>
-                }
-              </select>
-              <input type="tel" formControlName="phoneNumberEmergency" placeholder="01234567890" class="input input-bordered join-item flex-1" />
+        <!-- Step 4: Membership & Documents -->
+        @if (step() === 4) {
+          <div class="flex flex-col gap-4 animate-in">
+            <h2 class="card-title text-lg justify-center">Membership &amp; Documents</h2>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="form-control">
+                <label class="label"><span class="label-text">Start Month</span></label>
+                <select formControlName="subStartMonth" class="select select-bordered w-full">
+                  <option value="" disabled>Month</option>
+                  @for (m of monthOptions; track m.value) {
+                    <option [value]="m.value">{{ m.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="form-control">
+                <label class="label"><span class="label-text">Start Year</span></label>
+                <select formControlName="subStartYear" class="select select-bordered w-full">
+                  <option value="" disabled>Year</option>
+                  @for (y of yearOptions; track y.value) {
+                    <option [value]="y.value">{{ y.label }}</option>
+                  }
+                </select>
+              </div>
             </div>
-            @if (form.controls.phoneNumberEmergency.touched && form.controls.phoneNumberEmergency.invalid) {
-              <label class="label"><span class="label-text-alt text-error">Enter a valid phone number (7-15 digits)</span></label>
-            } @else {
-              <label class="label"><span class="label-text-alt">e.g. +20 01234567890</span></label>
-            }
-          </div>
 
-          <div class="form-control">
-            <label class="label cursor-pointer justify-start gap-3">
-              <input type="checkbox" formControlName="hasCondition" class="checkbox checkbox-primary" />
-              <span class="label-text">Has chronic condition or injury?</span>
-            </label>
-          </div>
-
-          @if (form.controls.hasCondition.value) {
-            <div class="form-control animate-in">
-              <label class="label"><span class="label-text">Medical Notes</span></label>
-              <textarea formControlName="medicalNotes" rows="3" placeholder="Describe any conditions or injuries..." class="textarea textarea-bordered w-full"></textarea>
+            <div class="form-control">
+              <label class="label"><span class="label-text">Profile Photo</span></label>
+              <input type="file" accept="image/*" (change)="onProfilePhotoSelected($event)" class="file-input file-input-bordered w-full" />
+              <label class="label">
+                <span class="label-text-alt">Max 5 MB — JPG, PNG</span>
+              </label>
+              @if (profilePhotoError()) {
+                <label class="label"><span class="label-text-alt text-error">{{ profilePhotoError() }}</span></label>
+              }
             </div>
+
+            <div class="form-control">
+              <label class="label"><span class="label-text">ID Photo</span></label>
+              <input type="file" accept="image/*" (change)="onIdPhotoSelected($event)" class="file-input file-input-bordered w-full" />
+              <label class="label">
+                <span class="label-text-alt">Max 5 MB — JPG, PNG</span>
+              </label>
+              @if (idPhotoError()) {
+                <label class="label"><span class="label-text-alt text-error">{{ idPhotoError() }}</span></label>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Error / Success Messages -->
+        @if (errorMessage()) {
+          <div class="alert alert-error text-sm">
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+        @if (successMessage()) {
+          <div class="alert alert-success text-sm">
+            <span>{{ successMessage() }}</span>
+          </div>
+        }
+
+        <!-- Navigation Buttons -->
+        <div class="flex gap-3 mt-2">
+          @if (!isFirstStep) {
+            <button type="button" (click)="prevStep()" class="btn btn-outline flex-1">
+              Back
+            </button>
+          }
+
+          @if (!isLastStep) {
+            <button type="button" (click)="nextStep()" [disabled]="!isCurrentStepValid" class="btn btn-primary flex-1 text-white">
+              Next
+            </button>
+          } @else {
+            <button type="submit" [disabled]="form.invalid || isLoading()" class="btn btn-primary flex-1 text-white">
+              @if (isLoading()) {
+                <span class="loading loading-spinner loading-sm"></span>
+              }
+              Register
+            </button>
           }
         </div>
-      }
 
-      <!-- Step 4: Membership & Documents -->
-      @if (step() === 4) {
-        <div class="flex flex-col gap-4 animate-in">
-          <h2 class="card-title text-lg justify-center">Membership &amp; Documents</h2>
+        <!-- Login Link -->
+        <p class="text-center text-sm mt-1">
+          Already have an account?
+          <a routerLink="/login" class="link link-primary">Login</a>
+        </p>
+      </form>
+    }
 
-          <div class="grid grid-cols-2 gap-3">
-            <div class="form-control">
-              <label class="label"><span class="label-text">Start Month</span></label>
-              <select formControlName="subStartMonth" class="select select-bordered w-full">
-                <option value="" disabled>Month</option>
-                @for (m of monthOptions; track m.value) {
-                  <option [value]="m.value">{{ m.label }}</option>
-                }
-              </select>
-            </div>
-
-            <div class="form-control">
-              <label class="label"><span class="label-text">Start Year</span></label>
-              <select formControlName="subStartYear" class="select select-bordered w-full">
-                <option value="" disabled>Year</option>
-                @for (y of yearOptions; track y.value) {
-                  <option [value]="y.value">{{ y.label }}</option>
-                }
-              </select>
-            </div>
-          </div>
-
-          <div class="form-control">
-            <label class="label"><span class="label-text">Profile Photo</span></label>
-            <input type="file" accept="image/*" (change)="onProfilePhotoSelected($event)" class="file-input file-input-bordered w-full" />
-            <label class="label">
-              <span class="label-text-alt">Max 5 MB — JPG, PNG</span>
-            </label>
-            @if (profilePhotoError()) {
-              <label class="label"><span class="label-text-alt text-error">{{ profilePhotoError() }}</span></label>
-            }
-          </div>
-
-          <div class="form-control">
-            <label class="label"><span class="label-text">ID Photo</span></label>
-            <input type="file" accept="image/*" (change)="onIdPhotoSelected($event)" class="file-input file-input-bordered w-full" />
-            <label class="label">
-              <span class="label-text-alt">Max 5 MB — JPG, PNG</span>
-            </label>
-            @if (idPhotoError()) {
-              <label class="label"><span class="label-text-alt text-error">{{ idPhotoError() }}</span></label>
-            }
-          </div>
-        </div>
-      }
-
-      <!-- Error / Success Messages -->
-      @if (errorMessage()) {
-        <div class="alert alert-error text-sm">
-          <span>{{ errorMessage() }}</span>
-        </div>
-      }
-      @if (successMessage()) {
-        <div class="alert alert-success text-sm">
-          <span>{{ successMessage() }}</span>
-        </div>
-      }
-
-      <!-- Navigation Buttons -->
-      <div class="flex gap-3 mt-2">
-        @if (!isFirstStep) {
-          <button type="button" (click)="prevStep()" class="btn btn-outline flex-1">
-            Back
-          </button>
-        }
-
-        @if (!isLastStep) {
-          <button type="button" (click)="nextStep()" [disabled]="!isCurrentStepValid" class="btn btn-primary flex-1 text-white">
-            Next
-          </button>
-        } @else {
-          <button type="submit" [disabled]="form.invalid || isLoading()" class="btn btn-primary flex-1 text-white">
-            @if (isLoading()) {
-              <span class="loading loading-spinner loading-sm"></span>
-            }
-            Register
-          </button>
-        }
-      </div>
-
-      <!-- Login Link -->
-      <p class="text-center text-sm mt-1">
-        Already have an account?
-        <a routerLink="/login" class="link link-primary">Login</a>
-      </p>
-    </form>
+    @if (view() === 'otp') {
+      <app-otp-verification
+        [email]="registeredEmail()"
+        (verified)="onOtpVerified()"
+        (backClicked)="onOtpBack()" />
+    }
   </div>
 </div>

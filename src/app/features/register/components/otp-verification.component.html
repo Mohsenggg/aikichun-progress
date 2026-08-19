@@ -1,0 +1,140 @@
+<div role="group" aria-label="Email verification" class="flex flex-col gap-4">
+
+  <!-- Step 1: Email -->
+  @if (step() === 1) {
+    <div class="animate-in flex flex-col gap-4">
+      <h2 class="card-title text-lg justify-center">Verify your email</h2>
+      <p class="text-sm text-base-content/50 text-center">We'll send a verification code to your email.</p>
+
+      <form [formGroup]="emailForm" (ngSubmit)="onSendOtp()" class="flex flex-col gap-4">
+        <div class="form-control">
+          <label class="label"><span class="label-text">Email</span></label>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="you@example.com"
+            class="input input-bordered w-full"
+            (input)="clearError()"
+          />
+          @if (emailForm.controls.email.touched && emailForm.controls.email.invalid) {
+            <label class="label">
+              <span class="label-text-alt text-error">Please enter a valid email address.</span>
+            </label>
+          }
+        </div>
+
+        @if (errorMessage()) {
+          <div class="alert alert-error text-sm py-2">
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <button
+          type="submit"
+          [disabled]="emailForm.invalid || isLoading()"
+          class="btn btn-primary w-full text-primary-content"
+        >
+          @if (isLoading()) {
+            <span class="loading loading-spinner loading-sm"></span>
+            Sending...
+          } @else {
+            Send OTP
+          }
+        </button>
+      </form>
+
+      <button
+        type="button"
+        (click)="onBack()"
+        [disabled]="isLoading()"
+        class="btn btn-outline w-full"
+      >
+        Back to Register
+      </button>
+    </div>
+  }
+
+  <!-- Step 2: OTP -->
+  @if (step() === 2) {
+    <div class="animate-in flex flex-col gap-4">
+      <div class="text-center">
+        <h2 class="card-title text-lg justify-center">Enter verification code</h2>
+        <p class="text-sm text-base-content/50 mt-1">
+          We sent a verification code to <span class="text-base-content font-medium">{{ emailValue }}</span>
+        </p>
+      </div>
+
+      <!-- OTP Input Boxes -->
+      <div class="flex gap-2.5 sm:gap-3 justify-center" role="group" aria-label="One-time password input">
+        @for (digit of otpDigits(); track $index) {
+          <input
+            #otpInput
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            [value]="digit"
+            [attr.aria-label]="'Digit ' + ($index + 1) + ' of 6'"
+            (input)="onOtpInput($event, $index)"
+            (keydown)="onOtpKeydown($event, $index)"
+            (paste)="onOtpPaste($event)"
+            (focus)="onOtpFocus($event)"
+            class="otp-box input input-bordered text-center text-xl font-semibold"
+            [class.input-primary]="digit !== ''"
+          />
+        }
+      </div>
+
+      @if (errorMessage()) {
+        <div class="alert alert-error text-sm py-2">
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      <!-- Code expired warning -->
+      @if (countdown() === 0) {
+        <div class="alert alert-warning text-sm py-2">
+          <span>Code expired. Please resend to get a new one.</span>
+        </div>
+      }
+
+      <div class="flex flex-col gap-3 items-center">
+        <button
+          type="button"
+          (click)="onVerifyOtp()"
+          [disabled]="!isOtpComplete || isLoading() || countdown() === 0"
+          class="btn btn-primary w-full text-primary-content"
+        >
+          @if (isLoading()) {
+            <span class="loading loading-spinner loading-sm"></span>
+            Verifying...
+          } @else {
+            Verify OTP
+          }
+        </button>
+
+        <button
+          type="button"
+          (click)="onBack()"
+          [disabled]="isLoading()"
+          class="btn btn-outline w-full"
+        >
+          Back to Register
+        </button>
+
+        <button
+          type="button"
+          (click)="onResendOtp()"
+          [disabled]="countdown() > 0 || isLoading()"
+          class="btn btn-ghost btn-sm text-primary"
+        >
+          @if (countdown() > 0) {
+            Resend code in {{ countdown() }}s
+          } @else {
+            Resend OTP
+          }
+        </button>
+      </div>
+    </div>
+  }
+
+</div>

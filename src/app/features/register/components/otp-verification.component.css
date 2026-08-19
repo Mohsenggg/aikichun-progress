@@ -1,0 +1,36 @@
+:host {
+  display: block;
+}
+
+/* ── OTP Boxes (DaisyUI has no equivalent) ── */
+
+.otp-box {
+  width: 44px;
+  height: 52px;
+  font-size: 1.25rem;
+}
+
+@media (max-width: 420px) {
+  .otp-box {
+    width: 40px;
+    height: 48px;
+    font-size: 1.1rem;
+  }
+}
+
+/* ── Step Transition ── */
+
+.animate-in {
+  animation: fadeSlideIn 0.3s ease-out;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
