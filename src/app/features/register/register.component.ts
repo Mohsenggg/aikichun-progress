@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { RegistrationService } from '../../core/services/registration.service';
+import { OtpAuthService } from '../../core/auth/otp-auth.service';
 import { ProgressIndicatorComponent } from './components/progress-indicator.component';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -17,6 +18,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 export class RegisterComponent {
   private fb = inject(FormBuilder);
   private registrationService = inject(RegistrationService);
+  private otpAuth = inject(OtpAuthService);
   private router = inject(Router);
 
   step = signal(1);
@@ -192,8 +194,15 @@ export class RegisterComponent {
       this.idPhotoFile
     ).subscribe({
       next: () => {
-        this.successMessage.set('Registration successful! Redirecting to login...');
-        setTimeout(() => this.router.navigate(['/login']), 2000);
+        const email = v.email!;
+        this.otpAuth.sendOtp(email).subscribe({
+          next: () => {
+            this.router.navigate(['/otp'], { queryParams: { email } });
+          },
+          error: () => {
+            this.router.navigate(['/otp'], { queryParams: { email } });
+          }
+        });
       },
       error: (err) => {
         this.errorMessage.set(err.error?.message || 'Registration failed. Please try again.');

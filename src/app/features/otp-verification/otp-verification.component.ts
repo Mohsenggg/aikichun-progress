@@ -1,7 +1,7 @@
 import { Component, inject, signal, ViewChildren, QueryList, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { OtpAuthService } from '../../core/auth/otp-auth.service';
 
 @Component({
@@ -15,6 +15,7 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private otpAuth = inject(OtpAuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   step = signal(1);
   isLoading = signal(false);
@@ -34,7 +35,15 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
 
   ngOnInit() {
-    this.startCountdown();
+    const email = this.route.snapshot.queryParams['email'];
+    if (email) {
+      this.emailForm.patchValue({ email });
+      this.step.set(2);
+      this.startCountdown();
+      setTimeout(() => this.focusOtpInput(0), 100);
+    } else {
+      this.startCountdown();
+    }
   }
 
   ngOnDestroy() {
@@ -205,7 +214,7 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
 
   private startCountdown() {
     this.stopCountdown();
-    this.countdown.set(60);
+    this.countdown.set(300);
     this.countdownInterval = setInterval(() => {
       const current = this.countdown();
       if (current <= 1) {
