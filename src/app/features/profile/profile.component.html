@@ -1,0 +1,92 @@
+<div class="profile-page">
+  <div class="profile-card bg-base-200 rounded-box shadow-xl">
+
+    <!-- Back Link -->
+    <a routerLink="/roadmap" class="link link-primary text-sm mb-4 inline-flex items-center gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+      </svg>
+      Back to Roadmap
+    </a>
+
+    <!-- Avatar -->
+    <div class="flex flex-col items-center mb-4">
+      <div class="avatar-placeholder">
+        <div class="bg-primary text-primary-content rounded-full w-20 h-20 flex items-center justify-center">
+          <span class="text-2xl font-bold">{{ initials() }}</span>
+        </div>
+      </div>
+      <h2 class="text-xl font-bold mt-3">{{ userName() }}</h2>
+      <p class="text-sm opacity-70">{{ email() }}</p>
+      <div class="flex gap-2 mt-2">
+        <span class="badge badge-primary badge-sm">{{ role() }}</span>
+        <span class="badge badge-sm" [ngClass]="{
+          'badge-success': accountStatus() === 'ACTIVE',
+          'badge-warning': accountStatus() === 'PENDING_VERIFICATION',
+          'badge-error': accountStatus() === 'SUSPENDED' || accountStatus() === 'BANNED'
+        }">{{ accountStatus() }}</span>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="divider my-2"></div>
+
+    <!-- Progress Section -->
+    <div class="space-y-3">
+      <h3 class="text-sm font-semibold uppercase opacity-60">Progress</h3>
+
+      <!-- Learning -->
+      <div>
+        <div class="flex justify-between text-xs mb-1">
+          <span>Learning</span>
+          <span class="font-semibold">{{ learningProgress() }}%</span>
+        </div>
+        <progress class="progress progress-primary w-full" [value]="learningProgress()" max="100"></progress>
+      </div>
+
+      <!-- Developed -->
+      <div>
+        <div class="flex justify-between text-xs mb-1">
+          <span>Developed</span>
+          <span class="font-semibold">{{ developedProgress() }}%</span>
+        </div>
+        <progress class="progress progress-primary w-full" [value]="developedProgress()" max="100"></progress>
+      </div>
+
+      <!-- Skilled -->
+      <div>
+        <div class="flex justify-between text-xs mb-1">
+          <span>Skilled</span>
+          <span class="font-semibold">{{ skilledProgress() }}%</span>
+        </div>
+        <progress class="progress progress-primary w-full" [value]="skilledProgress()" max="100"></progress>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="divider my-2"></div>
+
+    <!-- Stats -->
+    <div class="text-xs space-y-1 opacity-80">
+      <div class="flex justify-between">
+        <span>Last Update</span>
+        <span>{{ lastUpdateFormatted() }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span>Total Steps</span>
+        <span>{{ totalSteps() }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span>Updates Used</span>
+        <span>{{ updatesUsed() }} / 50</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3 mt-6">
+      <button class="btn btn-primary flex-1 text-white" (click)="goToRoadmap()">View Roadmap</button>
+      <button class="btn btn-outline btn-error flex-1" (click)="logout()">Logout</button>
+    </div>
+
+  </div>
+</div>
