@@ -7,13 +7,9 @@
         </div>
 
         <div class="user-controls">
-            <div class="user-info">
+            <button class="avatar-btn" (click)="showProfile.set(true)">
                 <i class="fa-solid fa-circle-user avatar-icon"></i>
-                <div class="user-details">
-                    <span class="user-name">{{ userName() }}</span>
-                    <button class="logout-link" (click)="logout()">Log Out</button>
-                </div>
-            </div>
+            </button>
         </div>
 
         <!-- Global Save/Changes Indicator -->
@@ -71,4 +67,6 @@
     </div>
 
 </div>
-<!-- Sticky Save Bar -->
+
+<!-- Profile Popup -->
+<app-profile [isOpen]="showProfile()" (close)="showProfile.set(false)" />

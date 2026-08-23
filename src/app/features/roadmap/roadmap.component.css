@@ -28,46 +28,27 @@
     right: 0;
 }
 
-.user-info {
-    display: flex;
-    flex-direction: column;
+.avatar-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    justify-content: center;
 }
 
 .avatar-icon {
     font-size: 1.5rem;
     color: white;
     opacity: 0.9;
+    transition: opacity 0.2s;
 }
 
-.user-details {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.user-name {
-    color: white;
-    font-weight: 700;
-    font-size: 1.1rem;
-}
-
-.logout-link {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    opacity: 0.8;
-    padding: 0;
-}
-
-.logout-link:hover {
+.avatar-btn:hover .avatar-icon {
     opacity: 1;
-    text-decoration: underline;
 }
 
 .global-actions {

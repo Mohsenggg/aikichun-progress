@@ -1,6 +1,5 @@
-import { Component, inject, signal, OnInit, computed } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { RoadmapService } from '../../core/roadmap/roadmap.service';
@@ -9,15 +8,17 @@ import { Profile } from '../../core/services/supabase-types';
 @Component({
     selector: 'app-profile',
     standalone: true,
-    imports: [CommonModule, RouterLink],
+    imports: [CommonModule],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css'
 })
 export class ProfileComponent implements OnInit {
+    @Input() isOpen = false;
+    @Output() close = new EventEmitter<void>();
+
     private auth = inject(AuthService);
     private supabase = inject(SupabaseService);
     private roadmapService = inject(RoadmapService);
-    private router = inject(Router);
 
     backendUser = this.auth.backendUser;
     profile = signal<Profile | null>(null);
@@ -88,6 +89,6 @@ export class ProfileComponent implements OnInit {
         }
     }
 
-    goToRoadmap() { this.router.navigate(['/roadmap']); }
+    onClose() { this.close.emit(); }
     logout() { this.auth.logout(); }
 }

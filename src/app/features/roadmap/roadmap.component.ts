@@ -12,6 +12,7 @@ import { SectionSelectionComponent } from './components/section-selection/sectio
 import { LevelSelectionComponent } from './components/level-selection/level-selection.component';
 import { RoadmapLevelComponent } from './components/roadmap-level.component';
 import { RoadmapStepComponent } from './components/roadmap-step.component';
+import { ProfileComponent } from '../profile/profile.component';
 
 type ViewState = 'GRADES' | 'SECTIONS' | 'LEVELS' | 'STEPS';
 
@@ -24,7 +25,8 @@ type ViewState = 'GRADES' | 'SECTIONS' | 'LEVELS' | 'STEPS';
         SectionSelectionComponent,
         LevelSelectionComponent,
         RoadmapLevelComponent,
-        RoadmapStepComponent
+        RoadmapStepComponent,
+        ProfileComponent
     ],
     templateUrl: './roadmap.component.html',
     styleUrl: './roadmap.component.css'
@@ -45,6 +47,7 @@ export class RoadmapComponent implements OnInit {
     selectedLevel = signal<RoadmapLevel | null>(null);
 
     // Profile State
+    showProfile = signal(false);
     originalProfile = signal<Profile | null>(null);
     draftStatus = signal<ProfileStatus>({ learning: null, developed: null, skilled: null });
     isSaving = signal(false);
