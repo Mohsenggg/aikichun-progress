@@ -11,6 +11,7 @@ export type UserRole = 'admin' | 'user' | 'guest';
 
 const ADMIN_CODE = 'ADMIN123';
 const TOKEN_KEY = 'aikichun_token';
+const USER_KEY = 'aikichun_user';
 
 @Injectable({
     providedIn: 'root'
@@ -21,6 +22,7 @@ export class AuthService {
     private router = inject(Router);
 
     private apiUrl = `${environment.backendApiUrl}/api/v1/auth`;
+    private userApiUrl = `${environment.backendApiUrl}/api/v1/user`;
 
     private _currentUser = signal<Profile | null>(null);
     private _backendUser = signal<PublicUserDto | null>(null);
@@ -44,16 +46,7 @@ export class AuthService {
             this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
         );
 
-        this._token.set(response.token);
-        this._backendUser.set(response.user);
-        localStorage.setItem(TOKEN_KEY, response.token);
-
-        if (response.user.role === 'ADMIN') {
-            this._role.set('admin');
-        } else {
-            this._role.set('user');
-        }
-
+        this.setSession(response);
         return response;
     }
 
@@ -82,6 +75,44 @@ export class AuthService {
         return true;
     }
 
+    async getProfile(): Promise<any> {
+        return firstValueFrom(
+            this.http.get(`${this.userApiUrl}/me`)
+        );
+    }
+
+    async updateProfile(data: Record<string, any>): Promise<any> {
+        return firstValueFrom(
+            this.http.put(`${this.userApiUrl}/profile`, data)
+        );
+    }
+
+    async changePassword(currentPassword: string, newPassword: string): Promise<any> {
+        return firstValueFrom(
+            this.http.put(`${this.userApiUrl}/password`, { currentPassword, newPassword })
+        );
+    }
+
+    async updatePhoto(file: File): Promise<any> {
+        const formData = new FormData();
+        formData.append('profilePhoto', file);
+        return firstValueFrom(
+            this.http.put(`${this.userApiUrl}/photo`, formData)
+        );
+    }
+
+    async forgotPassword(email: string): Promise<any> {
+        return firstValueFrom(
+            this.http.post(`${this.apiUrl}/forgot-password`, { email })
+        );
+    }
+
+    async resetPassword(email: string, otp: string, newPassword: string): Promise<any> {
+        return firstValueFrom(
+            this.http.post(`${this.apiUrl}/reset-password`, { email, otp, newPassword })
+        );
+    }
+
     getToken(): string | null {
         return this._token();
     }
@@ -97,23 +128,49 @@ export class AuthService {
                 );
             } catch { /* backend may have already invalidated — proceed anyway */ }
         }
+        this.clearSession();
+    }
+
+    private setSession(response: AuthResponse) {
+        this._token.set(response.token);
+        this._backendUser.set(response.user);
+        localStorage.setItem(TOKEN_KEY, response.token);
+        localStorage.setItem(USER_KEY, JSON.stringify(response.user));
+
+        if (response.user.role === 'ADMIN') {
+            this._role.set('admin');
+        } else {
+            this._role.set('user');
+        }
+    }
+
+    private clearSession() {
         this.supabase.clearCache();
         this._currentUser.set(null);
         this._backendUser.set(null);
         this._role.set('guest');
         this._token.set(null);
         localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(USER_KEY);
         localStorage.removeItem('aikichun_code');
         this.router.navigate(['/login']);
     }
 
     private restoreSession() {
         const token = localStorage.getItem(TOKEN_KEY);
+        const userJson = localStorage.getItem(USER_KEY);
 
-        if (token) {
-            this._token.set(token);
-            this._role.set('user');
-            return;
+        if (token && userJson) {
+            try {
+                const user: PublicUserDto = JSON.parse(userJson);
+                this._token.set(token);
+                this._backendUser.set(user);
+                this._role.set(user.role === 'ADMIN' ? 'admin' : 'user');
+                return;
+            } catch {
+                localStorage.removeItem(TOKEN_KEY);
+                localStorage.removeItem(USER_KEY);
+            }
         }
 
         const storedCode = localStorage.getItem('aikichun_code');

@@ -8,6 +8,26 @@ export interface PublicUserDto {
   accountStatus: AccountStatus;
 }
 
+export interface UserDto {
+  id: string;
+  fullName: string;
+  email: string;
+  dateOfBirth: string;
+  profession: string;
+  branch: string;
+  phoneNumber: string;
+  phoneNumberEmergency: string;
+  servicesOrExperience: string;
+  productsAndDiscounts: string;
+  martialArtsExperience: string;
+  hasChronicConditionOrInjury: boolean;
+  medicalNotes: string;
+  subscriptionStartMonth: number;
+  subscriptionStartYear: number;
+  role: string;
+  profilePhotoPath: string;
+}
+
 export interface AuthResponse {
   user: PublicUserDto;
   token: string;

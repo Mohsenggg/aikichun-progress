@@ -2,6 +2,7 @@ import { Component, inject, signal, ViewChildren, QueryList, ElementRef, Input, 
 import { NgClass } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { OtpAuthService } from '../../auth/otp-auth.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-otp-verification',
@@ -13,6 +14,7 @@ import { OtpAuthService } from '../../auth/otp-auth.service';
 export class OtpVerificationComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private otpAuth = inject(OtpAuthService);
+  private auth = inject(AuthService);
 
   @Input() email = '';
   @Output() verified = new EventEmitter<void>();
@@ -171,7 +173,8 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
     this.errorMessage.set('');
 
     this.otpAuth.verifyOtp(this.emailValue, this.otpValue).subscribe({
-      next: () => {
+      next: (response) => {
+        this.auth['setSession'](response);
         this.isLoading.set(false);
         this.isSuccess.set(true);
         setTimeout(() => this.verified.emit(), 800);

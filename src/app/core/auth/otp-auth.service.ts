@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { SendOtpRequest, VerifyOtpRequest } from '../models/auth.models';
+import { AuthResponse, SendOtpRequest, VerifyOtpRequest } from '../models/auth.models';
 import {environment} from '../../../environments/environment';
 
 const API_BASE_URL = `${environment.backendApiUrl}/api/v1/auth`;
@@ -17,8 +17,8 @@ export class OtpAuthService {
     return this.http.post(`${API_BASE_URL}/send-otp`, body);
   }
 
-  verifyOtp(email: string, otp: string): Observable<unknown> {
+  verifyOtp(email: string, otp: string): Observable<AuthResponse> {
     const body: VerifyOtpRequest = { email, otp };
-    return this.http.post(`${API_BASE_URL}/verify-otp`, body);
+    return this.http.post<AuthResponse>(`${API_BASE_URL}/verify-otp`, body);
   }
 }

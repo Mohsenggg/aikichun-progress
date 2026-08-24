@@ -1,85 +1,224 @@
-<dialog class="modal" [class.modal-open]="isOpen" (click)="onClose()">
-  <div class="modal-box max-w-md p-6 sm:p-8" (click)="$event.stopPropagation()">
+<dialog
+  #dialogEl
+  class="modal profile-modal"
+  [class.modal-open]="isOpen"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="profile-title"
+  (click)="onClose()">
+
+  <div class="modal-box profile-sheet" (click)="$event.stopPropagation()">
 
     <!-- Close Button -->
-    <form method="dialog" class="absolute top-2 right-2">
-      <button class="btn btn-sm btn-circle btn-ghost" (click)="onClose()">&times;</button>
-    </form>
+    <button
+      class="btn btn-sm btn-circle btn-ghost profile-close-btn"
+      aria-label="Close profile"
+      (click)="onClose()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
 
-    <!-- Avatar + Name -->
-    <div class="flex flex-col items-center mb-4">
-      <div class="avatar avatar-placeholder mb-3">
-        <div class="bg-primary text-primary-content rounded-full w-20 h-20">
-          <span class="text-2xl font-bold">{{ initials() }}</span>
+    <!-- Scrollable Content -->
+    <div class="profile-scroll">
+
+      <!-- Header: Avatar + Info -->
+      <div class="profile-header">
+        <div class="avatar-group">
+          <div class="avatar avatar-placeholder profile-avatar">
+            <div class="bg-base-300 text-base-content rounded-full w-16 h-16 sm:w-20 sm:h-20 ring-2 ring-primary/30 ring-offset-base-100 ring-offset-2">
+              @if (profilePhotoUrl() && !photoError()) {
+                <img
+                  [src]="profilePhotoUrl()"
+                  [alt]="userName() + ' profile photo'"
+                  class="object-cover"
+                  (error)="onPhotoError()" />
+              } @else {
+                <span class="text-xl sm:text-2xl font-bold">{{ initials() }}</span>
+              }
+            </div>
+          </div>
+          <label class="avatar-upload-overlay" aria-label="Upload profile photo">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <input type="file" accept="image/*" (change)="onPhotoSelected($event)" class="hidden" />
+          </label>
+        </div>
+
+        <div class="profile-info">
+          <h2 id="profile-title" class="profile-name">{{ userName() }}</h2>
+          <p class="profile-email">{{ email() }}</p>
+          <div class="flex flex-wrap gap-1.5 mt-1.5 justify-center">
+            <span class="badge badge-primary badge-sm">{{ roleLabel() }}</span>
+            @if (accountStatusLabel()) {
+              <span class="badge badge-sm" [ngClass]="accountStatusClass()">{{ accountStatusLabel() }}</span>
+            }
+          </div>
         </div>
       </div>
-      <h2 class="text-xl font-bold">{{ userName() }}</h2>
-      <p class="text-sm opacity-60 mt-0.5">{{ email() }}</p>
-      <div class="flex gap-2 mt-2">
-        <span class="badge badge-primary">{{ role() }}</span>
-        <span class="badge" [ngClass]="{
-          'badge-success': accountStatus() === 'ACTIVE',
-          'badge-warning': accountStatus() === 'PENDING_VERIFICATION',
-          'badge-error': accountStatus() === 'SUSPENDED' || accountStatus() === 'BANNED'
-        }">{{ accountStatus() }}</span>
-      </div>
-    </div>
 
-    <div class="divider"></div>
-
-    <!-- Progress Section -->
-    <div class="space-y-3">
-      <h3 class="text-xs font-semibold uppercase opacity-50">Progress</h3>
-
-      <div>
-        <div class="flex justify-between text-xs mb-1">
-          <span>Learning</span>
-          <span class="font-semibold">{{ learningProgress() }}%</span>
+      <!-- Alert -->
+      @if (saveMessage()) {
+        <div
+          role="alert"
+          class="alert text-sm py-2 px-3 mb-3"
+          [ngClass]="saveMessage().includes('success') ? 'alert-success' : 'alert-error'">
+          <span>{{ saveMessage() }}</span>
         </div>
-        <progress class="progress progress-primary w-full" [value]="learningProgress()" max="100"></progress>
-      </div>
+      }
 
-      <div>
-        <div class="flex justify-between text-xs mb-1">
-          <span>Developed</span>
-          <span class="font-semibold">{{ developedProgress() }}%</span>
-        </div>
-        <progress class="progress progress-primary w-full" [value]="developedProgress()" max="100"></progress>
-      </div>
+      <!-- Edit Mode -->
+      @if (isEditing()) {
+        <form [formGroup]="profileForm" (ngSubmit)="onSaveProfile()" class="flex flex-col gap-3">
+          <div class="form-control">
+            <label class="label py-1"><span class="label-text text-xs">Full name</span></label>
+            <input type="text" formControlName="fullName" class="input input-bordered input-sm w-full" />
+          </div>
+          <div class="form-control">
+            <label class="label py-1"><span class="label-text text-xs">Phone number</span></label>
+            <input type="tel" formControlName="phoneNumber" placeholder="+201234567890" class="input input-bordered input-sm w-full" />
+          </div>
+          <div class="form-control">
+            <label class="label py-1"><span class="label-text text-xs">Emergency phone</span></label>
+            <input type="tel" formControlName="phoneNumberEmergency" placeholder="+201234567890" class="input input-bordered input-sm w-full" />
+          </div>
+          <div class="form-control">
+            <label class="label py-1"><span class="label-text text-xs">Medical notes</span></label>
+            <textarea formControlName="medicalNotes" rows="2" class="textarea textarea-bordered textarea-sm w-full" placeholder="Any chronic conditions or injuries..."></textarea>
+          </div>
+          <div class="flex gap-2 pt-1">
+            <button type="button" (click)="cancelEditing()" class="btn btn-outline btn-sm flex-1">Cancel</button>
+            <button type="submit" [disabled]="isSaving() || profileForm.invalid" class="btn btn-primary btn-sm text-white flex-1">
+              @if (isSaving()) { <span class="loading loading-spinner loading-xs"></span> }
+              Save
+            </button>
+          </div>
+        </form>
+      }
 
-      <div>
-        <div class="flex justify-between text-xs mb-1">
-          <span>Skilled</span>
-          <span class="font-semibold">{{ skilledProgress() }}%</span>
-        </div>
-        <progress class="progress progress-primary w-full" [value]="skilledProgress()" max="100"></progress>
-      </div>
+      <!-- View Mode -->
+      @if (!isEditing()) {
+
+        <!-- Progress Section -->
+        <section aria-labelledby="progress-heading">
+          <h3 id="progress-heading" class="section-label">Progress</h3>
+          <div class="space-y-2.5">
+            <div>
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="progress-label">Learning</span>
+                <span class="progress-value">{{ learningProgress() }}%</span>
+              </div>
+              <progress
+                class="progress w-full"
+                [ngClass]="learningColor()"
+                [value]="learningProgress()"
+                max="100"
+                aria-label="Learning progress"
+                role="progressbar"
+                [attr.aria-valuenow]="learningProgress()"
+                aria-valuemin="0"
+                aria-valuemax="100">
+              </progress>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="progress-label">Developed</span>
+                <span class="progress-value">{{ developedProgress() }}%</span>
+              </div>
+              <progress
+                class="progress w-full"
+                [ngClass]="developedColor()"
+                [value]="developedProgress()"
+                max="100"
+                aria-label="Developed progress"
+                role="progressbar"
+                [attr.aria-valuenow]="developedProgress()"
+                aria-valuemin="0"
+                aria-valuemax="100">
+              </progress>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="progress-label">Skilled</span>
+                <span class="progress-value">{{ skilledProgress() }}%</span>
+              </div>
+              <progress
+                class="progress w-full"
+                [ngClass]="skilledColor()"
+                [value]="skilledProgress()"
+                max="100"
+                aria-label="Skilled progress"
+                role="progressbar"
+                [attr.aria-valuenow]="skilledProgress()"
+                aria-valuemin="0"
+                aria-valuemax="100">
+              </progress>
+            </div>
+          </div>
+        </section>
+
+        <div class="divider my-3"></div>
+
+        <!-- Stats Section -->
+        <section aria-label="Account statistics">
+          <div class="stats-grid">
+            <div class="stat-cell">
+              <span class="stat-label">Last Update</span>
+              <span class="stat-value">{{ lastUpdateFormatted() }}</span>
+            </div>
+            <div class="stat-cell">
+              <span class="stat-label">Total Steps</span>
+              <span class="stat-value">{{ totalSteps() }}</span>
+            </div>
+            <div class="stat-cell">
+              <span class="stat-label">Updates Used</span>
+              <span class="stat-value">{{ updatesUsed() }} / 50</span>
+            </div>
+          </div>
+        </section>
+
+        <div class="divider my-3"></div>
+
+        <!-- Password Change Section -->
+        @if (showPasswordSection()) {
+          <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="flex flex-col gap-3 mb-3">
+            <div class="form-control">
+              <label class="label py-1"><span class="label-text text-xs">Current password</span></label>
+              <input type="password" formControlName="currentPassword" class="input input-bordered input-sm w-full" />
+            </div>
+            <div class="form-control">
+              <label class="label py-1"><span class="label-text text-xs">New password</span></label>
+              <input type="password" formControlName="newPassword" class="input input-bordered input-sm w-full" placeholder="Min 8 chars, 1 uppercase, 1 digit" />
+            </div>
+            <div class="flex gap-2">
+              <button type="button" (click)="showPasswordSection.set(false)" class="btn btn-outline btn-sm flex-1">Cancel</button>
+              <button type="submit" [disabled]="isSaving() || passwordForm.invalid" class="btn btn-primary btn-sm text-white flex-1">
+                @if (isSaving()) { <span class="loading loading-spinner loading-xs"></span> }
+                Change
+              </button>
+            </div>
+          </form>
+        }
+      }
+
     </div>
 
-    <div class="divider"></div>
-
-    <!-- Stats -->
-    <div class="stats stats-vertical w-full sm:stats-horizontal shadow-sm">
-      <div class="stat place-items-center py-2 px-4">
-        <div class="stat-title text-xs">Last Update</div>
-        <div class="stat-value text-sm">{{ lastUpdateFormatted() }}</div>
+    <!-- Sticky Actions Footer -->
+    @if (!isEditing()) {
+      <div class="profile-actions">
+        <button class="btn btn-outline btn-sm w-full" (click)="startEditing()">Edit Profile</button>
+        <button class="btn btn-outline btn-sm w-full" (click)="togglePasswordSection()">
+          {{ showPasswordSection() ? 'Hide Password' : 'Change Password' }}
+        </button>
+        <div class="divider my-1"></div>
+        <button class="btn btn-outline btn-error btn-sm w-full" (click)="logout()">Logout</button>
       </div>
-      <div class="stat place-items-center py-2 px-4">
-        <div class="stat-title text-xs">Total Steps</div>
-        <div class="stat-value text-sm">{{ totalSteps() }}</div>
-      </div>
-      <div class="stat place-items-center py-2 px-4">
-        <div class="stat-title text-xs">Updates Used</div>
-        <div class="stat-value text-sm">{{ updatesUsed() }} / 50</div>
-      </div>
-    </div>
-
-    <!-- Logout Button -->
-    <div class="modal-action">
-      <button class="btn btn-outline btn-error w-full" (click)="logout()">Logout</button>
-    </div>
+    }
 
   </div>
+
   <form method="dialog" class="modal-backdrop">
     <button (click)="onClose()">close</button>
   </form>
