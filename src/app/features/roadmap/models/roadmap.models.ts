@@ -6,10 +6,8 @@ export interface PriorityStage {
 
 export interface Task {
   id: number;
-  code: string | null;
   title: string;
   description: string;
-  weight: number;
   active: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -27,7 +25,9 @@ export interface StageTask {
 export interface RoadmapStage {
   id: number;
   levelId: number;
+  code?: string | null;
   name: string;
+  weight: number;
   position: number;
   priorityStage: PriorityStage | null;
   tasks: StageTask[];
@@ -68,6 +68,8 @@ export interface PriorityStageRequest {
 export interface StageRequest {
   name: string;
   levelId: number;
+  code?: string | null;
+  weight?: number;
   priorityStageId?: number | null;
 }
 
@@ -87,17 +89,15 @@ export interface StageTaskReorderItem {
 }
 
 export interface TaskRequest {
-  code?: string;
   title: string;
   description?: string;
-  weight: number;
   active?: boolean;
 }
 
 // UI-Only State Types
 export type EditTarget =
   | { kind: 'level'; id: number; initialValue: string }
-  | { kind: 'stage'; id: number; initialValue: string }
+  | { kind: 'stage'; id: number; initialName: string; initialCode?: string | null; initialWeight: number }
   | { kind: 'priorityStage'; id: number; initialName: string; initialColor: string }
   | null;
 

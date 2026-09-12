@@ -80,36 +80,6 @@
             }
           </div>
 
-          <div class="form-row">
-            <div class="form-group col-half">
-              <label for="task-code" class="form-label">Code / Reference</label>
-              <input
-                id="task-code"
-                type="text"
-                class="form-input"
-                formControlName="code"
-                placeholder="e.g., T-001"
-                maxlength="20" />
-            </div>
-
-            <div class="form-group col-half">
-              <label for="task-weight" class="form-label">
-                Weight (points) <span class="required">*</span>
-              </label>
-              <input
-                id="task-weight"
-                type="number"
-                min="1"
-                class="form-input"
-                [class.input-error]="taskForm.get('weight')?.invalid && (taskForm.get('weight')?.dirty || taskForm.get('weight')?.touched)"
-                formControlName="weight"
-                placeholder="10" />
-              @if (taskForm.get('weight')?.invalid && (taskForm.get('weight')?.dirty || taskForm.get('weight')?.touched)) {
-                <span class="field-error">Weight must be ≥ 1</span>
-              }
-            </div>
-          </div>
-
           <div class="form-group">
             <label for="task-desc" class="form-label">Description / Instructions</label>
             <textarea
@@ -178,9 +148,6 @@
                   (click)="selectExistingTask(task.id)">
                   <div class="task-card-info">
                     <div class="task-card-header">
-                      @if (task.code) {
-                        <span class="task-code-badge">{{ task.code }}</span>
-                      }
                       <span class="task-card-title">{{ task.title }}</span>
                     </div>
                     @if (task.description) {
@@ -188,7 +155,6 @@
                     }
                   </div>
                   <div class="task-card-meta">
-                    <span class="weight-badge">w: {{ task.weight }}</span>
                     <span class="selection-check">
                       @if (selectedExistingTaskId() === task.id) {
                         ✓

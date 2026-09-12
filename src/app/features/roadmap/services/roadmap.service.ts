@@ -251,8 +251,37 @@ export class RoadmapService {
                 return {
                   ...stage,
                   name: updated.name,
+                  code: updated.code,
+                  weight: updated.weight,
                   position: updated.position,
                   priorityStage: updated.priorityStage
+                };
+              }
+              return stage;
+            })
+          }));
+          this.roadmap.set({ ...current, levels: updatedLevels });
+        }
+      }),
+      catchError(err => {
+        this.setError(err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  updateStageWeight(id: number, weight: number): Observable<RoadmapStage> {
+    return this.http.patch<RoadmapStage>(`${this.base}/stages/${id}/weight`, { weight }).pipe(
+      tap((updated) => {
+        const current = this.roadmap();
+        if (current) {
+          const updatedLevels = current.levels.map(level => ({
+            ...level,
+            stages: level.stages.map(stage => {
+              if (stage.id === id) {
+                return {
+                  ...stage,
+                  weight: updated.weight
                 };
               }
               return stage;

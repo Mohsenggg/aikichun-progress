@@ -32,10 +32,8 @@ export class TaskFormDialogComponent implements OnChanges {
   isSearching = signal(false);
 
   taskForm: FormGroup = this.fb.group({
-    code: [''],
     title: ['', [Validators.required, Validators.maxLength(150)]],
     description: [''],
-    weight: [10, [Validators.required, Validators.min(1)]],
     active: [true]
   });
 
@@ -48,19 +46,15 @@ export class TaskFormDialogComponent implements OnChanges {
       if (this.mode.kind === 'editTask') {
         this.activeTab.set('create');
         this.taskForm.setValue({
-          code: this.mode.task.code || '',
           title: this.mode.task.title || '',
           description: this.mode.task.description || '',
-          weight: this.mode.task.weight ?? 10,
           active: this.mode.task.active ?? true
         });
       } else {
         this.activeTab.set('create');
         this.taskForm.reset({
-          code: '',
           title: '',
           description: '',
-          weight: 10,
           active: true
         });
         if (this.mode.kind === 'addExistingTask') {
@@ -144,10 +138,8 @@ export class TaskFormDialogComponent implements OnChanges {
 
     const formVal = this.taskForm.value;
     const taskReq = {
-      code: formVal.code?.trim() || undefined,
       title: formVal.title.trim(),
       description: formVal.description?.trim() || undefined,
-      weight: Number(formVal.weight),
       active: formVal.active ?? true
     };
 

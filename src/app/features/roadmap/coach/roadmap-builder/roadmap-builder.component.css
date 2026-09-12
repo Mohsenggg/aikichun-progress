@@ -491,6 +491,96 @@
   color: var(--white);
 }
 
+.stage-code-badge {
+  font-size: 0.72rem;
+  font-family: monospace;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--white);
+  padding: 0.15rem 0.45rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  letter-spacing: 0.04em;
+}
+
+.stage-weight-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #facc15;
+  background: rgba(250, 204, 21, 0.12);
+  border: 1px solid rgba(250, 204, 21, 0.28);
+  padding: 0.15rem 0.45rem;
+  border-radius: 0.25rem;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: default;
+}
+
+.stage-weight-badge.clickable {
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.stage-weight-badge.clickable:hover {
+  background: rgba(250, 204, 21, 0.25);
+  border-color: rgba(250, 204, 21, 0.6);
+  transform: translateY(-1px);
+}
+
+.stage-weight-badge .edit-icon {
+  font-size: 0.68rem;
+  opacity: 0.7;
+}
+
+.inline-weight-edit-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.35rem;
+  border: 1px solid rgba(250, 204, 21, 0.45);
+}
+
+.weight-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #facc15;
+}
+
+.weight-quick-input {
+  width: 65px;
+  padding: 0.1rem 0.3rem;
+  font-size: 0.8rem;
+  height: 24px;
+}
+
+.stage-edit-box {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.stage-code-input {
+  max-width: 90px;
+}
+
+.stage-weight-input {
+  max-width: 80px;
+}
+
+.inline-add-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  width: 100%;
+}
+
 .priority-selector-wrapper {
   display: inline-flex;
   align-items: center;

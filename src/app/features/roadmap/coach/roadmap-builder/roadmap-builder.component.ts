@@ -38,6 +38,8 @@ export class RoadmapBuilderComponent implements OnInit {
   // Inline Editing
   editingTarget = signal<EditTarget>(null);
   inlineEditValue = signal('');
+  inlineEditCode = signal('');
+  inlineEditWeight = signal<number>(10);
   inlineEditColor = signal('#d92027');
   inlineEditError = signal<string | null>(null);
 
@@ -48,13 +50,20 @@ export class RoadmapBuilderComponent implements OnInit {
 
   // New Stage Inline Input
   addingStageLevelId = signal<number | null>(null);
+  newStageCode = signal('');
   newStageName = signal('');
+  newStageWeight = signal<number>(10);
   newStageError = signal<string | null>(null);
 
   // New Priority Stage Inline Input
   newPriorityName = signal('');
   newPriorityColor = signal('#d92027');
   newPriorityError = signal<string | null>(null);
+
+  // Quick Edit Stage Weight Input
+  editingWeightStageId = signal<number | null>(null);
+  inlineStageWeightValue = signal<number>(10);
+  inlineStageWeightError = signal<string | null>(null);
 
   ngOnInit(): void {
     this.roadmapService.loadRoadmap();
@@ -175,13 +184,17 @@ export class RoadmapBuilderComponent implements OnInit {
 
   openAddStage(levelId: number): void {
     this.addingStageLevelId.set(levelId);
+    this.newStageCode.set('');
     this.newStageName.set('');
+    this.newStageWeight.set(10);
     this.newStageError.set(null);
   }
 
   cancelAddStage(): void {
     this.addingStageLevelId.set(null);
+    this.newStageCode.set('');
     this.newStageName.set('');
+    this.newStageWeight.set(10);
     this.newStageError.set(null);
   }
 
@@ -191,22 +204,39 @@ export class RoadmapBuilderComponent implements OnInit {
       this.newStageError.set('Stage name is required');
       return;
     }
+    const weight = Number(this.newStageWeight());
+    if (isNaN(weight) || weight <= 0) {
+      this.newStageError.set('Stage weight must be greater than zero');
+      return;
+    }
 
     this.roadmapService.createStage({
       name,
       levelId,
+      code: this.newStageCode().trim() || null,
+      weight,
       priorityStageId: null
     }).subscribe({
       next: () => {
         this.cancelAddStage();
       },
-      error: () => {}
+      error: (err) => {
+        this.newStageError.set(err.error?.message || err.message || 'Failed to create stage');
+      }
     });
   }
 
   startEditStage(stage: RoadmapStage): void {
-    this.editingTarget.set({ kind: 'stage', id: stage.id, initialValue: stage.name });
+    this.editingTarget.set({
+      kind: 'stage',
+      id: stage.id,
+      initialName: stage.name,
+      initialCode: stage.code,
+      initialWeight: stage.weight ?? 10
+    });
     this.inlineEditValue.set(stage.name);
+    this.inlineEditCode.set(stage.code || '');
+    this.inlineEditWeight.set(stage.weight ?? 10);
     this.inlineEditError.set(null);
   }
 
@@ -216,14 +246,23 @@ export class RoadmapBuilderComponent implements OnInit {
       this.inlineEditError.set('Name is required');
       return;
     }
+    const weight = Number(this.inlineEditWeight());
+    if (isNaN(weight) || weight <= 0) {
+      this.inlineEditError.set('Weight must be greater than zero');
+      return;
+    }
 
     this.roadmapService.updateStage(stage.id, {
       name: val,
       levelId: stage.levelId,
+      code: this.inlineEditCode().trim() || null,
+      weight,
       priorityStageId: stage.priorityStage?.id ?? null
     }).subscribe({
       next: () => this.cancelEdit(),
-      error: () => {}
+      error: (err) => {
+        this.inlineEditError.set(err.error?.message || err.message || 'Failed to update stage');
+      }
     });
   }
 
@@ -231,6 +270,35 @@ export class RoadmapBuilderComponent implements OnInit {
     if (confirm('Are you sure you want to delete this stage?')) {
       this.roadmapService.deleteStage(id).subscribe();
     }
+  }
+
+  startEditStageWeight(stage: RoadmapStage): void {
+    this.editingWeightStageId.set(stage.id);
+    this.inlineStageWeightValue.set(stage.weight ?? 10);
+    this.inlineStageWeightError.set(null);
+  }
+
+  cancelEditStageWeight(): void {
+    this.editingWeightStageId.set(null);
+    this.inlineStageWeightValue.set(10);
+    this.inlineStageWeightError.set(null);
+  }
+
+  saveStageWeight(stage: RoadmapStage): void {
+    const weight = Number(this.inlineStageWeightValue());
+    if (isNaN(weight) || weight <= 0) {
+      this.inlineStageWeightError.set('Weight must be > 0');
+      return;
+    }
+
+    this.roadmapService.updateStageWeight(stage.id, weight).subscribe({
+      next: () => {
+        this.cancelEditStageWeight();
+      },
+      error: (err) => {
+        this.inlineStageWeightError.set(err.error?.message || err.message || 'Failed to update weight');
+      }
+    });
   }
 
   onPriorityStageChange(stage: RoadmapStage, event: Event): void {
@@ -452,7 +520,10 @@ export class RoadmapBuilderComponent implements OnInit {
   cancelEdit(): void {
     this.editingTarget.set(null);
     this.inlineEditValue.set('');
+    this.inlineEditCode.set('');
+    this.inlineEditWeight.set(10);
     this.inlineEditError.set(null);
+    this.cancelEditStageWeight();
   }
 
   onInlineKeydown(event: KeyboardEvent, onSave: () => void): void {
