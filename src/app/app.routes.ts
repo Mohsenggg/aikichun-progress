@@ -3,7 +3,7 @@ import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
-    { path: '', redirectTo: '/login', pathMatch: 'full' },
+    { path: '', redirectTo: '/coach/roadmap', pathMatch: 'full' },
     {
         path: 'login',
         loadComponent: () => import('./features/login/login.component').then(m => m.LoginComponent)
@@ -18,7 +18,15 @@ export const routes: Routes = [
     {
         path: 'roadmap',
         canActivate: [authGuard],
-        loadComponent: () => import('./features/roadmap/roadmap.component').then(m => m.RoadmapComponent)
+        loadComponent: () => import('./features/roadmap_old/roadmap.component').then(m => m.RoadmapComponent)
+    },
+    {
+        path: 'coach/roadmap',
+        // canActivate: [roleGuard],
+        // data: { expectedRole: 'admin' },
+        loadComponent: () =>
+            import('./features/roadmap/coach/roadmap-builder/roadmap-builder.component')
+                .then(m => m.RoadmapBuilderComponent)
     },
     { path: '**', redirectTo: '/login' }
 ];

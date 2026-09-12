@@ -1,0 +1,225 @@
+@if (mode) {
+  <div class="dialog-backdrop" (click)="onBackdropClick($event)">
+    <div class="dialog-container" role="dialog" aria-modal="true">
+      <!-- Header -->
+      <div class="dialog-header">
+        <div class="dialog-title-wrapper">
+          <h3 class="dialog-title">
+            @if (mode.kind === 'editTask') {
+              Edit Task
+            } @else {
+              Add Task to Stage
+            }
+          </h3>
+          <p class="dialog-subtitle">
+            @if (mode.kind === 'editTask') {
+              Update global task properties
+            } @else {
+              Define a new task or choose from existing pool
+            }
+          </p>
+        </div>
+        <button type="button" class="close-btn" (click)="close()" aria-label="Close dialog">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mode switcher if creating -->
+      @if (mode.kind !== 'editTask') {
+        <div class="tab-bar">
+          <button
+            type="button"
+            class="tab-btn"
+            [class.active]="activeTab() === 'create'"
+            (click)="setTab('create')">
+            Create New Task
+          </button>
+          <button
+            type="button"
+            class="tab-btn"
+            [class.active]="activeTab() === 'existing'"
+            (click)="setTab('existing')">
+            Choose Existing Task
+          </button>
+        </div>
+      }
+
+      <!-- Error message -->
+      @if (errorMessage()) {
+        <div class="dialog-error">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      <!-- Body: Create / Edit Form -->
+      @if (activeTab() === 'create' || mode.kind === 'editTask') {
+        <form [formGroup]="taskForm" (ngSubmit)="submit()" class="dialog-body">
+          <div class="form-group">
+            <label for="task-title" class="form-label">
+              Task Title <span class="required">*</span>
+            </label>
+            <input
+              id="task-title"
+              type="text"
+              class="form-input"
+              [class.input-error]="taskForm.get('title')?.invalid && (taskForm.get('title')?.dirty || taskForm.get('title')?.touched)"
+              formControlName="title"
+              placeholder="e.g., Forward Roll (Mae Ukemi)"
+              maxlength="150"
+              autofocus />
+            @if (taskForm.get('title')?.invalid && (taskForm.get('title')?.dirty || taskForm.get('title')?.touched)) {
+              <span class="field-error">Title is required (max 150 chars)</span>
+            }
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="task-code" class="form-label">Code / Reference</label>
+              <input
+                id="task-code"
+                type="text"
+                class="form-input"
+                formControlName="code"
+                placeholder="e.g., T-001"
+                maxlength="20" />
+            </div>
+
+            <div class="form-group col-half">
+              <label for="task-weight" class="form-label">
+                Weight (points) <span class="required">*</span>
+              </label>
+              <input
+                id="task-weight"
+                type="number"
+                min="1"
+                class="form-input"
+                [class.input-error]="taskForm.get('weight')?.invalid && (taskForm.get('weight')?.dirty || taskForm.get('weight')?.touched)"
+                formControlName="weight"
+                placeholder="10" />
+              @if (taskForm.get('weight')?.invalid && (taskForm.get('weight')?.dirty || taskForm.get('weight')?.touched)) {
+                <span class="field-error">Weight must be ≥ 1</span>
+              }
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="task-desc" class="form-label">Description / Instructions</label>
+            <textarea
+              id="task-desc"
+              class="form-textarea"
+              formControlName="description"
+              rows="3"
+              placeholder="Provide context, criteria, or coaching tips for this task..."></textarea>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="active" class="form-checkbox" />
+              <span>Active in system</span>
+            </label>
+          </div>
+
+          <!-- Dialog Actions -->
+          <div class="dialog-footer">
+            <button type="button" class="btn btn-ghost" (click)="close()" [disabled]="isSubmitting()">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="isSubmitting() || taskForm.invalid">
+              @if (isSubmitting()) {
+                <span class="spinner-sm"></span>
+                <span>Saving…</span>
+              } @else {
+                <span>{{ mode.kind === 'editTask' ? 'Save Changes' : 'Create & Add' }}</span>
+              }
+            </button>
+          </div>
+        </form>
+      } @else {
+        <!-- Existing tasks picker tab -->
+        <div class="dialog-body existing-picker">
+          <div class="form-group">
+            <div class="search-input-wrapper">
+              <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input
+                type="text"
+                class="form-input search-input"
+                placeholder="Search by task title or code..."
+                [value]="searchQuery()"
+                (input)="onSearchInput($event)" />
+            </div>
+          </div>
+
+          <div class="existing-tasks-list">
+            @if (isSearching()) {
+              <div class="list-state">
+                <span class="spinner-sm"></span>
+                <span>Searching tasks…</span>
+              </div>
+            } @else if (searchResults().length === 0) {
+              <div class="list-state empty">
+                No matching tasks found. You can switch to "Create New Task" above.
+              </div>
+            } @else {
+              @for (task of searchResults(); track task.id) {
+                <div
+                  class="existing-task-card"
+                  [class.selected]="selectedExistingTaskId() === task.id"
+                  (click)="selectExistingTask(task.id)">
+                  <div class="task-card-info">
+                    <div class="task-card-header">
+                      @if (task.code) {
+                        <span class="task-code-badge">{{ task.code }}</span>
+                      }
+                      <span class="task-card-title">{{ task.title }}</span>
+                    </div>
+                    @if (task.description) {
+                      <p class="task-card-desc">{{ task.description }}</p>
+                    }
+                  </div>
+                  <div class="task-card-meta">
+                    <span class="weight-badge">w: {{ task.weight }}</span>
+                    <span class="selection-check">
+                      @if (selectedExistingTaskId() === task.id) {
+                        ✓
+                      }
+                    </span>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+
+          <!-- Dialog Actions for existing -->
+          <div class="dialog-footer">
+            <button type="button" class="btn btn-ghost" (click)="close()" [disabled]="isSubmitting()">
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="submit()"
+              [disabled]="isSubmitting() || !selectedExistingTaskId()">
+              @if (isSubmitting()) {
+                <span class="spinner-sm"></span>
+                <span>Adding…</span>
+              } @else {
+                <span>Add Selected Task</span>
+              }
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}
