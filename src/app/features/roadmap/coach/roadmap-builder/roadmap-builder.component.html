@@ -2,8 +2,8 @@
   <!-- Top Navigation / Header -->
   <header class="builder-header">
     <div class="header-brand">
-      <h1 class="page-title">Roadmap Builder</h1>
-      <p class="page-subtitle">Configure Aikichun progression, levels, stages, and tasks</p>
+      <h1 class="page-title">{{ roadmap()?.name || 'Roadmap Builder' }}</h1>
+      <p class="page-subtitle">{{ roadmap()?.description || 'Configure Aikichun progression, levels, steps, and tasks' }}</p>
     </div>
 
     <div class="header-actions">
@@ -60,13 +60,35 @@
   <main class="builder-container">
     <!-- Roadmap Meta Card -->
     <div class="roadmap-meta">
+      @if (editingTarget()?.kind === 'roadmap') {
+      <div class="roadmap-meta-edit-box">
+        <div class="edit-fields-row">
+          <input type="text" class="form-input flex-1" placeholder="Roadmap Title" [value]="inlineEditValue()"
+            (input)="inlineEditValue.set($any($event.target).value)"
+            (keydown)="onInlineKeydown($event, saveEditRoadmap.bind(this))" autofocus />
+          <button type="button" class="btn btn-primary btn-sm" (click)="saveEditRoadmap()">Save</button>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="cancelEdit()">Cancel</button>
+        </div>
+        <textarea class="form-textarea mt-2" placeholder="Roadmap description..." [value]="inlineEditDescription()"
+          (input)="inlineEditDescription.set($any($event.target).value)" rows="2"></textarea>
+        @if (inlineEditError()) {
+        <span class="inline-error">{{ inlineEditError() }}</span>
+        }
+      </div>
+      } @else {
       <div class="meta-info">
-        <h2 class="roadmap-name">{{ roadmap()?.name }}</h2>
+        <div class="meta-title-row">
+          <h2 class="roadmap-name">{{ roadmap()?.name }}</h2>
+          <button type="button" class="btn-icon sm edit-roadmap-btn" (click)="startEditRoadmap()" title="Edit Roadmap Details">
+            ✎
+          </button>
+        </div>
         <p class="roadmap-desc">{{ roadmap()?.description || 'Active curriculum structure' }}</p>
       </div>
       <div class="meta-stats">
         <span class="stat-pill">{{ roadmap()?.levels?.length || 0 }} Levels</span>
       </div>
+      }
     </div>
 
     <!-- Inline Add Level Form -->
@@ -76,9 +98,14 @@
         <h4>Create New Level</h4>
       </div>
       <div class="inline-add-body">
-        <input type="text" class="form-input" placeholder="e.g., LEVEL 1 — White Belt (Rokkyu)" [value]="newLevelName()"
-          (input)="newLevelName.set($any($event.target).value)"
-          (keydown)="onInlineKeydown($event, confirmAddLevel.bind(this))" autofocus />
+        <div class="form-row">
+          <input type="text" class="form-input flex-1" placeholder="e.g., LEVEL 1 — White Belt (Rokkyu)" [value]="newLevelName()"
+            (input)="newLevelName.set($any($event.target).value)"
+            (keydown)="onInlineKeydown($event, confirmAddLevel.bind(this))" autofocus />
+          <input type="url" class="form-input flex-1" placeholder="Resource Link (optional, e.g. https://...)" [value]="newLevelLink()"
+            (input)="newLevelLink.set($any($event.target).value)"
+            (keydown)="onInlineKeydown($event, confirmAddLevel.bind(this))" />
+        </div>
         @if (newLevelError()) {
         <span class="field-error">{{ newLevelError() }}</span>
         }
@@ -114,26 +141,35 @@
         <!-- Level Header -->
         <div class="level-header">
           <div class="level-title-group">
-            <span class="drag-handle" title="Level drag affordance">⋮⋮</span>
-
             @if (editingTarget()?.kind === 'level' && editingTarget()?.id === level.id) {
-            <div class="inline-edit-box">
-              <input type="text" class="inline-input" [value]="inlineEditValue()"
+            <div class="inline-edit-box level-edit-box">
+              <input type="text" class="inline-input flex-1" placeholder="Level Name" [value]="inlineEditValue()"
                 (input)="inlineEditValue.set($any($event.target).value)"
                 (keydown)="onInlineKeydown($event, saveEditLevel.bind(this, level))" autofocus />
+              <input type="url" class="inline-input flex-1" placeholder="Resource Link URL" [value]="inlineEditLink()"
+                (input)="inlineEditLink.set($any($event.target).value)"
+                (keydown)="onInlineKeydown($event, saveEditLevel.bind(this, level))" />
               <button type="button" class="btn-icon btn-save" (click)="saveEditLevel(level)"
-                title="Save name">✓</button>
+                title="Save level">✓</button>
               <button type="button" class="btn-icon btn-cancel" (click)="cancelEdit()" title="Cancel">✕</button>
               @if (inlineEditError()) {
               <span class="inline-error">{{ inlineEditError() }}</span>
               }
             </div>
             } @else {
-            <h3 class="level-name">{{ level.name }}</h3>
+            <h3 class="level-name">
+              {{ level.name }}
+              @if (level.link) {
+              <a [href]="level.link" target="_blank" rel="noopener noreferrer" class="link-badge" title="Open level resource">
+                ↗
+              </a>
+              }
+            </h3>
             }
           </div>
 
           <div class="level-actions">
+            <!-- Level Reorder Arrows (Levels ONLY) -->
             <button type="button" class="btn-icon" [disabled]="isFirstLevel" (click)="moveLevelUp(levelIdx)"
               title="Move level up">
               ▲
@@ -142,8 +178,8 @@
               title="Move level down">
               ▼
             </button>
-            <button type="button" class="btn-text" (click)="startEditLevel(level)" title="Rename level">
-              Rename
+            <button type="button" class="btn-text" (click)="startEditLevel(level)" title="Edit level properties">
+              Edit
             </button>
             <button type="button" class="btn-text btn-danger" (click)="deleteLevel(level.id)" title="Delete level">
               Delete
@@ -151,29 +187,41 @@
           </div>
         </div>
 
-        <!-- Stages List inside Level -->
-        <div class="stages-container">
-          @for (stage of level.stages; track stage.id; let stageIdx = $index; let isFirstStage = $first; let isLastStage
-          = $last) {
-          <div class="stage-card">
+        <!-- Steps (Stages) Drop List inside Level -->
+        <div class="stages-container"
+             cdkDropList
+             [id]="'level-steps-' + level.id"
+             [cdkDropListData]="level.stages"
+             [cdkDropListConnectedTo]="allLevelDropListIds()"
+             (cdkDropListDropped)="onStepDrop($event, level)">
+
+          @for (stage of level.stages; track stage.id) {
+          <div class="stage-card" cdkDrag [cdkDragData]="stage">
+            <!-- Stage Drag Placeholder -->
+            <div class="stage-drag-placeholder" *cdkDragPlaceholder></div>
+
             <!-- Stage Header -->
             <div class="stage-header">
               <div class="stage-title-group">
-                <span class="drag-handle sm" title="Stage drag affordance">⋮⋮</span>
+                <!-- Step Drag Handle -->
+                <span class="drag-handle sm" cdkDragHandle title="Drag to reorder step or move to another level">⋮⋮</span>
 
                 @if (editingTarget()?.kind === 'stage' && editingTarget()?.id === stage.id) {
                 <div class="inline-edit-box stage-edit-box">
                   <input type="text" class="inline-input stage-code-input" placeholder="Code" [value]="inlineEditCode()"
                     (input)="inlineEditCode.set($any($event.target).value)"
                     (keydown)="onInlineKeydown($event, saveEditStage.bind(this, stage))" />
-                  <input type="text" class="inline-input flex-1" placeholder="Stage Name" [value]="inlineEditValue()"
+                  <input type="text" class="inline-input flex-1" placeholder="Step Name (optional)" [value]="inlineEditValue()"
                     (input)="inlineEditValue.set($any($event.target).value)"
                     (keydown)="onInlineKeydown($event, saveEditStage.bind(this, stage))" autofocus />
+                  <input type="url" class="inline-input flex-1" placeholder="Link URL" [value]="inlineEditLink()"
+                    (input)="inlineEditLink.set($any($event.target).value)"
+                    (keydown)="onInlineKeydown($event, saveEditStage.bind(this, stage))" />
                   <input type="number" class="inline-input stage-weight-input" placeholder="Weight" min="1"
                     [value]="inlineEditWeight()" (input)="inlineEditWeight.set(+$any($event.target).value)"
                     (keydown)="onInlineKeydown($event, saveEditStage.bind(this, stage))" />
                   <button type="button" class="btn-icon btn-save" (click)="saveEditStage(stage)"
-                    title="Save stage">✓</button>
+                    title="Save step">✓</button>
                   <button type="button" class="btn-icon btn-cancel" (click)="cancelEdit()" title="Cancel">✕</button>
                   @if (inlineEditError()) {
                   <span class="inline-error">{{ inlineEditError() }}</span>
@@ -183,35 +231,34 @@
                 @if (stage.code) {
                 <span class="stage-code-badge">{{ stage.code }}</span>
                 }
-                <h4 class="stage-name">{{ stage.name }}</h4>
+                <h4 class="stage-name" [class.unnamed-step]="!stage.name">
+                  {{ stage.name || 'Unnamed Step' }}
+                  @if (stage.link) {
+                  <a [href]="stage.link" target="_blank" rel="noopener noreferrer" class="link-badge" title="Open step resource">
+                    ↗
+                  </a>
+                  }
+                </h4>
 
                 @if (editingWeightStageId() === stage.id) {
-                  <div class="inline-weight-edit-box">
-                    <span class="weight-label">w:</span>
-                    <input
-                      type="number"
-                      class="inline-input weight-quick-input"
-                      min="0.1"
-                      step="0.5"
-                      [value]="inlineStageWeightValue()"
-                      (input)="inlineStageWeightValue.set(+$any($event.target).value)"
-                      (keydown)="onInlineKeydown($event, saveStageWeight.bind(this, stage))"
-                      autofocus />
-                    <button type="button" class="btn-icon btn-save sm" (click)="saveStageWeight(stage)" title="Save weight">✓</button>
-                    <button type="button" class="btn-icon btn-cancel sm" (click)="cancelEditStageWeight()" title="Cancel">✕</button>
-                    @if (inlineStageWeightError()) {
-                      <span class="inline-error">{{ inlineStageWeightError() }}</span>
-                    }
-                  </div>
+                <div class="inline-weight-edit-box">
+                  <span class="weight-label">w:</span>
+                  <input type="number" class="inline-input weight-quick-input" min="0.1" step="0.5"
+                    [value]="inlineStageWeightValue()" (input)="inlineStageWeightValue.set(+$any($event.target).value)"
+                    (keydown)="onInlineKeydown($event, saveStageWeight.bind(this, stage))" autofocus />
+                  <button type="button" class="btn-icon btn-save sm" (click)="saveStageWeight(stage)"
+                    title="Save weight">✓</button>
+                  <button type="button" class="btn-icon btn-cancel sm" (click)="cancelEditStageWeight()"
+                    title="Cancel">✕</button>
+                  @if (inlineStageWeightError()) {
+                  <span class="inline-error">{{ inlineStageWeightError() }}</span>
+                  }
+                </div>
                 } @else {
-                  <button
-                    type="button"
-                    class="stage-weight-badge clickable"
-                    (click)="startEditStageWeight(stage)"
-                    title="Weight: {{ stage.weight }}. Click to edit weight">
-                    w: {{ stage.weight }}
-                    <span class="edit-icon">✎</span>
-                  </button>
+                <button type="button" class="stage-weight-badge clickable" (click)="startEditStageWeight(stage)"
+                  title="Weight: {{ stage.weight }}. Click to edit weight">
+                  w: {{ stage.weight }}
+                </button>
                 }
                 }
 
@@ -220,30 +267,26 @@
                   @if (stage.priorityStage) {
                   <span class="priority-dot" [style.background-color]="getPriorityColor(stage.priorityStage)"></span>
                   }
-                  <select class="priority-select" [value]="stage.priorityStage?.id || ''"
-                    (change)="onPriorityStageChange(stage, $event)" title="Assign Priority Stage">
-                    <option value="">No Priority</option>
+                  <select class="priority-select"
+                          [ngModel]="stage.priorityStage?.id ?? null"
+                          (ngModelChange)="onPriorityStageChange(stage, $event)"
+                          title="Assign Priority Stage">
+                    <option [ngValue]="null">No Priority</option>
                     @for (p of priorityStages(); track p.id) {
-                    <option [value]="p.id">{{ p.name }}</option>
+                    <option [ngValue]="p.id">{{ p.name }}</option>
                     }
                   </select>
                 </div>
               </div>
 
               <div class="stage-actions">
-                <button type="button" class="btn-icon sm" [disabled]="isFirstStage"
-                  (click)="moveStageUp(level, stageIdx)" title="Move stage up">
-                  ▲
-                </button>
-                <button type="button" class="btn-icon sm" [disabled]="isLastStage"
-                  (click)="moveStageDown(level, stageIdx)" title="Move stage down">
-                  ▼
-                </button>
-                <button type="button" class="btn-text sm" (click)="startEditStage(stage)" title="Edit stage name, code, and weight">
+                <!-- No Up/Down arrows for Steps (DnD only) -->
+                <button type="button" class="btn-text sm" (click)="startEditStage(stage)"
+                  title="Edit step name, code, link, and weight">
                   Edit
                 </button>
                 <button type="button" class="btn-icon sm btn-danger" (click)="deleteStage(stage.id)"
-                  title="Delete stage">
+                  title="Delete step">
                   ✕
                 </button>
               </div>
@@ -252,51 +295,61 @@
             <!-- Tasks inside Stage -->
             <div class="stage-tasks">
               @if (!stage.tasks.length) {
-              <div class="empty-tasks-row">
-                <span class="empty-tasks-text">No tasks yet.</span>
+              <div class="empty-tasks-row"
+                   cdkDropList
+                   [id]="'stage-tasks-' + stage.id"
+                   [cdkDropListData]="stage.tasks"
+                   [cdkDropListConnectedTo]="allStageDropListIds()"
+                   (cdkDropListDropped)="onTaskDrop($event, stage)">
+                <span class="empty-tasks-text">No tasks yet. Drop tasks here or</span>
                 <button type="button" class="btn-text btn-add-task-link" (click)="openAddTaskDialog(stage.id)">
                   + Add Task
                 </button>
               </div>
               } @else {
-              <div class="tasks-table">
-                @for (st of stage.tasks; track st.id; let taskIdx = $index; let isFirstTask = $first; let isLastTask =
-                $last) {
-                <div class="task-row" [class.main-task-row]="st.isMain">
+              <div class="tasks-table"
+                   cdkDropList
+                   [id]="'stage-tasks-' + stage.id"
+                   [cdkDropListData]="stage.tasks"
+                   [cdkDropListConnectedTo]="allStageDropListIds()"
+                   (cdkDropListDropped)="onTaskDrop($event, stage)">
+
+                @for (st of stage.tasks; track st.id) {
+                <div class="task-row" [class.main-task-row]="st.isMain" cdkDrag [cdkDragData]="st">
+                  <!-- Task Drag Placeholder -->
+                  <div class="task-drag-placeholder" *cdkDragPlaceholder></div>
+
                   <!-- Drag handle -->
-                  <span class="drag-handle xs" title="Task affordance">⋮⋮</span>
+                  <span class="drag-handle xs" cdkDragHandle title="Drag to reorder task or move to another step">⋮⋮</span>
 
                   <!-- Main Task Star Toggle -->
                   <button type="button" class="star-btn" [class.is-main]="st.isMain"
                     (click)="toggleMainTask(stage.id, st)"
-                    [title]="st.isMain ? 'Main task (click to unset)' : 'Set as main task for this stage'">
+                    [title]="st.isMain ? 'Main task (click to unset)' : 'Set as main task for this step'">
                     ★
                   </button>
 
-                  <!-- Task Title -->
+                  <!-- Task Title + Link -->
                   <div class="task-info">
                     <span class="task-title">{{ st.task.title }}</span>
+                    @if (st.task.link) {
+                    <a [href]="st.task.link" target="_blank" rel="noopener noreferrer" class="link-badge sm" title="Open task resource">
+                      ↗
+                    </a>
+                    }
                     @if (st.isMain) {
                     <span class="main-badge">MAIN</span>
                     }
                   </div>
 
-                  <!-- Row actions -->
+                  <!-- Row actions (No Up/Down arrows for Tasks - DnD only) -->
                   <div class="task-row-actions">
-                    <button type="button" class="btn-icon xs" [disabled]="isFirstTask"
-                      (click)="moveTaskUp(stage, taskIdx)" title="Move task up">
-                      ▲
-                    </button>
-                    <button type="button" class="btn-icon xs" [disabled]="isLastTask"
-                      (click)="moveTaskDown(stage, taskIdx)" title="Move task down">
-                      ▼
-                    </button>
                     <button type="button" class="btn-icon xs" (click)="openEditTaskDialog(st, stage.id)"
                       title="Edit task properties">
                       ✎
                     </button>
                     <button type="button" class="btn-icon xs btn-danger" (click)="removeTask(stage.id, st.task.id)"
-                      title="Remove task from stage">
+                      title="Remove task from step">
                       ✕
                     </button>
                   </div>
@@ -323,9 +376,13 @@
                 [value]="newStageCode()" (input)="newStageCode.set($any($event.target).value)"
                 (keydown)="onInlineKeydown($event, confirmAddStage.bind(this, level.id))" />
               <input type="text" class="form-input flex-1"
-                placeholder="Stage Name (e.g., Basic Techniques / Hanmi Handachi)" [value]="newStageName()"
+                placeholder="Step Name (optional)" [value]="newStageName()"
                 (input)="newStageName.set($any($event.target).value)"
                 (keydown)="onInlineKeydown($event, confirmAddStage.bind(this, level.id))" autofocus />
+              <input type="url" class="form-input flex-1"
+                placeholder="Link URL (optional)" [value]="newStageLink()"
+                (input)="newStageLink.set($any($event.target).value)"
+                (keydown)="onInlineKeydown($event, confirmAddStage.bind(this, level.id))" />
               <input type="number" class="form-input stage-weight-input" placeholder="Weight" min="1"
                 [value]="newStageWeight()" (input)="newStageWeight.set(+$any($event.target).value)"
                 (keydown)="onInlineKeydown($event, confirmAddStage.bind(this, level.id))" />
@@ -338,13 +395,13 @@
                 Cancel
               </button>
               <button type="button" class="btn btn-primary btn-sm" (click)="confirmAddStage(level.id)">
-                Add Stage
+                Add Step
               </button>
             </div>
           </div>
           } @else {
           <button type="button" class="btn-add-stage" (click)="openAddStage(level.id)">
-            + Add Stage to {{ level.name }}
+            + Add Step to {{ level.name }}
           </button>
           }
         </div>
@@ -379,24 +436,36 @@
         <!-- List of existing priorities -->
         <div class="priorities-list">
           @if (!priorityStages().length) {
-          <div class="empty-list-note">No priority stages created yet.</div>
+          <div class="empty-list-note">No priority tags created yet.</div>
           } @else {
           @for (p of priorityStages(); track p.id) {
           <div class="priority-item">
             @if (editingTarget()?.kind === 'priorityStage' && editingTarget()?.id === p.id) {
             <div class="inline-edit-priority">
-              <input type="color" class="color-input" [value]="inlineEditColor()"
-                (input)="inlineEditColor.set($any($event.target).value)" />
-              <input type="text" class="inline-input flex-1" [value]="inlineEditValue()"
-                (input)="inlineEditValue.set($any($event.target).value)"
-                (keydown)="onInlineKeydown($event, saveEditPriority.bind(this, p.id))" />
-              <button type="button" class="btn-icon btn-save" (click)="saveEditPriority(p.id)">✓</button>
-              <button type="button" class="btn-icon btn-cancel" (click)="cancelEdit()">✕</button>
+              <div class="priority-edit-row">
+                <input type="color" class="color-input" [value]="inlineEditColor()"
+                  (input)="inlineEditColor.set($any($event.target).value)" />
+                <input type="text" class="inline-input flex-1" placeholder="Tag name" [value]="inlineEditValue()"
+                  (input)="inlineEditValue.set($any($event.target).value)"
+                  (keydown)="onInlineKeydown($event, saveEditPriority.bind(this, p.id))" />
+                <button type="button" class="btn-icon btn-save" (click)="saveEditPriority(p.id)" title="Save">✓</button>
+                <button type="button" class="btn-icon btn-cancel" (click)="cancelEdit()" title="Cancel">✕</button>
+              </div>
+              <textarea class="form-textarea mt-2" placeholder="Description / notes (optional)..."
+                [value]="inlineEditDescription()" (input)="inlineEditDescription.set($any($event.target).value)" rows="2"></textarea>
+              @if (inlineEditError()) {
+              <span class="inline-error">{{ inlineEditError() }}</span>
+              }
             </div>
             } @else {
             <div class="priority-item-info">
-              <span class="priority-color-swatch" [style.background-color]="p.color || '#d92027'"></span>
-              <span class="priority-name">{{ p.name }}</span>
+              <div class="priority-title-row">
+                <span class="priority-color-swatch" [style.background-color]="p.color || '#d92027'"></span>
+                <span class="priority-name">{{ p.name }}</span>
+              </div>
+              @if (p.description) {
+              <p class="priority-desc">{{ p.description }}</p>
+              }
             </div>
             <div class="priority-item-actions">
               <button type="button" class="btn-icon sm" (click)="startEditPriority(p)" title="Edit">
@@ -416,15 +485,21 @@
         <div class="add-priority-section">
           <h4 class="section-title">Add New Priority Stage</h4>
           <div class="add-priority-form">
-            <input type="color" class="color-input" [value]="newPriorityColor()"
-              (input)="newPriorityColor.set($any($event.target).value)" title="Select stage tag color" />
-            <input type="text" class="form-input flex-1" placeholder="Tag name (e.g., Foundation)"
-              [value]="newPriorityName()" (input)="newPriorityName.set($any($event.target).value)"
-              (keydown)="onInlineKeydown($event, confirmAddPriority.bind(this))" />
-            <button type="button" class="btn btn-primary btn-sm" (click)="confirmAddPriority()"
-              [disabled]="!newPriorityName().trim()">
-              + Add
-            </button>
+            <div class="add-priority-row">
+              <input type="color" class="color-input" [value]="newPriorityColor()"
+                (input)="newPriorityColor.set($any($event.target).value)" title="Select tag color" />
+              <input type="text" class="form-input flex-1" placeholder="Tag name (e.g., Foundation)"
+                [value]="newPriorityName()" (input)="newPriorityName.set($any($event.target).value)"
+                (keydown)="onInlineKeydown($event, confirmAddPriority.bind(this))" />
+            </div>
+            <textarea class="form-textarea mt-2" placeholder="Description / usage notes (optional)..."
+              [value]="newPriorityDesc()" (input)="newPriorityDesc.set($any($event.target).value)" rows="2"></textarea>
+            <div class="add-priority-actions mt-2">
+              <button type="button" class="btn btn-primary btn-sm" (click)="confirmAddPriority()"
+                [disabled]="!newPriorityName().trim()">
+                + Add Priority Tag
+              </button>
+            </div>
           </div>
           @if (newPriorityError()) {
           <span class="field-error">{{ newPriorityError() }}</span>

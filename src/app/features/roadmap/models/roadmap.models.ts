@@ -2,12 +2,14 @@ export interface PriorityStage {
   id: number;
   name: string;
   color?: string; // hex e.g. "#d92027"
+  description?: string | null;
 }
 
 export interface Task {
   id: number;
   title: string;
   description: string;
+  link?: string | null;
   active: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -26,7 +28,8 @@ export interface RoadmapStage {
   id: number;
   levelId: number;
   code?: string | null;
-  name: string;
+  name?: string | null;
+  link?: string | null;
   weight: number;
   position: number;
   priorityStage: PriorityStage | null;
@@ -37,6 +40,7 @@ export interface Level {
   id: number;
   roadmapId: number;
   name: string;
+  link?: string | null;
   position: number;
   stages: RoadmapStage[];
 }
@@ -44,15 +48,23 @@ export interface Level {
 export interface Roadmap {
   id: number;
   name: string;
-  description: string;
+  description?: string | null;
   isActive: boolean;
   levels: Level[];
 }
 
 // Request DTOs
+export interface RoadmapRequest {
+  name: string;
+  description?: string | null;
+  isActive?: boolean;
+}
+
 export interface LevelRequest {
   name: string;
   roadmapId: number;
+  link?: string | null;
+  position?: number;
 }
 
 export interface LevelReorderItem {
@@ -63,13 +75,16 @@ export interface LevelReorderItem {
 export interface PriorityStageRequest {
   name: string;
   color?: string;
+  description?: string | null;
 }
 
 export interface StageRequest {
-  name: string;
+  name?: string | null;
   levelId: number;
   code?: string | null;
+  link?: string | null;
   weight?: number;
+  position?: number;
   priorityStageId?: number | null;
 }
 
@@ -80,6 +95,13 @@ export interface StageReorderItem {
 
 export interface StageTaskPlacement {
   taskId: number;
+  position?: number;
+  isMain?: boolean;
+}
+
+export interface StageTaskMoveRequest {
+  targetStageId: number;
+  targetPosition?: number;
 }
 
 export interface StageTaskReorderItem {
@@ -91,14 +113,16 @@ export interface StageTaskReorderItem {
 export interface TaskRequest {
   title: string;
   description?: string;
+  link?: string | null;
   active?: boolean;
 }
 
 // UI-Only State Types
 export type EditTarget =
-  | { kind: 'level'; id: number; initialValue: string }
-  | { kind: 'stage'; id: number; initialName: string; initialCode?: string | null; initialWeight: number }
-  | { kind: 'priorityStage'; id: number; initialName: string; initialColor: string }
+  | { kind: 'roadmap'; id: number; initialName: string; initialDescription: string }
+  | { kind: 'level'; id: number; initialValue: string; initialLink?: string | null }
+  | { kind: 'stage'; id: number; initialName: string; initialCode?: string | null; initialWeight: number; initialLink?: string | null }
+  | { kind: 'priorityStage'; id: number; initialName: string; initialColor: string; initialDescription?: string | null }
   | null;
 
 export type DialogMode =

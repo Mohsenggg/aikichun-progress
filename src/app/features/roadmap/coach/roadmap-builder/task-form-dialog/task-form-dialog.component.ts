@@ -34,6 +34,7 @@ export class TaskFormDialogComponent implements OnChanges {
   taskForm: FormGroup = this.fb.group({
     title: ['', [Validators.required, Validators.maxLength(150)]],
     description: [''],
+    link: [''],
     active: [true]
   });
 
@@ -48,6 +49,7 @@ export class TaskFormDialogComponent implements OnChanges {
         this.taskForm.setValue({
           title: this.mode.task.title || '',
           description: this.mode.task.description || '',
+          link: this.mode.task.link || '',
           active: this.mode.task.active ?? true
         });
       } else {
@@ -55,6 +57,7 @@ export class TaskFormDialogComponent implements OnChanges {
         this.taskForm.reset({
           title: '',
           description: '',
+          link: '',
           active: true
         });
         if (this.mode.kind === 'addExistingTask') {
@@ -140,6 +143,7 @@ export class TaskFormDialogComponent implements OnChanges {
     const taskReq = {
       title: formVal.title.trim(),
       description: formVal.description?.trim() || undefined,
+      link: formVal.link?.trim() || undefined,
       active: formVal.active ?? true
     };
 

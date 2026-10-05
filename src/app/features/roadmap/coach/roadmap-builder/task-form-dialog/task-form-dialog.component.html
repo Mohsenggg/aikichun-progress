@@ -90,6 +90,16 @@
               placeholder="Provide context, criteria, or coaching tips for this task..."></textarea>
           </div>
 
+          <div class="form-group">
+            <label for="task-link" class="form-label">Link / Reference URL (optional)</label>
+            <input
+              id="task-link"
+              type="url"
+              class="form-input"
+              formControlName="link"
+              placeholder="https://example.com/reference-video" />
+          </div>
+
           <div class="form-group checkbox-group">
             <label class="checkbox-label">
               <input type="checkbox" formControlName="active" class="form-checkbox" />

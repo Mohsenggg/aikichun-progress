@@ -1,6 +1,12 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import {
+  CdkDragDrop,
+  DragDropModule,
+  moveItemInArray,
+  transferArrayItem
+} from '@angular/cdk/drag-drop';
 import { RoadmapService } from '../../services/roadmap.service';
 import { TaskService } from '../../services/task.service';
 import {
@@ -17,7 +23,7 @@ import { TaskFormDialogComponent } from './task-form-dialog/task-form-dialog.com
 @Component({
   selector: 'app-roadmap-builder',
   standalone: true,
-  imports: [CommonModule, FormsModule, TaskFormDialogComponent],
+  imports: [CommonModule, FormsModule, DragDropModule, TaskFormDialogComponent],
   templateUrl: './roadmap-builder.component.html',
   styleUrl: './roadmap-builder.component.css'
 })
@@ -38,7 +44,9 @@ export class RoadmapBuilderComponent implements OnInit {
   // Inline Editing
   editingTarget = signal<EditTarget>(null);
   inlineEditValue = signal('');
+  inlineEditDescription = signal('');
   inlineEditCode = signal('');
+  inlineEditLink = signal('');
   inlineEditWeight = signal<number>(10);
   inlineEditColor = signal('#d92027');
   inlineEditError = signal<string | null>(null);
@@ -46,24 +54,40 @@ export class RoadmapBuilderComponent implements OnInit {
   // New Level Inline Input
   isAddingLevel = signal(false);
   newLevelName = signal('');
+  newLevelLink = signal('');
   newLevelError = signal<string | null>(null);
 
-  // New Stage Inline Input
+  // New Stage (Step) Inline Input
   addingStageLevelId = signal<number | null>(null);
   newStageCode = signal('');
   newStageName = signal('');
+  newStageLink = signal('');
   newStageWeight = signal<number>(10);
   newStageError = signal<string | null>(null);
 
   // New Priority Stage Inline Input
   newPriorityName = signal('');
   newPriorityColor = signal('#d92027');
+  newPriorityDesc = signal('');
   newPriorityError = signal<string | null>(null);
 
   // Quick Edit Stage Weight Input
   editingWeightStageId = signal<number | null>(null);
   inlineStageWeightValue = signal<number>(10);
   inlineStageWeightError = signal<string | null>(null);
+
+  // Drag Drop Connected List IDs
+  allLevelDropListIds = computed(() => {
+    const current = this.roadmap();
+    if (!current || !current.levels) return [];
+    return current.levels.map(l => 'level-steps-' + l.id);
+  });
+
+  allStageDropListIds = computed(() => {
+    const current = this.roadmap();
+    if (!current || !current.levels) return [];
+    return current.levels.flatMap(l => l.stages || []).map(s => 'stage-tasks-' + s.id);
+  });
 
   ngOnInit(): void {
     this.roadmapService.loadRoadmap();
@@ -74,17 +98,53 @@ export class RoadmapBuilderComponent implements OnInit {
     this.roadmapService.clearError();
   }
 
+  // --- Roadmap Meta Operations ---
+
+  startEditRoadmap(): void {
+    const r = this.roadmap();
+    if (!r) return;
+    this.editingTarget.set({
+      kind: 'roadmap',
+      id: r.id,
+      initialName: r.name,
+      initialDescription: r.description || ''
+    });
+    this.inlineEditValue.set(r.name);
+    this.inlineEditDescription.set(r.description || '');
+    this.inlineEditError.set(null);
+  }
+
+  saveEditRoadmap(): void {
+    const name = this.inlineEditValue().trim();
+    if (!name) {
+      this.inlineEditError.set('Roadmap name is required');
+      return;
+    }
+    const r = this.roadmap();
+    if (!r) return;
+
+    this.roadmapService.updateRoadmap(r.id, {
+      name,
+      description: this.inlineEditDescription().trim() || undefined
+    }).subscribe({
+      next: () => this.cancelEdit(),
+      error: () => {}
+    });
+  }
+
   // --- Level Operations ---
 
   openAddLevel(): void {
     this.isAddingLevel.set(true);
     this.newLevelName.set('');
+    this.newLevelLink.set('');
     this.newLevelError.set(null);
   }
 
   cancelAddLevel(): void {
     this.isAddingLevel.set(false);
     this.newLevelName.set('');
+    this.newLevelLink.set('');
     this.newLevelError.set(null);
   }
 
@@ -100,7 +160,8 @@ export class RoadmapBuilderComponent implements OnInit {
 
     this.roadmapService.createLevel({
       name,
-      roadmapId: currentRoadmap.id
+      roadmapId: currentRoadmap.id,
+      link: this.newLevelLink().trim() || null
     }).subscribe({
       next: () => {
         this.cancelAddLevel();
@@ -110,8 +171,14 @@ export class RoadmapBuilderComponent implements OnInit {
   }
 
   startEditLevel(level: Level): void {
-    this.editingTarget.set({ kind: 'level', id: level.id, initialValue: level.name });
+    this.editingTarget.set({
+      kind: 'level',
+      id: level.id,
+      initialValue: level.name,
+      initialLink: level.link
+    });
     this.inlineEditValue.set(level.name);
+    this.inlineEditLink.set(level.link || '');
     this.inlineEditError.set(null);
   }
 
@@ -126,7 +193,8 @@ export class RoadmapBuilderComponent implements OnInit {
 
     this.roadmapService.updateLevel(level.id, {
       name: val,
-      roadmapId: currentRoadmap.id
+      roadmapId: currentRoadmap.id,
+      link: this.inlineEditLink().trim() || null
     }).subscribe({
       next: () => this.cancelEdit(),
       error: () => {}
@@ -134,7 +202,7 @@ export class RoadmapBuilderComponent implements OnInit {
   }
 
   deleteLevel(id: number): void {
-    if (confirm('Are you sure you want to delete this level and all its stages and tasks?')) {
+    if (confirm('Are you sure you want to delete this level and all its steps and tasks?')) {
       this.roadmapService.deleteLevel(id).subscribe();
     }
   }
@@ -180,12 +248,13 @@ export class RoadmapBuilderComponent implements OnInit {
     });
   }
 
-  // --- Stage Operations ---
+  // --- Step (Stage) Operations ---
 
   openAddStage(levelId: number): void {
     this.addingStageLevelId.set(levelId);
     this.newStageCode.set('');
     this.newStageName.set('');
+    this.newStageLink.set('');
     this.newStageWeight.set(10);
     this.newStageError.set(null);
   }
@@ -194,19 +263,17 @@ export class RoadmapBuilderComponent implements OnInit {
     this.addingStageLevelId.set(null);
     this.newStageCode.set('');
     this.newStageName.set('');
+    this.newStageLink.set('');
     this.newStageWeight.set(10);
     this.newStageError.set(null);
   }
 
   confirmAddStage(levelId: number): void {
-    const name = this.newStageName().trim();
-    if (!name) {
-      this.newStageError.set('Stage name is required');
-      return;
-    }
+    // Step name is optional!
+    const name = this.newStageName().trim() || null;
     const weight = Number(this.newStageWeight());
     if (isNaN(weight) || weight <= 0) {
-      this.newStageError.set('Stage weight must be greater than zero');
+      this.newStageError.set('Step weight must be greater than zero');
       return;
     }
 
@@ -214,6 +281,7 @@ export class RoadmapBuilderComponent implements OnInit {
       name,
       levelId,
       code: this.newStageCode().trim() || null,
+      link: this.newStageLink().trim() || null,
       weight,
       priorityStageId: null
     }).subscribe({
@@ -221,7 +289,7 @@ export class RoadmapBuilderComponent implements OnInit {
         this.cancelAddStage();
       },
       error: (err) => {
-        this.newStageError.set(err.error?.message || err.message || 'Failed to create stage');
+        this.newStageError.set(err.error?.message || err.message || 'Failed to create step');
       }
     });
   }
@@ -230,22 +298,21 @@ export class RoadmapBuilderComponent implements OnInit {
     this.editingTarget.set({
       kind: 'stage',
       id: stage.id,
-      initialName: stage.name,
+      initialName: stage.name || '',
       initialCode: stage.code,
-      initialWeight: stage.weight ?? 10
+      initialWeight: stage.weight ?? 10,
+      initialLink: stage.link
     });
-    this.inlineEditValue.set(stage.name);
+    this.inlineEditValue.set(stage.name || '');
     this.inlineEditCode.set(stage.code || '');
+    this.inlineEditLink.set(stage.link || '');
     this.inlineEditWeight.set(stage.weight ?? 10);
     this.inlineEditError.set(null);
   }
 
   saveEditStage(stage: RoadmapStage): void {
-    const val = this.inlineEditValue().trim();
-    if (!val) {
-      this.inlineEditError.set('Name is required');
-      return;
-    }
+    // Step name is optional!
+    const val = this.inlineEditValue().trim() || null;
     const weight = Number(this.inlineEditWeight());
     if (isNaN(weight) || weight <= 0) {
       this.inlineEditError.set('Weight must be greater than zero');
@@ -256,18 +323,19 @@ export class RoadmapBuilderComponent implements OnInit {
       name: val,
       levelId: stage.levelId,
       code: this.inlineEditCode().trim() || null,
+      link: this.inlineEditLink().trim() || null,
       weight,
       priorityStageId: stage.priorityStage?.id ?? null
     }).subscribe({
       next: () => this.cancelEdit(),
       error: (err) => {
-        this.inlineEditError.set(err.error?.message || err.message || 'Failed to update stage');
+        this.inlineEditError.set(err.error?.message || err.message || 'Failed to update step');
       }
     });
   }
 
   deleteStage(id: number): void {
-    if (confirm('Are you sure you want to delete this stage?')) {
+    if (confirm('Are you sure you want to delete this step?')) {
       this.roadmapService.deleteStage(id).subscribe();
     }
   }
@@ -301,67 +369,108 @@ export class RoadmapBuilderComponent implements OnInit {
     });
   }
 
-  onPriorityStageChange(stage: RoadmapStage, event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const priorityId = select.value ? Number(select.value) : null;
+  onPriorityStageChange(stage: RoadmapStage, newPriorityId: number | null): void {
+    const priorityId = (newPriorityId !== null && newPriorityId !== undefined && (newPriorityId as any) !== '')
+      ? Number(newPriorityId)
+      : null;
 
     this.roadmapService.updateStage(stage.id, {
       name: stage.name,
       levelId: stage.levelId,
+      code: stage.code,
+      link: stage.link,
+      weight: stage.weight,
       priorityStageId: priorityId
     }).subscribe();
   }
 
-  moveStageUp(level: Level, index: number): void {
-    if (index <= 0) return;
-    this.reorderStagesByIndex(level, index, index - 1);
-  }
+  // --- Step Drag & Drop (Within Level + Cross-Level) ---
 
-  moveStageDown(level: Level, index: number): void {
-    if (index >= level.stages.length - 1) return;
-    this.reorderStagesByIndex(level, index, index + 1);
-  }
-
-  private reorderStagesByIndex(level: Level, fromIndex: number, toIndex: number): void {
+  onStepDrop(event: CdkDragDrop<RoadmapStage[]>, targetLevel: Level): void {
     const current = this.roadmap();
     if (!current) return;
 
-    const previousStages = [...level.stages];
-    const newStages = [...level.stages];
-    const [moved] = newStages.splice(fromIndex, 1);
-    newStages.splice(toIndex, 0, moved);
+    if (event.previousContainer === event.container) {
+      if (event.previousIndex === event.currentIndex) return;
 
-    const reorderedWithPositions = newStages.map((stg, idx) => ({
-      ...stg,
-      position: idx + 1
-    }));
+      const updatedStages = [...targetLevel.stages];
+      moveItemInArray(updatedStages, event.previousIndex, event.currentIndex);
 
-    // Optimistic update
-    const updatedLevels = current.levels.map(lvl => {
-      if (lvl.id === level.id) {
-        return { ...lvl, stages: reorderedWithPositions };
-      }
-      return lvl;
-    });
-    this.roadmapService.roadmap.set({ ...current, levels: updatedLevels });
+      const reorderedStages = updatedStages.map((stg, idx) => ({
+        ...stg,
+        position: idx + 1
+      }));
 
-    const payload = reorderedWithPositions.map(stg => ({
-      id: stg.id,
-      position: stg.position
-    }));
+      // Optimistic update
+      const updatedLevels = current.levels.map(lvl => {
+        if (lvl.id === targetLevel.id) {
+          return { ...lvl, stages: reorderedStages };
+        }
+        return lvl;
+      });
+      this.roadmapService.roadmap.set({ ...current, levels: updatedLevels });
 
-    this.roadmapService.reorderStages(payload).subscribe({
-      error: () => {
-        // Rollback
-        const rollbackLevels = current.levels.map(lvl => {
-          if (lvl.id === level.id) {
-            return { ...lvl, stages: previousStages };
+      const payload = reorderedStages.map(stg => ({
+        id: stg.id,
+        position: stg.position
+      }));
+
+      this.roadmapService.reorderStages(payload).subscribe({
+        error: () => this.roadmapService.loadRoadmap()
+      });
+    } else {
+      // Cross-Level Move
+      const sourceLevelId = Number(event.previousContainer.id.replace('level-steps-', ''));
+      const sourceLevel = current.levels.find(l => l.id === sourceLevelId);
+      if (!sourceLevel) return;
+
+      const sourceStages = [...sourceLevel.stages];
+      const targetStages = [...targetLevel.stages];
+      const draggedStage = sourceStages[event.previousIndex];
+
+      transferArrayItem(
+        sourceStages,
+        targetStages,
+        event.previousIndex,
+        event.currentIndex
+      );
+
+      const reorderedSource = sourceStages.map((s, idx) => ({ ...s, position: idx + 1 }));
+      const reorderedTarget = targetStages.map((s, idx) => ({
+        ...s,
+        levelId: targetLevel.id,
+        position: idx + 1
+      }));
+
+      // Optimistic update
+      const updatedLevels = current.levels.map(lvl => {
+        if (lvl.id === sourceLevel.id) return { ...lvl, stages: reorderedSource };
+        if (lvl.id === targetLevel.id) return { ...lvl, stages: reorderedTarget };
+        return lvl;
+      });
+      this.roadmapService.roadmap.set({ ...current, levels: updatedLevels });
+
+      // Update backend: update stage's levelId and position, then reorder target and source
+      this.roadmapService.updateStage(draggedStage.id, {
+        name: draggedStage.name,
+        levelId: targetLevel.id,
+        code: draggedStage.code,
+        link: draggedStage.link,
+        weight: draggedStage.weight,
+        position: event.currentIndex + 1,
+        priorityStageId: draggedStage.priorityStage?.id ?? null
+      }).subscribe({
+        next: () => {
+          if (reorderedTarget.length > 1) {
+            this.roadmapService.reorderStages(reorderedTarget.map(s => ({ id: s.id, position: s.position }))).subscribe();
           }
-          return lvl;
-        });
-        this.roadmapService.roadmap.set({ ...current, levels: rollbackLevels });
-      }
-    });
+          if (reorderedSource.length > 0) {
+            this.roadmapService.reorderStages(reorderedSource.map(s => ({ id: s.id, position: s.position }))).subscribe();
+          }
+        },
+        error: () => this.roadmapService.loadRoadmap()
+      });
+    }
   }
 
   // --- Task Operations ---
@@ -375,7 +484,7 @@ export class RoadmapBuilderComponent implements OnInit {
   }
 
   removeTask(stageId: number, taskId: number): void {
-    if (confirm('Are you sure you want to remove this task from this stage?')) {
+    if (confirm('Are you sure you want to remove this task from this step?')) {
       this.roadmapService.removeTaskFromStage(stageId, taskId).subscribe();
     }
   }
@@ -385,70 +494,105 @@ export class RoadmapBuilderComponent implements OnInit {
     if (!taskId) return;
 
     if (st.isMain) {
-      // Unset main task
       this.roadmapService.removeMainTask(stageId).subscribe();
     } else {
-      // Set main task
       this.roadmapService.setMainTask(stageId, taskId).subscribe();
     }
   }
 
-  moveTaskUp(stage: RoadmapStage, index: number): void {
-    if (index <= 0) return;
-    this.reorderTasksByIndex(stage, index, index - 1);
-  }
+  // --- Task Drag & Drop (Within Step + Cross-Step) ---
 
-  moveTaskDown(stage: RoadmapStage, index: number): void {
-    if (index >= stage.tasks.length - 1) return;
-    this.reorderTasksByIndex(stage, index, index + 1);
-  }
-
-  private reorderTasksByIndex(stage: RoadmapStage, fromIndex: number, toIndex: number): void {
+  onTaskDrop(event: CdkDragDrop<StageTask[]>, targetStage: RoadmapStage): void {
     const current = this.roadmap();
     if (!current) return;
 
-    const previousTasks = [...stage.tasks];
-    const newTasks = [...stage.tasks];
-    const [moved] = newTasks.splice(fromIndex, 1);
-    newTasks.splice(toIndex, 0, moved);
+    if (event.previousContainer === event.container) {
+      if (event.previousIndex === event.currentIndex) return;
 
-    const reorderedWithPositions = newTasks.map((t, idx) => ({
-      ...t,
-      position: idx + 1
-    }));
+      const updatedTasks = [...targetStage.tasks];
+      moveItemInArray(updatedTasks, event.previousIndex, event.currentIndex);
 
-    // Optimistic update
-    const updatedLevels = current.levels.map(lvl => ({
-      ...lvl,
-      stages: lvl.stages.map(stg => {
-        if (stg.id === stage.id) {
-          return { ...stg, tasks: reorderedWithPositions };
-        }
-        return stg;
-      })
-    }));
-    this.roadmapService.roadmap.set({ ...current, levels: updatedLevels });
+      const reorderedTasks = updatedTasks.map((t, idx) => ({
+        ...t,
+        position: idx + 1
+      }));
 
-    const payload = reorderedWithPositions.map(t => ({
-      taskId: (t.task?.id || t.taskId)!,
-      position: t.position
-    }));
+      // Optimistic update
+      const updatedLevels = current.levels.map(lvl => ({
+        ...lvl,
+        stages: lvl.stages.map(stg => {
+          if (stg.id === targetStage.id) {
+            return { ...stg, tasks: reorderedTasks };
+          }
+          return stg;
+        })
+      }));
+      this.roadmapService.roadmap.set({ ...current, levels: updatedLevels });
 
-    this.roadmapService.reorderTasksInStage(stage.id, payload).subscribe({
-      error: () => {
-        // Rollback
-        const rollbackLevels = current.levels.map(lvl => ({
-          ...lvl,
-          stages: lvl.stages.map(stg => {
-            if (stg.id === stage.id) {
-              return { ...stg, tasks: previousTasks };
-            }
-            return stg;
-          })
-        }));
-        this.roadmapService.roadmap.set({ ...current, levels: rollbackLevels });
-      }
-    });
+      const payload = reorderedTasks.map(t => ({
+        taskId: (t.task?.id || t.taskId)!,
+        position: t.position
+      }));
+
+      this.roadmapService.reorderTasksInStage(targetStage.id, payload).subscribe({
+        error: () => this.roadmapService.loadRoadmap()
+      });
+    } else {
+      // Cross-Step Move
+      const sourceStageId = Number(event.previousContainer.id.replace('stage-tasks-', ''));
+      const draggedItem = event.previousContainer.data[event.previousIndex];
+      const taskId = (draggedItem.task?.id || draggedItem.taskId)!;
+
+      const sourceTasks = [...event.previousContainer.data];
+      const targetTasks = [...targetStage.tasks];
+
+      transferArrayItem(
+        sourceTasks,
+        targetTasks,
+        event.previousIndex,
+        event.currentIndex
+      );
+
+      const reorderedSource = sourceTasks.map((t, idx) => ({ ...t, position: idx + 1 }));
+      const reorderedTarget = targetTasks.map((t, idx) => ({
+        ...t,
+        stageId: targetStage.id,
+        position: idx + 1,
+        isMain: false
+      }));
+
+      // Optimistic update
+      const updatedLevels = current.levels.map(lvl => ({
+        ...lvl,
+        stages: lvl.stages.map(stg => {
+          if (stg.id === sourceStageId) return { ...stg, tasks: reorderedSource };
+          if (stg.id === targetStage.id) return { ...stg, tasks: reorderedTarget };
+          return stg;
+        })
+      }));
+      this.roadmapService.roadmap.set({ ...current, levels: updatedLevels });
+
+      this.roadmapService.moveTaskToStage(sourceStageId, taskId, {
+        targetStageId: targetStage.id,
+        targetPosition: event.currentIndex + 1
+      }).subscribe({
+        next: () => {
+          if (reorderedTarget.length > 1) {
+            this.roadmapService.reorderTasksInStage(
+              targetStage.id,
+              reorderedTarget.map(t => ({ taskId: (t.task?.id || t.taskId)!, position: t.position }))
+            ).subscribe();
+          }
+          if (reorderedSource.length > 0) {
+            this.roadmapService.reorderTasksInStage(
+              sourceStageId,
+              reorderedSource.map(t => ({ taskId: (t.task?.id || t.taskId)!, position: t.position }))
+            ).subscribe();
+          }
+        },
+        error: () => this.roadmapService.loadRoadmap()
+      });
+    }
   }
 
   // --- Priority Stages Panel Operations ---
@@ -466,10 +610,12 @@ export class RoadmapBuilderComponent implements OnInit {
       kind: 'priorityStage',
       id: p.id,
       initialName: p.name,
-      initialColor: p.color || '#d92027'
+      initialColor: p.color || '#d92027',
+      initialDescription: p.description
     });
     this.inlineEditValue.set(p.name);
     this.inlineEditColor.set(p.color || '#d92027');
+    this.inlineEditDescription.set(p.description || '');
     this.inlineEditError.set(null);
   }
 
@@ -482,7 +628,8 @@ export class RoadmapBuilderComponent implements OnInit {
 
     this.roadmapService.updatePriorityStage(id, {
       name: val,
-      color: this.inlineEditColor()
+      color: this.inlineEditColor(),
+      description: this.inlineEditDescription().trim() || null
     }).subscribe({
       next: () => this.cancelEdit(),
       error: () => {}
@@ -490,7 +637,7 @@ export class RoadmapBuilderComponent implements OnInit {
   }
 
   deletePriority(id: number): void {
-    if (confirm('Delete this priority stage? It will be unassigned from all associated stages.')) {
+    if (confirm('Delete this priority tag? It will be unassigned from all associated steps.')) {
       this.roadmapService.deletePriorityStage(id).subscribe();
     }
   }
@@ -504,11 +651,13 @@ export class RoadmapBuilderComponent implements OnInit {
 
     this.roadmapService.createPriorityStage({
       name,
-      color: this.newPriorityColor()
+      color: this.newPriorityColor(),
+      description: this.newPriorityDesc().trim() || null
     }).subscribe({
       next: () => {
         this.newPriorityName.set('');
         this.newPriorityColor.set('#d92027');
+        this.newPriorityDesc.set('');
         this.newPriorityError.set(null);
       },
       error: () => {}
@@ -520,7 +669,9 @@ export class RoadmapBuilderComponent implements OnInit {
   cancelEdit(): void {
     this.editingTarget.set(null);
     this.inlineEditValue.set('');
+    this.inlineEditDescription.set('');
     this.inlineEditCode.set('');
+    this.inlineEditLink.set('');
     this.inlineEditWeight.set(10);
     this.inlineEditError.set(null);
     this.cancelEditStageWeight();

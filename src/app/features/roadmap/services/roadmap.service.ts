@@ -4,6 +4,7 @@ import { Observable, catchError, finalize, tap, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import {
   Roadmap,
+  RoadmapRequest,
   PriorityStage,
   Level,
   RoadmapStage,
@@ -14,6 +15,7 @@ import {
   StageRequest,
   StageReorderItem,
   StageTaskPlacement,
+  StageTaskMoveRequest,
   StageTaskReorderItem
 } from '../models/roadmap.models';
 
@@ -77,6 +79,23 @@ export class RoadmapService {
       });
   }
 
+  updateRoadmap(id: number, req: RoadmapRequest): Observable<Roadmap> {
+    return this.http.put<Roadmap>(`${this.base}/roadmap/${id}`, req).pipe(
+      tap((updated) => {
+        const current = this.roadmap();
+        if (current) {
+          this.roadmap.set({ ...current, name: updated.name, description: updated.description, isActive: updated.isActive });
+        } else {
+          this.roadmap.set(updated);
+        }
+      }),
+      catchError(err => {
+        this.setError(err);
+        return throwError(() => err);
+      })
+    );
+  }
+
   loadPriorityStages(): void {
     this.http.get<PriorityStage[]>(`${this.base}/priority-stages`)
       .pipe(
@@ -113,7 +132,7 @@ export class RoadmapService {
       tap((updated) => {
         const current = this.roadmap();
         if (current) {
-          const levels = current.levels.map(lvl => lvl.id === id ? { ...lvl, name: updated.name, position: updated.position } : lvl);
+          const levels = current.levels.map(lvl => lvl.id === id ? { ...lvl, name: updated.name, link: updated.link, position: updated.position } : lvl);
           this.roadmap.set({ ...current, levels });
         }
       }),
@@ -244,22 +263,50 @@ export class RoadmapService {
       tap((updated) => {
         const current = this.roadmap();
         if (current) {
-          const updatedLevels = current.levels.map(level => ({
-            ...level,
-            stages: level.stages.map(stage => {
-              if (stage.id === id) {
-                return {
-                  ...stage,
-                  name: updated.name,
-                  code: updated.code,
-                  weight: updated.weight,
-                  position: updated.position,
-                  priorityStage: updated.priorityStage
-                };
+          const sourceLevel = current.levels.find(lvl => lvl.stages.some(s => s.id === id));
+          const targetLevelId = req.levelId;
+
+          let updatedLevels = current.levels;
+          if (sourceLevel && targetLevelId && sourceLevel.id !== targetLevelId) {
+            // Moved to a different level
+            const stageToMove = sourceLevel.stages.find(s => s.id === id);
+            const preservedTasks = stageToMove?.tasks || updated.tasks || [];
+            const updatedStageObj: RoadmapStage = {
+              ...stageToMove!,
+              ...updated,
+              levelId: targetLevelId,
+              tasks: preservedTasks
+            };
+
+            updatedLevels = current.levels.map(lvl => {
+              if (lvl.id === sourceLevel.id) {
+                return { ...lvl, stages: lvl.stages.filter(s => s.id !== id) };
               }
-              return stage;
-            })
-          }));
+              if (lvl.id === targetLevelId) {
+                return { ...lvl, stages: [...lvl.stages, updatedStageObj] };
+              }
+              return lvl;
+            });
+          } else {
+            updatedLevels = current.levels.map(level => ({
+              ...level,
+              stages: level.stages.map(stage => {
+                if (stage.id === id) {
+                  return {
+                    ...stage,
+                    name: updated.name,
+                    code: updated.code,
+                    link: updated.link,
+                    weight: updated.weight,
+                    position: updated.position,
+                    priorityStage: updated.priorityStage,
+                    tasks: stage.tasks || updated.tasks || []
+                  };
+                }
+                return stage;
+              })
+            }));
+          }
           this.roadmap.set({ ...current, levels: updatedLevels });
         }
       }),
@@ -382,6 +429,58 @@ export class RoadmapService {
 
   reorderTasksInStage(stageId: number, items: StageTaskReorderItem[]): Observable<StageTask[]> {
     return this.http.put<StageTask[]>(`${this.base}/stages/${stageId}/tasks/reorder`, items).pipe(
+      catchError(err => {
+        this.setError(err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  moveTaskToStage(sourceStageId: number, taskId: number, req: StageTaskMoveRequest): Observable<StageTask> {
+    return this.http.put<StageTask>(`${this.base}/stages/${sourceStageId}/tasks/${taskId}/move`, req).pipe(
+      tap((moved) => {
+        const current = this.roadmap();
+        if (current) {
+          let movedTaskRef: StageTask | undefined;
+          let updatedLevels = current.levels.map(level => ({
+            ...level,
+            stages: level.stages.map(stage => {
+              if (stage.id === sourceStageId) {
+                const found = stage.tasks.find(st => (st.task?.id === taskId || st.taskId === taskId));
+                if (found) movedTaskRef = found;
+                return {
+                  ...stage,
+                  tasks: stage.tasks.filter(st => (st.task?.id !== taskId && st.taskId !== taskId))
+                };
+              }
+              return stage;
+            })
+          }));
+
+          if (movedTaskRef || moved) {
+            const itemToAdd: StageTask = moved || {
+              ...movedTaskRef!,
+              stageId: req.targetStageId,
+              position: req.targetPosition || 1,
+              isMain: false
+            };
+            updatedLevels = updatedLevels.map(level => ({
+              ...level,
+              stages: level.stages.map(stage => {
+                if (stage.id === req.targetStageId) {
+                  const tasks = [...stage.tasks];
+                  const insertIdx = req.targetPosition ? Math.max(0, Math.min(req.targetPosition - 1, tasks.length)) : tasks.length;
+                  tasks.splice(insertIdx, 0, itemToAdd);
+                  return { ...stage, tasks };
+                }
+                return stage;
+              })
+            }));
+          }
+
+          this.roadmap.set({ ...current, levels: updatedLevels });
+        }
+      }),
       catchError(err => {
         this.setError(err);
         return throwError(() => err);
