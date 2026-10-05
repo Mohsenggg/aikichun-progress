@@ -74,7 +74,21 @@ export class RoadmapService {
         })
       )
       .subscribe({
-        next: (data) => this.roadmap.set(data),
+        next: (data) => {
+          if (data && data.levels) {
+            data.levels = data.levels.map(level => ({
+              ...level,
+              stages: (level.stages || []).map(stage => ({
+                ...stage,
+                tasks: (stage.tasks || []).map(st => ({
+                  ...st,
+                  isMain: Boolean(st.isMain ?? (st as any).main ?? false)
+                }))
+              }))
+            }));
+          }
+          this.roadmap.set(data);
+        },
         error: () => {}
       });
   }
@@ -445,7 +459,7 @@ export class RoadmapService {
           let updatedLevels = current.levels.map(level => ({
             ...level,
             stages: level.stages.map(stage => {
-              if (stage.id === sourceStageId) {
+              if (stage.id === sourceStageId && sourceStageId !== req.targetStageId) {
                 const found = stage.tasks.find(st => (st.task?.id === taskId || st.taskId === taskId));
                 if (found) movedTaskRef = found;
                 return {
@@ -457,26 +471,50 @@ export class RoadmapService {
             })
           }));
 
-          if (movedTaskRef || moved) {
-            const itemToAdd: StageTask = moved || {
-              ...movedTaskRef!,
-              stageId: req.targetStageId,
-              position: req.targetPosition || 1,
-              isMain: false
-            };
-            updatedLevels = updatedLevels.map(level => ({
-              ...level,
-              stages: level.stages.map(stage => {
-                if (stage.id === req.targetStageId) {
-                  const tasks = [...stage.tasks];
+          const itemToAdd: StageTask = {
+            ...(movedTaskRef || {}),
+            ...(moved || {}),
+            stageId: req.targetStageId,
+            position: moved?.position || req.targetPosition || 1,
+            isMain: Boolean(moved?.isMain ?? (moved as any)?.main ?? false),
+            task: (moved && moved.task) ? moved.task : movedTaskRef?.task!
+          };
+
+          updatedLevels = updatedLevels.map(level => ({
+            ...level,
+            stages: level.stages.map(stage => {
+              if (stage.id === req.targetStageId) {
+                const targetTasks = stage.tasks || [];
+                const alreadyExists = targetTasks.some(st =>
+                  (st.task?.id === taskId || st.taskId === taskId || (moved && st.id === moved.id))
+                );
+
+                if (alreadyExists) {
+                  // Task already present (optimistic update from drag-and-drop). Update in place without duplicating!
+                  return {
+                    ...stage,
+                    tasks: targetTasks.map(st => {
+                      if (st.task?.id === taskId || st.taskId === taskId || (moved && st.id === moved.id)) {
+                        return {
+                          ...st,
+                          ...itemToAdd,
+                          task: st.task || itemToAdd.task
+                        };
+                      }
+                      return st;
+                    })
+                  };
+                } else {
+                  // Task not yet in target stage, insert it
+                  const tasks = [...targetTasks];
                   const insertIdx = req.targetPosition ? Math.max(0, Math.min(req.targetPosition - 1, tasks.length)) : tasks.length;
                   tasks.splice(insertIdx, 0, itemToAdd);
                   return { ...stage, tasks };
                 }
-                return stage;
-              })
-            }));
-          }
+              }
+              return stage;
+            })
+          }));
 
           this.roadmap.set({ ...current, levels: updatedLevels });
         }
