@@ -9,12 +9,15 @@ import {
 } from '@angular/cdk/drag-drop';
 import { RoadmapService } from '../../services/roadmap.service';
 import { TaskService } from '../../services/task.service';
+import { CheckDefinitionService } from '../../services/check-definition.service';
 import {
   Roadmap,
   Level,
   RoadmapStage,
   StageTask,
   PriorityStage,
+  CheckDefinition,
+  CheckDefinitionRequest,
   EditTarget,
   DialogMode
 } from '../../models/roadmap.models';
@@ -30,16 +33,19 @@ import { TaskFormDialogComponent } from './task-form-dialog/task-form-dialog.com
 export class RoadmapBuilderComponent implements OnInit {
   roadmapService = inject(RoadmapService);
   taskService = inject(TaskService);
+  checkDefService = inject(CheckDefinitionService);
 
   // Signals
   roadmap = this.roadmapService.roadmap;
   priorityStages = this.roadmapService.priorityStages;
   isLoading = this.roadmapService.isLoading;
   errorMessage = this.roadmapService.error;
+  checkDefinitions = this.checkDefService.checkDefinitions;
 
   // Dialog & Panels
   dialogMode = signal<DialogMode>(null);
   showPriorityPanel = signal(false);
+  showChecksPanel = signal(false);
 
   // Inline Editing
   editingTarget = signal<EditTarget>(null);
@@ -55,6 +61,7 @@ export class RoadmapBuilderComponent implements OnInit {
   isAddingLevel = signal(false);
   newLevelName = signal('');
   newLevelLink = signal('');
+  newLevelWeight = signal<number>(10);
   newLevelError = signal<string | null>(null);
 
   // New Stage (Step) Inline Input
@@ -76,6 +83,19 @@ export class RoadmapBuilderComponent implements OnInit {
   inlineStageWeightValue = signal<number>(10);
   inlineStageWeightError = signal<string | null>(null);
 
+  // ── Checks Panel State ───────────────────────────────────────────────────
+  newCheckName = signal('');
+  newCheckDesc = signal('');
+  newCheckError = signal<string | null>(null);
+  isSavingCheck = signal(false);
+  editingCheckId = signal<number | null>(null);
+  editCheckName = signal('');
+  editCheckDesc = signal('');
+  editCheckError = signal<string | null>(null);
+  isUpdatingCheck = signal(false);
+  isDeletingCheckId = signal<number | null>(null);
+  // ─────────────────────────────────────────────────────────────────────────
+
   // Drag Drop Connected List IDs
   allLevelDropListIds = computed(() => {
     const current = this.roadmap();
@@ -89,9 +109,33 @@ export class RoadmapBuilderComponent implements OnInit {
     return current.levels.flatMap(l => l.stages || []).map(s => 'stage-tasks-' + s.id);
   });
 
+  // ── Computed Weight Percentages ──────────────────────────────────────────
+  levelWeightPercent(level: Level): string {
+    const lvls = this.roadmap()?.levels || [];
+    const total = lvls.reduce((s, l) => s + (l.weight ?? 1), 0);
+    if (!total) return '0';
+    return ((( level.weight ?? 1) / total) * 100).toFixed(0);
+  }
+
+  stageWeightPercent(stage: RoadmapStage, level: Level): string {
+    const stages = level.stages || [];
+    const total = stages.reduce((s, st) => s + (st.weight ?? 1), 0);
+    if (!total) return '0';
+    return (((stage.weight ?? 1) / total) * 100).toFixed(0);
+  }
+
+  taskWeightPercent(task: StageTask, stage: RoadmapStage): string {
+    const tasks = stage.tasks || [];
+    const total = tasks.reduce((s, t) => s + ((t.task?.weight as number) ?? 1), 0);
+    if (!total) return '0';
+    return ((((task.task?.weight as number) ?? 1) / total) * 100).toFixed(0);
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
   ngOnInit(): void {
     this.roadmapService.loadRoadmap();
     this.roadmapService.loadPriorityStages();
+    this.checkDefService.loadAll();
   }
 
   dismissError(): void {
@@ -138,6 +182,7 @@ export class RoadmapBuilderComponent implements OnInit {
     this.isAddingLevel.set(true);
     this.newLevelName.set('');
     this.newLevelLink.set('');
+    this.newLevelWeight.set(10);
     this.newLevelError.set(null);
   }
 
@@ -145,6 +190,7 @@ export class RoadmapBuilderComponent implements OnInit {
     this.isAddingLevel.set(false);
     this.newLevelName.set('');
     this.newLevelLink.set('');
+    this.newLevelWeight.set(10);
     this.newLevelError.set(null);
   }
 
@@ -154,6 +200,11 @@ export class RoadmapBuilderComponent implements OnInit {
       this.newLevelError.set('Level name is required');
       return;
     }
+    const weight = Number(this.newLevelWeight());
+    if (isNaN(weight) || weight <= 0) {
+      this.newLevelError.set('Weight must be greater than zero');
+      return;
+    }
 
     const currentRoadmap = this.roadmap();
     if (!currentRoadmap) return;
@@ -161,11 +212,10 @@ export class RoadmapBuilderComponent implements OnInit {
     this.roadmapService.createLevel({
       name,
       roadmapId: currentRoadmap.id,
-      link: this.newLevelLink().trim() || null
+      link: this.newLevelLink().trim() || null,
+      weight
     }).subscribe({
-      next: () => {
-        this.cancelAddLevel();
-      },
+      next: () => this.cancelAddLevel(),
       error: () => {}
     });
   }
@@ -179,6 +229,7 @@ export class RoadmapBuilderComponent implements OnInit {
     });
     this.inlineEditValue.set(level.name);
     this.inlineEditLink.set(level.link || '');
+    this.inlineEditWeight.set(level.weight ?? 10);
     this.inlineEditError.set(null);
   }
 
@@ -188,13 +239,19 @@ export class RoadmapBuilderComponent implements OnInit {
       this.inlineEditError.set('Name is required');
       return;
     }
+    const weight = Number(this.inlineEditWeight());
+    if (isNaN(weight) || weight <= 0) {
+      this.inlineEditError.set('Weight must be greater than zero');
+      return;
+    }
     const currentRoadmap = this.roadmap();
     if (!currentRoadmap) return;
 
     this.roadmapService.updateLevel(level.id, {
       name: val,
       roadmapId: currentRoadmap.id,
-      link: this.inlineEditLink().trim() || null
+      link: this.inlineEditLink().trim() || null,
+      weight
     }).subscribe({
       next: () => this.cancelEdit(),
       error: () => {}
@@ -598,11 +655,78 @@ export class RoadmapBuilderComponent implements OnInit {
   // --- Priority Stages Panel Operations ---
 
   togglePriorityPanel(): void {
+    this.showChecksPanel.set(false);
     this.showPriorityPanel.update(v => !v);
   }
 
   closePriorityPanel(): void {
     this.showPriorityPanel.set(false);
+  }
+
+  // --- Check Definitions Panel Operations ---
+
+  toggleChecksPanel(): void {
+    this.showPriorityPanel.set(false);
+    this.showChecksPanel.update(v => !v);
+  }
+
+  closeChecksPanel(): void {
+    this.showChecksPanel.set(false);
+  }
+
+  startEditCheck(check: CheckDefinition): void {
+    this.editingCheckId.set(check.id);
+    this.editCheckName.set(check.name);
+    this.editCheckDesc.set(check.description || '');
+    this.editCheckError.set(null);
+  }
+
+  cancelEditCheck(): void {
+    this.editingCheckId.set(null);
+  }
+
+  saveEditCheck(): void {
+    const id = this.editingCheckId();
+    if (!id) return;
+    const name = this.editCheckName().trim();
+    if (!name) { this.editCheckError.set('Name is required'); return; }
+    this.isUpdatingCheck.set(true);
+    this.editCheckError.set(null);
+    const desc = this.editCheckDesc().trim();
+    const req: CheckDefinitionRequest = { name, description: desc ? desc : undefined };
+    this.checkDefService.update(id, req).subscribe({
+      next: () => { this.isUpdatingCheck.set(false); this.editingCheckId.set(null); },
+      error: (err) => { this.editCheckError.set(err.error?.message || err.message || 'Failed to update'); this.isUpdatingCheck.set(false); }
+    });
+  }
+
+  confirmAddCheck(): void {
+    const name = this.newCheckName().trim();
+    if (!name) { this.newCheckError.set('Name is required'); return; }
+    this.isSavingCheck.set(true);
+    this.newCheckError.set(null);
+    const desc = this.newCheckDesc().trim();
+    const req: CheckDefinitionRequest = { name, description: desc ? desc : undefined };
+    this.checkDefService.create(req).subscribe({
+      next: () => {
+        this.newCheckName.set('');
+        this.newCheckDesc.set('');
+        this.isSavingCheck.set(false);
+      },
+      error: (err) => { this.newCheckError.set(err.error?.message || err.message || 'Failed to create'); this.isSavingCheck.set(false); }
+    });
+  }
+
+  deleteCheck(id: number): void {
+    if (!confirm('Delete this Check Definition? It will be removed from all tasks that use it.')) return;
+    this.isDeletingCheckId.set(id);
+    this.checkDefService.delete(id).subscribe({
+      next: () => this.isDeletingCheckId.set(null),
+      error: (err) => {
+        this.roadmapService.setError(err);
+        this.isDeletingCheckId.set(null);
+      }
+    });
   }
 
   startEditPriority(p: PriorityStage): void {

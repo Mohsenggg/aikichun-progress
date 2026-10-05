@@ -8,12 +8,12 @@
             @if (mode.kind === 'editTask') {
               Edit Task
             } @else {
-              Add Task to Stage
+              Add Task to Step
             }
           </h3>
           <p class="dialog-subtitle">
             @if (mode.kind === 'editTask') {
-              Update global task properties
+              Update global task properties and check definitions
             } @else {
               Define a new task or choose from existing pool
             }
@@ -100,12 +100,170 @@
               placeholder="https://example.com/reference-video" />
           </div>
 
-          <div class="form-group checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" formControlName="active" class="form-checkbox" />
-              <span>Active in system</span>
-            </label>
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="task-weight" class="form-label">
+                Subweight <span class="required">*</span>
+              </label>
+              <input
+                id="task-weight"
+                type="number"
+                class="form-input"
+                formControlName="weight"
+                min="0.01"
+                step="0.5"
+                placeholder="1.0" />
+              <span class="field-hint">Relative importance in step (default: 1.0)</span>
+            </div>
+            <div class="form-group col-half" style="justify-content: center; padding-top: 1.4rem;">
+              <label class="checkbox-label">
+                <input type="checkbox" formControlName="active" class="form-checkbox" />
+                <span>Active in system</span>
+              </label>
+            </div>
           </div>
+
+          <!-- ── Check Definitions Section ───────────────────────────────── -->
+          <div class="checks-section">
+            <div class="checks-section-header">
+              <div class="checks-section-title-row">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 11 12 14 22 4"></polyline>
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                </svg>
+                <span class="checks-section-label">Check Definitions</span>
+                @if (selectedCheckIds().size > 0) {
+                  <span class="checks-badge">{{ selectedCheckIds().size }}</span>
+                }
+              </div>
+              <p class="checks-section-desc">Select the criteria a trainee must complete for this task. Each check is trackable independently.</p>
+            </div>
+
+            <!-- Loading state -->
+            @if (checkDefService.isLoading()) {
+              <div class="checks-loading">
+                <span class="spinner-sm"></span>
+                <span>Loading checks…</span>
+              </div>
+            } @else {
+              <!-- Checks list -->
+              <div class="checks-list">
+                @for (check of allChecks(); track check.id) {
+                  <div class="check-item" [class.check-item-selected]="isCheckSelected(check.id)">
+                    @if (editingCheckId() === check.id) {
+                      <!-- Edit mode for this check -->
+                      <div class="check-edit-panel">
+                        @if (editCheckError()) {
+                          <div class="check-inline-error">{{ editCheckError() }}</div>
+                        }
+                        <input
+                          type="text"
+                          class="form-input form-input-sm"
+                          placeholder="Check name"
+                          [value]="editCheckName()"
+                          (input)="editCheckName.set($any($event.target).value)"
+                          (keydown.enter)="$event.preventDefault(); saveEditCheck()"
+                          (keydown.escape)="$event.preventDefault(); cancelEditCheck()"
+                          autofocus />
+                        <input
+                          type="text"
+                          class="form-input form-input-sm"
+                          placeholder="Description (optional)"
+                          [value]="editCheckDesc()"
+                          (input)="editCheckDesc.set($any($event.target).value)"
+                          (keydown.enter)="$event.preventDefault(); saveEditCheck()"
+                          (keydown.escape)="$event.preventDefault(); cancelEditCheck()" />
+                        <div class="check-edit-actions">
+                          <button type="button" class="btn btn-xs btn-ghost" (click)="cancelEditCheck()" [disabled]="isUpdatingCheck()">Cancel</button>
+                          <button type="button" class="btn btn-xs btn-primary" (click)="saveEditCheck()" [disabled]="isUpdatingCheck()">
+                            @if (isUpdatingCheck()) { <span class="spinner-xs"></span> } Save
+                          </button>
+                        </div>
+                      </div>
+                    } @else {
+                      <!-- Normal row -->
+                      <button
+                        type="button"
+                        class="check-toggle-btn"
+                        [class.selected]="isCheckSelected(check.id)"
+                        (click)="toggleCheck(check.id)"
+                        [title]="isCheckSelected(check.id) ? 'Deselect' : 'Select'">
+                        <span class="check-toggle-icon">
+                          @if (isCheckSelected(check.id)) {
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                          } @else {
+                            <span class="check-toggle-empty-circle"></span>
+                          }
+                        </span>
+                      </button>
+                      <div class="check-info" (click)="toggleCheck(check.id)">
+                        <span class="check-name">{{ check.name }}</span>
+                        @if (check.description) {
+                          <span class="check-desc">{{ check.description }}</span>
+                        }
+                      </div>
+                      <button
+                        type="button"
+                        class="check-edit-icon-btn"
+                        title="Edit this check definition"
+                        (click)="startEditCheck(check)">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                      </button>
+                    }
+                  </div>
+                }
+
+                @if (allChecks().length === 0) {
+                  <div class="checks-empty">No check definitions yet. Add the first one below.</div>
+                }
+              </div>
+
+              <!-- Add new check inline panel -->
+              @if (showAddCheckPanel()) {
+                <div class="add-check-panel">
+                  <p class="add-check-panel-title">New Check Definition</p>
+                  @if (checkPanelError()) {
+                    <div class="check-inline-error">{{ checkPanelError() }}</div>
+                  }
+                  <input
+                    type="text"
+                    class="form-input form-input-sm"
+                    placeholder="Check name (e.g., Correct posture)"
+                    [value]="newCheckName()"
+                    (input)="newCheckName.set($any($event.target).value)"
+                    (keydown.enter)="$event.preventDefault(); saveNewCheck()"
+                    (keydown.escape)="$event.preventDefault(); cancelAddCheck()"
+                    autofocus />
+                  <input
+                    type="text"
+                    class="form-input form-input-sm"
+                    placeholder="Description (optional)"
+                    [value]="newCheckDesc()"
+                    (input)="newCheckDesc.set($any($event.target).value)"
+                    (keydown.enter)="$event.preventDefault(); saveNewCheck()"
+                    (keydown.escape)="$event.preventDefault(); cancelAddCheck()" />
+                  <div class="add-check-actions">
+                    <button type="button" class="btn btn-xs btn-ghost" (click)="cancelAddCheck()" [disabled]="isSavingCheck()">Cancel</button>
+                    <button type="button" class="btn btn-xs btn-primary" (click)="saveNewCheck()" [disabled]="isSavingCheck()">
+                      @if (isSavingCheck()) { <span class="spinner-xs"></span> } Add Check
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <button type="button" class="add-check-trigger-btn" (click)="openAddCheckPanel()">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  Add new check definition
+                </button>
+              }
+            }
+          </div>
+          <!-- ── End Checks Section ───────────────────────────────────────── -->
 
           <!-- Dialog Actions -->
           <div class="dialog-footer">
@@ -159,6 +317,9 @@
                   <div class="task-card-info">
                     <div class="task-card-header">
                       <span class="task-card-title">{{ task.title }}</span>
+                      @if (task.checks && task.checks.length > 0) {
+                        <span class="task-checks-pill">{{ task.checks.length }} check{{ task.checks.length !== 1 ? 's' : '' }}</span>
+                      }
                     </div>
                     @if (task.description) {
                       <p class="task-card-desc">{{ task.description }}</p>

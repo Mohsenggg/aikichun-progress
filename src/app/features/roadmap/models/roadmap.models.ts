@@ -1,3 +1,12 @@
+export interface CheckDefinition {
+  id: number;
+  name: string;
+  description?: string | null;
+  assignedTaskCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface PriorityStage {
   id: number;
   name: string;
@@ -7,10 +16,13 @@ export interface PriorityStage {
 
 export interface Task {
   id: number;
+  code?: string | null;
   title: string;
   description: string;
   link?: string | null;
+  weight?: number | null;
   active: boolean;
+  checks?: CheckDefinition[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -41,6 +53,7 @@ export interface Level {
   roadmapId: number;
   name: string;
   link?: string | null;
+  weight?: number;
   position: number;
   stages: RoadmapStage[];
 }
@@ -64,6 +77,7 @@ export interface LevelRequest {
   name: string;
   roadmapId: number;
   link?: string | null;
+  weight?: number;
   position?: number;
 }
 
@@ -114,13 +128,24 @@ export interface TaskRequest {
   title: string;
   description?: string;
   link?: string | null;
+  weight?: number;
   active?: boolean;
+  checkDefinitionIds?: number[];
+}
+
+export interface CheckDefinitionRequest {
+  name: string;
+  description?: string | null;
+}
+
+export interface TraineeCheckProgressRequest {
+  completed: boolean;
 }
 
 // UI-Only State Types
 export type EditTarget =
   | { kind: 'roadmap'; id: number; initialName: string; initialDescription: string }
-  | { kind: 'level'; id: number; initialValue: string; initialLink?: string | null }
+  | { kind: 'level'; id: number; initialValue: string; initialLink?: string | null; initialWeight?: number }
   | { kind: 'stage'; id: number; initialName: string; initialCode?: string | null; initialWeight: number; initialLink?: string | null }
   | { kind: 'priorityStage'; id: number; initialName: string; initialColor: string; initialDescription?: string | null }
   | null;

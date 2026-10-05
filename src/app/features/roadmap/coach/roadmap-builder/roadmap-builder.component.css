@@ -1170,3 +1170,89 @@
     max-width: 100%;
   }
 }
+
+/* 3-Level Dynamic Weights & Check System UI Enhancements */
+.level-weight-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.12);
+  border: 1px solid rgba(96, 165, 250, 0.28);
+  padding: 0.15rem 0.45rem;
+  border-radius: 0.25rem;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.task-weight-badge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #c084fc;
+  background: rgba(192, 132, 252, 0.12);
+  border: 1px solid rgba(192, 132, 252, 0.28);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.task-checks-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  flex-shrink: 0;
+}
+
+.weight-pct {
+  font-size: 0.68rem;
+  opacity: 0.85;
+  font-weight: normal;
+}
+
+.check-icon-chip {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: rgba(52, 211, 153, 0.2);
+  color: #34d399;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.usage-count-badge {
+  font-size: 0.68rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--white-70);
+  padding: 0.05rem 0.35rem;
+  border-radius: 0.25rem;
+  margin-left: 0.4rem;
+}
+
+.spinner-xs {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--white);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+}
+

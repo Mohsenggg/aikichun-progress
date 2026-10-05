@@ -146,10 +146,38 @@ export class RoadmapService {
       tap((updated) => {
         const current = this.roadmap();
         if (current) {
-          const levels = current.levels.map(lvl => lvl.id === id ? { ...lvl, name: updated.name, link: updated.link, position: updated.position } : lvl);
+          const levels = current.levels.map(lvl => lvl.id === id ? { ...lvl, name: updated.name, link: updated.link, position: updated.position, weight: updated.weight } : lvl);
           this.roadmap.set({ ...current, levels });
         }
       }),
+      catchError(err => {
+        this.setError(err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  updateLevelWeight(id: number, weight: number): Observable<Level> {
+    return this.http.put<Level>(`${this.base}/levels/${id}/weight?weight=${weight}`, {}).pipe(
+      tap((updated) => {
+        const current = this.roadmap();
+        if (current) {
+          const levels = current.levels.map(lvl => lvl.id === id ? { ...lvl, weight: updated.weight } : lvl);
+          this.roadmap.set({ ...current, levels });
+        }
+      }),
+      catchError(err => {
+        this.setError(err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  toggleTaskCheck(traineeId: number, taskId: number, checkDefinitionId: number, completed: boolean): Observable<void> {
+    return this.http.put<void>(
+      `${environment.apiUrl}/trainee/${traineeId}/tasks/${taskId}/checks/${checkDefinitionId}`,
+      { completed }
+    ).pipe(
       catchError(err => {
         this.setError(err);
         return throwError(() => err);
