@@ -112,9 +112,21 @@
           <input type="text" class="form-input flex-1" placeholder="e.g., LEVEL 1 — White Belt (Rokkyu)" [value]="newLevelName()"
             (input)="newLevelName.set($any($event.target).value)"
             (keydown)="onInlineKeydown($event, confirmAddLevel.bind(this))" autofocus />
-          <input type="url" class="form-input flex-1" placeholder="Resource Link (optional, e.g. https://...)" [value]="newLevelLink()"
-            (input)="newLevelLink.set($any($event.target).value)"
-            (keydown)="onInlineKeydown($event, confirmAddLevel.bind(this))" />
+          <button type="button" class="btn-resource-toggle"
+            [class.has-link]="!!newLevelLink()"
+            (click)="openResourceModal('newLevel', 'Level Resource Link', newLevelLink())"
+            [title]="newLevelLink() ? 'Resource Link: ' + newLevelLink() : 'Add Resource Link (optional)'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            @if (newLevelLink()) {
+              <span class="link-active-indicator"></span>
+              <span class="btn-resource-label">Link Set</span>
+            } @else {
+              <span class="btn-resource-label">+ Link</span>
+            }
+          </button>
           <input type="number" class="form-input stage-weight-input" placeholder="Weight" min="0.1" step="1"
             [value]="newLevelWeight()" (input)="newLevelWeight.set(+$any($event.target).value)"
             (keydown)="onInlineKeydown($event, confirmAddLevel.bind(this))" title="Level Weight" />
@@ -159,9 +171,21 @@
               <input type="text" class="inline-input flex-1" placeholder="Level Name" [value]="inlineEditValue()"
                 (input)="inlineEditValue.set($any($event.target).value)"
                 (keydown)="onInlineKeydown($event, saveEditLevel.bind(this, level))" autofocus />
-              <input type="url" class="inline-input flex-1" placeholder="Resource Link URL" [value]="inlineEditLink()"
-                (input)="inlineEditLink.set($any($event.target).value)"
-                (keydown)="onInlineKeydown($event, saveEditLevel.bind(this, level))" />
+              <button type="button" class="btn-resource-toggle"
+                [class.has-link]="!!inlineEditLink()"
+                (click)="openResourceModal('editLevel', 'Level Resource Link', inlineEditLink())"
+                [title]="inlineEditLink() ? 'Resource Link: ' + inlineEditLink() : 'Add Resource Link (optional)'">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                @if (inlineEditLink()) {
+                  <span class="link-active-indicator"></span>
+                  <span class="btn-resource-label">Link Set</span>
+                } @else {
+                  <span class="btn-resource-label">+ Link</span>
+                }
+              </button>
               <input type="number" class="inline-input stage-weight-input" placeholder="Weight" min="0.1" step="1"
                 [value]="inlineEditWeight()" (input)="inlineEditWeight.set(+$any($event.target).value)"
                 (keydown)="onInlineKeydown($event, saveEditLevel.bind(this, level))" title="Level Weight" />
@@ -176,8 +200,13 @@
             <h3 class="level-name">
               {{ level.name }}
               @if (level.link) {
-              <a [href]="level.link" target="_blank" rel="noopener noreferrer" class="link-badge" title="Open level resource">
-                ↗
+              <a [href]="level.link" target="_blank" rel="noopener noreferrer" class="resource-chip" title="Open resource: {{ level.link }}">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                <span>Resource</span>
+                <span class="external-icon">↗</span>
               </a>
               }
               <span class="level-weight-badge" title="Level Weight: {{ level.weight ?? 10 }}">
@@ -233,9 +262,21 @@
                   <input type="text" class="inline-input flex-1" placeholder="Step Name (optional)" [value]="inlineEditValue()"
                     (input)="inlineEditValue.set($any($event.target).value)"
                     (keydown)="onInlineKeydown($event, saveEditStage.bind(this, stage))" autofocus />
-                  <input type="url" class="inline-input flex-1" placeholder="Link URL" [value]="inlineEditLink()"
-                    (input)="inlineEditLink.set($any($event.target).value)"
-                    (keydown)="onInlineKeydown($event, saveEditStage.bind(this, stage))" />
+                  <button type="button" class="btn-resource-toggle"
+                    [class.has-link]="!!inlineEditLink()"
+                    (click)="openResourceModal('editStage', 'Step Resource Link', inlineEditLink())"
+                    [title]="inlineEditLink() ? 'Resource Link: ' + inlineEditLink() : 'Add Resource Link (optional)'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                    @if (inlineEditLink()) {
+                      <span class="link-active-indicator"></span>
+                      <span class="btn-resource-label">Link Set</span>
+                    } @else {
+                      <span class="btn-resource-label">+ Link</span>
+                    }
+                  </button>
                   <input type="number" class="inline-input stage-weight-input" placeholder="Weight" min="1"
                     [value]="inlineEditWeight()" (input)="inlineEditWeight.set(+$any($event.target).value)"
                     (keydown)="onInlineKeydown($event, saveEditStage.bind(this, stage))" />
@@ -253,8 +294,13 @@
                 <h4 class="stage-name" [class.unnamed-step]="!stage.name">
                   {{ stage.name || 'Unnamed Step' }}
                   @if (stage.link) {
-                  <a [href]="stage.link" target="_blank" rel="noopener noreferrer" class="link-badge" title="Open step resource">
-                    ↗
+                  <a [href]="stage.link" target="_blank" rel="noopener noreferrer" class="resource-chip sm" title="Open step resource: {{ stage.link }}">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                    <span>Resource</span>
+                    <span class="external-icon">↗</span>
                   </a>
                   }
                 </h4>
@@ -352,8 +398,12 @@
                   <div class="task-info">
                     <span class="task-title">{{ st.task.title }}</span>
                     @if (st.task.link) {
-                    <a [href]="st.task.link" target="_blank" rel="noopener noreferrer" class="link-badge sm" title="Open task resource">
-                      ↗
+                    <a [href]="st.task.link" target="_blank" rel="noopener noreferrer" class="resource-chip xs" title="Open task resource: {{ st.task.link }}">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                      </svg>
+                      <span class="external-icon">↗</span>
                     </a>
                     }
                     @if (st.isMain) {
@@ -406,10 +456,21 @@
                 placeholder="Step Name (optional)" [value]="newStageName()"
                 (input)="newStageName.set($any($event.target).value)"
                 (keydown)="onInlineKeydown($event, confirmAddStage.bind(this, level.id))" autofocus />
-              <input type="url" class="form-input flex-1"
-                placeholder="Link URL (optional)" [value]="newStageLink()"
-                (input)="newStageLink.set($any($event.target).value)"
-                (keydown)="onInlineKeydown($event, confirmAddStage.bind(this, level.id))" />
+              <button type="button" class="btn-resource-toggle"
+                [class.has-link]="!!newStageLink()"
+                (click)="openResourceModal('newStage', 'Step Resource Link', newStageLink())"
+                [title]="newStageLink() ? 'Resource Link: ' + newStageLink() : 'Add Resource Link (optional)'">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                @if (newStageLink()) {
+                  <span class="link-active-indicator"></span>
+                  <span class="btn-resource-label">Link Set</span>
+                } @else {
+                  <span class="btn-resource-label">+ Link</span>
+                }
+              </button>
               <input type="number" class="form-input stage-weight-input" placeholder="Weight" min="1"
                 [value]="newStageWeight()" (input)="newStageWeight.set(+$any($event.target).value)"
                 (keydown)="onInlineKeydown($event, confirmAddStage.bind(this, level.id))" />
@@ -625,6 +686,64 @@
           @if (newCheckError()) {
           <span class="field-error">{{ newCheckError() }}</span>
           }
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Resource Link Modal / Popup -->
+  @if (resourceModalTarget()) {
+  <div class="resource-modal-backdrop" (click)="closeResourceModal()">
+    <div class="resource-modal-card" (click)="$event.stopPropagation()">
+      <div class="resource-modal-header">
+        <div class="resource-modal-title-group">
+          <div class="resource-modal-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+          </div>
+          <div>
+            <h4 class="resource-modal-title">{{ resourceModalTarget()?.title || 'Resource Link' }}</h4>
+            <p class="resource-modal-subtitle">Add or edit reference documentation, video, or URL</p>
+          </div>
+        </div>
+        <button type="button" class="btn-icon sm" (click)="closeResourceModal()" aria-label="Close modal">✕</button>
+      </div>
+      <div class="resource-modal-body">
+        <label class="resource-form-label">Resource URL</label>
+        <div class="resource-input-wrapper">
+          <input type="url" class="form-input resource-url-input"
+            placeholder="https://example.com/reference-or-guide"
+            [value]="resourceModalUrl()"
+            (input)="resourceModalUrl.set($any($event.target).value)"
+            (keydown.enter)="saveResourceModal()" autofocus />
+        </div>
+        @if (resourceModalUrl()) {
+          <div class="resource-preview-row">
+            <span class="resource-preview-label">Active Link:</span>
+            <a [href]="resourceModalUrl()" target="_blank" rel="noopener noreferrer" class="resource-preview-link">
+              {{ resourceModalUrl() }} ↗
+            </a>
+          </div>
+        }
+      </div>
+      <div class="resource-modal-footer">
+        <div>
+          @if (resourceModalUrl()) {
+            <button type="button" class="btn btn-ghost btn-sm btn-danger" (click)="clearResourceModal()">
+              Remove Link
+            </button>
+          }
+        </div>
+        <div class="modal-action-group">
+          <button type="button" class="btn btn-ghost btn-sm" (click)="closeResourceModal()">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" (click)="saveResourceModal()">
+            Save Link
+          </button>
         </div>
       </div>
     </div>

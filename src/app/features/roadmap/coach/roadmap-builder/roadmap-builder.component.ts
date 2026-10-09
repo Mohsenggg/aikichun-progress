@@ -83,6 +83,14 @@ export class RoadmapBuilderComponent implements OnInit {
   inlineStageWeightValue = signal<number>(10);
   inlineStageWeightError = signal<string | null>(null);
 
+  // ── Resource Link Popup / Modal State ────────────────────────────────────
+  resourceModalTarget = signal<{
+    type: 'newLevel' | 'editLevel' | 'newStage' | 'editStage';
+    title: string;
+  } | null>(null);
+  resourceModalUrl = signal<string>('');
+  // ─────────────────────────────────────────────────────────────────────────
+
   // ── Checks Panel State ───────────────────────────────────────────────────
   newCheckName = signal('');
   newCheckDesc = signal('');
@@ -813,5 +821,40 @@ export class RoadmapBuilderComponent implements OnInit {
 
   getPriorityColor(priorityStage: PriorityStage | null | undefined): string {
     return priorityStage?.color || 'transparent';
+  }
+
+  // --- Resource Modal Helpers ---
+
+  openResourceModal(type: 'newLevel' | 'editLevel' | 'newStage' | 'editStage', title: string, currentUrl?: string | null): void {
+    this.resourceModalTarget.set({ type, title });
+    this.resourceModalUrl.set(currentUrl || '');
+  }
+
+  closeResourceModal(): void {
+    this.resourceModalTarget.set(null);
+    this.resourceModalUrl.set('');
+  }
+
+  saveResourceModal(): void {
+    const target = this.resourceModalTarget();
+    if (!target) return;
+    const url = this.resourceModalUrl().trim();
+
+    if (target.type === 'newLevel') {
+      this.newLevelLink.set(url);
+    } else if (target.type === 'editLevel') {
+      this.inlineEditLink.set(url);
+    } else if (target.type === 'newStage') {
+      this.newStageLink.set(url);
+    } else if (target.type === 'editStage') {
+      this.inlineEditLink.set(url);
+    }
+
+    this.closeResourceModal();
+  }
+
+  clearResourceModal(): void {
+    this.resourceModalUrl.set('');
+    this.saveResourceModal();
   }
 }
