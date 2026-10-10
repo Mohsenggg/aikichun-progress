@@ -6,6 +6,9 @@
   <!-- Top Meta & Title Row -->
   <div class="task-header-row">
     <div class="task-title-group" (click)="openTaskDetails($event)">
+      @if (priority) {
+        <app-priority-chip [priority]="priority"></app-priority-chip>
+      }
       @if (stageTask.isMain) {
         <span class="main-star-icon" title="Main Core Task">★</span>
       }

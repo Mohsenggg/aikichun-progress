@@ -192,6 +192,79 @@
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Narrow screens: keep hero elements on one row, compact to avoid overlap/wrap. */
+@media (max-width: 460px) {
+  .level-detail-page {
+    padding: 16px 10px 64px;
+    gap: 14px;
+  }
+
+  .level-hero-card {
+    border-radius: 14px;
+  }
+
+  .level-hero-main {
+    padding: 12px 12px 10px;
+    gap: 10px;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .level-title-group {
+    min-width: 0;
+    flex: 1 1 auto;
+    gap: 5px;
+  }
+
+  .level-badge {
+    font-size: 10px;
+    padding: 2px 7px;
+    letter-spacing: 0.04em;
+  }
+
+  .level-hero-title {
+    font-size: 15px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .level-hero-desc {
+    font-size: 12px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .level-hero-stats {
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  /* Shrink the fixed 64px ring so title + stats fit on one row. */
+  .level-hero-stats app-progress-ring {
+    transform: scale(0.75);
+    margin: -8px;
+  }
+
+  .level-stats-labels {
+    gap: 4px;
+  }
+
+  .level-steps-count {
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .level-link-btn {
+    font-size: 10px;
+    padding: 4px 8px;
+    gap: 3px;
+    white-space: nowrap;
+  }
+}
+
 /* Steps Section */
 .steps-section {
   display: flex;

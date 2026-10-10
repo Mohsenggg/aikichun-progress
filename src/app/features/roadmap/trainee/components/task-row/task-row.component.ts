@@ -1,12 +1,13 @@
 import { Component, Input, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TraineeStageTask } from '../../../models/trainee.models';
+import { TraineeStageTask, PriorityStageInfo } from '../../../models/trainee.models';
 import { TraineeRoadmapService } from '../../../services/trainee-roadmap.service';
+import { PriorityChipComponent } from '../priority-chip/priority-chip.component';
 
 @Component({
   selector: 'app-task-row',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PriorityChipComponent],
   templateUrl: './task-row.component.html',
   styleUrl: './task-row.component.css'
 })
@@ -16,6 +17,7 @@ export class TaskRowComponent {
   @Input() traineeId = 0;
   @Input() hideStepPercentage = false;
   @Input() stepCode?: string | null;
+  @Input() priority: PriorityStageInfo | null = null;
 
   private traineeRoadmapService = inject(TraineeRoadmapService);
 
