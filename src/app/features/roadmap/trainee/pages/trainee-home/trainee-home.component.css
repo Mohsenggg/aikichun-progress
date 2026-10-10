@@ -282,10 +282,31 @@
   border-style: dashed;
 }
 
-.level-card-top {
+.level-card-main {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+}
+
+.level-card-left-cluster {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  order: -1;
+  min-width: 0;
+}
+
+.level-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  gap: 4px;
+  order: 2;
 }
 
 .level-number-badge {
@@ -297,39 +318,7 @@
   background: rgba(56, 189, 248, 0.12);
   padding: 3px 8px;
   border-radius: 6px;
-}
-
-.level-card-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.level-card-icon-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  color: #94a3b8;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.level-card-icon-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #f8fafc;
-}
-
-.level-card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  width: fit-content;
 }
 
 .level-card-title {
@@ -338,18 +327,20 @@
   font-weight: 700;
   color: #f8fafc;
   line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 
 .level-card-steps-count {
   margin: 0;
   font-size: 13px;
   color: #94a3b8;
+  white-space: nowrap;
 }
 
 .level-card-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   padding-top: 14px;
 }
@@ -371,6 +362,7 @@
 .level-lock-badge {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   color: #94a3b8;
   font-size: 12px;

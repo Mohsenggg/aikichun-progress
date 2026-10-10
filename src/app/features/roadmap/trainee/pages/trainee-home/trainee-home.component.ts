@@ -55,6 +55,11 @@ export class TraineeHomeComponent implements OnInit {
     });
   }
 
+  levelTasksCount(level: TraineeLevel | null | undefined): number {
+    if (!level?.stages) return 0;
+    return level.stages.reduce((sum, s) => sum + (s.tasks?.length ?? 0), 0);
+  }
+
   openLevelInfo(level: TraineeLevel, event: MouseEvent): void {
     event.stopPropagation();
     this.activeLevelInfoModal.set(level);

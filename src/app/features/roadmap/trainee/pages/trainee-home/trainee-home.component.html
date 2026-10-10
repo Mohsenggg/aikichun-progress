@@ -90,52 +90,9 @@
             [attr.role]="lvl.isLocked ? 'region' : 'button'"
             [attr.aria-disabled]="lvl.isLocked"
           >
-            <!-- Card Top Row -->
-            <div class="level-card-top">
-              <span class="level-number-badge">Level {{ lvl.position }}</span>
-
-              <div class="level-card-actions">
-                @if (lvl.link) {
-                  <a
-                    [href]="lvl.link"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="level-card-icon-btn"
-                    (click)="$event.stopPropagation()"
-                    title="Open level learning resource"
-                    aria-label="Open level resource"
-                  >
-                    ↗
-                  </a>
-                }
-                @if (lvl.description) {
-                  <button
-                    type="button"
-                    class="level-card-icon-btn"
-                    (click)="openLevelInfo(lvl, $event)"
-                    title="View level information"
-                    aria-label="View level information"
-                  >
-                    ℹ️
-                  </button>
-                }
-              </div>
-            </div>
-
-            <!-- Card Body -->
-            <div class="level-card-body">
-              <h3 class="level-card-title" dir="auto">{{ lvl.name }}</h3>
-              <p class="level-card-steps-count">{{ lvl.stepsCount }} Steps</p>
-            </div>
-
-            <!-- Card Footer (Progress & Status) -->
-            <div class="level-card-footer">
-              @if (lvl.isLocked) {
-                <div class="level-lock-badge">
-                  <span class="lock-icon">🔒</span>
-                  <span class="lock-text">Complete previous level to unlock</span>
-                </div>
-              } @else {
+            <!-- Card Main Row: left stats + right title (same alignment as level-hero-card) -->
+            <div class="level-card-main">
+              <div class="level-card-left-cluster">
                 <div class="level-progress-ring-box">
                   <app-progress-ring
                     [percentage]="lvl.progressPercentage"
@@ -145,6 +102,23 @@
                     [textSize]="'11px'"
                   ></app-progress-ring>
                 </div>
+                <p class="level-card-steps-count">{{ levelTasksCount(lvl) }} Tasks</p>
+              </div>
+
+              <div class="level-card-body">
+                <span class="level-number-badge">Level {{ lvl.position }}</span>
+                <h3 class="level-card-title" dir="auto">{{ lvl.name }}</h3>
+              </div>
+            </div>
+
+            <!-- Card Footer (Enter CTA centered) -->
+            <div class="level-card-footer">
+              @if (lvl.isLocked) {
+                <div class="level-lock-badge">
+                  <span class="lock-icon">🔒</span>
+                  <span class="lock-text">Complete previous level to unlock</span>
+                </div>
+              } @else {
                 <span class="level-enter-cta">
                   <span>Enter Level</span>
                   <span class="cta-arrow">→</span>
