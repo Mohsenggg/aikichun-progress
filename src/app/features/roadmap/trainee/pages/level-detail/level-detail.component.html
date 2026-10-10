@@ -28,6 +28,50 @@
       <!-- Level Hero Header -->
       <div class="level-hero-card">
         <div class="level-hero-main">
+          <div class="level-actions">
+            @if (lvl.description) {
+              <button
+                type="button"
+                class="level-action-btn"
+                (click)="openLevelInfo(lvl, $event)"
+                title="View level information"
+                aria-label="View level information"
+              >
+                ℹ️
+              </button>
+            } @else {
+              <span
+                class="level-action-btn icon-inactive"
+                aria-disabled="true"
+                title="No level description"
+                aria-label="No level description"
+              >
+                ℹ️
+              </span>
+            }
+            @if (lvl.link) {
+              <a
+                [href]="lvl.link"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="level-action-btn level-action-link"
+                title="Open level curriculum resource"
+                aria-label="Open level curriculum resource"
+              >
+                ↗
+              </a>
+            } @else {
+              <span
+                class="level-action-btn icon-inactive"
+                aria-disabled="true"
+                title="No level resource"
+                aria-label="No level resource"
+              >
+                ↗
+              </span>
+            }
+          </div>
+
           <div class="level-title-group">
             <span class="level-badge">Level {{ lvl.position }}</span>
             <h1 class="level-hero-title" dir="auto">{{ lvl.name }}</h1>
@@ -37,16 +81,9 @@
           </div>
 
           <div class="level-hero-stats">
-            <app-progress-ring
-              [percentage]="lvl.progressPercentage"
-              [size]="64"
-              [strokeWidth]="5"
-              [color]="'#22c55e'"
-              [textSize]="'13px'"
-            ></app-progress-ring>
-
+           
             <div class="level-stats-labels">
-              <span class="level-steps-count">{{ lvl.stepsCount }} Steps</span>
+              <span class="level-steps-count">{{ levelTasksCount(lvl) }} Tasks</span>
               @if (lvl.link) {
                 <a
                   [href]="lvl.link"
@@ -60,6 +97,15 @@
                 </a>
               }
             </div>
+
+             <app-progress-ring
+              [percentage]="lvl.progressPercentage"
+              [size]="64"
+              [strokeWidth]="5"
+              [color]="'#22c55e'"
+              [textSize]="'13px'"
+            ></app-progress-ring>
+
           </div>
         </div>
 

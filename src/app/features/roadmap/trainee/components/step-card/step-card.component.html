@@ -63,15 +63,15 @@
     </div>
 
     <div class="step-primary-cluster">
-      <!-- Code Badge -->
-      @if (stage.code) {
-        <span class="step-code-badge" dir="ltr">{{ stage.code }}</span>
-      }
-
       <!-- Step Title -->
       <h3 class="step-title" dir="auto">
         {{ displayName }}
       </h3>
+
+      <!-- Code Badge (far right) -->
+      @if (stage.code) {
+        <span class="step-code-badge" dir="ltr">{{ stage.code }}</span>
+      }
     </div>
 
     <!-- Step Progress & Expand Controls -->

@@ -58,13 +58,13 @@
       @if (stageTask.isMain) {
         <span class="main-star-icon" title="Main Core Task">★</span>
       }
+      <span class="task-title" dir="auto">{{ stageTask.task.title }}</span>
       @if (stageTask.task.code) {
         <span class="task-code-badge" dir="ltr">{{ stageTask.task.code }}</span>
       }
       @if (stepCode && stepCode !== stageTask.task.code) {
         <span class="task-code-badge task-step-code-badge" dir="ltr" title="Step code">{{ stepCode }}</span>
       }
-      <span class="task-title" dir="auto">{{ stageTask.task.title }}</span>
     </div>
   </div>
 

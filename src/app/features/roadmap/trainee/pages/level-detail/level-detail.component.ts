@@ -29,6 +29,7 @@ export class LevelDetailComponent implements OnInit {
 
   levelId = signal<number>(0);
   traineeId = signal<number>(1);
+  activeLevelInfoModal = signal<TraineeLevel | null>(null);
 
   roadmap = this.traineeRoadmapService.roadmap;
   isLoading = this.traineeRoadmapService.isLoading;
@@ -40,6 +41,11 @@ export class LevelDetailComponent implements OnInit {
     if (!rm || !id) return null;
     return rm.levels.find(l => l.id === id) || null;
   });
+
+  levelTasksCount(level: TraineeLevel | null | undefined): number {
+    if (!level?.stages) return 0;
+    return level.stages.reduce((sum, s) => sum + (s.tasks?.length ?? 0), 0);
+  }
 
   ngOnInit(): void {
     // 1. Resolve trainee ID
