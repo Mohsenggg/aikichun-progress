@@ -8,7 +8,7 @@
     >
       <span
         class="priority-dot"
-        [style.background-color]="priority.color || '#22c55e'"
+        [style.background-color]="priority.color || 'var(--color-neutral)'"
       ></span>
       <span class="priority-name">{{ priority.name }}</span>
     </button>
@@ -19,7 +19,7 @@
           <div class="priority-popover-title-row">
             <span
               class="priority-dot-large"
-              [style.background-color]="priority.color || '#22c55e'"
+              [style.background-color]="priority.color || 'var(--color-neutral)'"
             ></span>
             <h4 class="priority-popover-title">{{ priority.name }}</h4>
           </div>

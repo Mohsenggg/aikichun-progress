@@ -8,10 +8,10 @@
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  background: rgba(23, 42, 31, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 9999px;
-  color: #f1f5f9;
+  color: var(--color-text-primary);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -21,9 +21,8 @@
 }
 
 .priority-chip-btn:hover {
-  background: rgba(32, 58, 42, 0.9);
-  border-color: rgba(255, 255, 255, 0.25);
-  transform: translateY(-1px);
+  background: rgba(var(--color-neutral-rgb), 0.1);
+  border-color: rgba(var(--color-neutral-rgb), 0.5);
 }
 
 .priority-dot {
@@ -53,11 +52,11 @@
   left: 0;
   z-index: 100;
   width: 260px;
-  background: #172a1f;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--color-environment);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 14px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
   animation: popoverFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -96,13 +95,13 @@
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #f8fafc;
+  color: var(--color-text-primary);
 }
 
 .priority-popover-close {
   background: transparent;
   border: none;
-  color: #94a3b8;
+  color: var(--color-neutral);
   cursor: pointer;
   padding: 2px 6px;
   font-size: 14px;
@@ -111,13 +110,19 @@
 }
 
 .priority-popover-close:hover {
-  color: #f8fafc;
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-primary);
+  background: rgba(var(--color-neutral-rgb), 0.12);
 }
 
 .priority-popover-desc {
   margin: 0;
   font-size: 13px;
-  color: #cbd5e1;
+  color: var(--color-text-primary);
   line-height: 1.5;
+}
+
+.priority-chip-btn:focus-visible,
+.priority-popover-close:focus-visible {
+  outline: 2px solid var(--color-progress);
+  outline-offset: 2px;
 }

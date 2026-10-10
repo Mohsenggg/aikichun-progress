@@ -14,8 +14,8 @@ export class ProgressRingComponent {
   }
   @Input() size = 44;
   @Input() strokeWidth = 4;
-  @Input() color = '#22c55e';
-  @Input() trackColor = 'rgba(255, 255, 255, 0.1)';
+  @Input() color = 'var(--color-progress)';
+  @Input() trackColor = 'rgba(var(--color-neutral-rgb), 0.22)';
   @Input() showText = true;
   @Input() textSize = '11px';
 

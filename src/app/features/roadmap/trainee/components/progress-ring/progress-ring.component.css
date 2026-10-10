@@ -27,7 +27,7 @@
   transform: translate(-50%, -50%);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--color-text-primary);
   line-height: 1;
   text-align: center;
 }

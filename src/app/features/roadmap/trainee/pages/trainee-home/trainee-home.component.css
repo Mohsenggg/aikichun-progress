@@ -1,7 +1,7 @@
 .trainee-home-page {
   min-height: 100vh;
-  background: var(--aikido-green);
-  color: #f8fafc;
+  background: var(--color-environment);
+  color: var(--color-text-primary);
   padding: 20px 16px 80px;
   max-width: 1000px;
   margin: 0 auto;
@@ -24,10 +24,10 @@
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: rgba(var(--color-attention-rgb), 0.14);
+  border: 1px solid rgba(var(--color-attention-rgb), 0.4);
   border-radius: 12px;
-  color: #fca5a5;
+  color: var(--color-text-primary);
   font-size: 14px;
   animation: slideDownToast 0.3s ease;
 }
@@ -40,7 +40,7 @@
 .toast-close {
   background: transparent;
   border: none;
-  color: #fca5a5;
+  color: var(--color-text-primary);
   margin-left: auto;
   cursor: pointer;
   padding: 4px;
@@ -49,8 +49,8 @@
 
 /* Global Header Card */
 .global-header-card {
-  background: #172a1f;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--color-environment);
+  border: 1px solid var(--color-border);
   border-radius: 24px;
   padding: 24px;
   display: flex;
@@ -85,14 +85,14 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--color-primary);
+  color: var(--color-text-secondary);
 }
 
 .header-roadmap-title {
   margin: 0;
   font-size: 22px;
   font-weight: 800;
-  color: #f8fafc;
+  color: var(--color-text-primary);
   line-height: 1.2;
 }
 
@@ -106,23 +106,23 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(26, 47, 35, 0.65);
+  background: var(--color-surface);
   padding: 6px 14px 6px 8px;
   border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--color-border);
 }
 
 .user-avatar-circle {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--color-primary);
+  background: rgba(var(--color-neutral-rgb), 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
   font-weight: 700;
-  color: var(--aikido-green);
+  color: var(--color-text-primary);
 }
 
 .user-info-text {
@@ -134,14 +134,14 @@
 .user-name {
   font-size: 13px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--color-text-primary);
 }
 
 .logout-btn {
   background: none;
   border: none;
   padding: 0;
-  color: #a8b5ac;
+  color: var(--color-neutral);
   font-size: 11px;
   font-weight: 500;
   text-align: left;
@@ -150,7 +150,7 @@
 }
 
 .logout-btn:hover {
-  color: #fca5a5;
+  color: var(--color-text-primary);
 }
 
 /* Overall Progress Section */
@@ -158,10 +158,10 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: rgba(26, 47, 35, 0.55);
+  background: var(--color-surface);
   padding: 16px 20px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-border);
 }
 
 .overall-progress-header {
@@ -173,19 +173,19 @@
 .overall-progress-label {
   font-size: 13px;
   font-weight: 600;
-  color: #cbd5e1;
+  color: var(--color-text-primary);
 }
 
 .overall-progress-percentage {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 18px;
   font-weight: 800;
-  color: var(--color-primary);
+  color: var(--color-progress);
 }
 
 .overall-progress-bar-track {
   height: 10px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(var(--color-neutral-rgb), 0.2);
   border-radius: 9999px;
   overflow: hidden;
   position: relative;
@@ -193,7 +193,7 @@
 
 .overall-progress-bar-fill {
   height: 100%;
-  background: var(--color-primary);
+  background: var(--color-progress);
   border-radius: 9999px;
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -203,12 +203,16 @@
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: #a8b5ac;
+  color: var(--color-neutral);
   flex-wrap: wrap;
 }
 
+.overall-progress-metrics .metric-item:first-child strong {
+  color: var(--color-progress);
+}
+
 .metric-dot {
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(var(--color-neutral-rgb), 0.45);
 }
 
 /* Levels Section */
@@ -229,13 +233,13 @@
   margin: 0;
   font-size: 20px;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--color-text-primary);
 }
 
 .levels-count-text {
   font-size: 13px;
   font-weight: 500;
-  color: #a8b5ac;
+  color: var(--color-neutral);
 }
 
 /* Levels Grid */
@@ -253,8 +257,9 @@
 }
 
 .level-card {
-  background: #172a1f;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--color-environment);
+    border: 2px solid var(--color-attention);
+
   border-radius: 20px;
   padding: 20px;
   display: flex;
@@ -265,19 +270,17 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }
 
 .level-card:not(.level-locked):hover {
-  border-color: rgba(34, 197, 94, 0.4);
+  border-color: rgba(var(--color-neutral-rgb), 0.55);
   transform: translateY(-2px);
-  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.3);
 }
 
 .level-card.level-locked {
   cursor: not-allowed;
   opacity: 0.65;
-  background: rgba(23, 42, 31, 0.5);
+  background: rgba(var(--color-neutral-rgb), 0.06);
   border-style: dashed;
 }
 
@@ -313,8 +316,8 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #cbd5e1;
-  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-neutral);
+  background: var(--color-surface);
   padding: 3px 8px;
   border-radius: 6px;
   width: fit-content;
@@ -324,7 +327,7 @@
   margin: 0;
   font-size: 18px;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--color-text-primary);
   line-height: 1.3;
   overflow-wrap: anywhere;
 }
@@ -332,7 +335,7 @@
 .level-card-steps-count {
   margin: 0;
   font-size: 13px;
-  color: #a8b5ac;
+  color: var(--color-neutral);
   white-space: nowrap;
 }
 
@@ -340,7 +343,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--color-border);
   padding-top: 14px;
 }
 
@@ -350,12 +353,14 @@
   gap: 6px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--color-primary);
+  text-shadow: 3px  var(--color-text-primary);
+  color: var(--color-attention);
   transition: transform 0.2s ease;
 }
 
 .level-card:hover .level-enter-cta {
   transform: translateX(4px);
+  color: var(--color-text-primary);
 }
 
 .level-lock-badge {
@@ -363,7 +368,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  color: #a8b5ac;
+  color: var(--color-neutral);
   font-size: 12px;
   font-weight: 500;
 }
@@ -377,7 +382,7 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(11, 22, 16, 0.78);
+  background: rgba(var(--color-environment-rgb), 0.82);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
@@ -387,8 +392,8 @@
 }
 
 .modal-dialog {
-  background: #172a1f;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--color-environment);
+  border: 1px solid var(--color-border);
   border-radius: 20px;
   width: 100%;
   max-width: 500px;
@@ -414,20 +419,20 @@
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  color: #4ade80;
+  color: var(--color-neutral);
 }
 
 .modal-title {
   margin: 0;
   font-size: 18px;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--color-text-primary);
 }
 
 .modal-close-btn {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--color-surface);
   border: none;
-  color: #a8b5ac;
+  color: var(--color-neutral);
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -439,8 +444,8 @@
 }
 
 .modal-close-btn:hover {
-  background: rgba(255, 255, 255, 0.16);
-  color: #f8fafc;
+  background: rgba(var(--color-neutral-rgb), 0.16);
+  color: var(--color-text-primary);
 }
 
 .modal-body {
@@ -456,14 +461,14 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #a8b5ac;
+  color: var(--color-neutral);
 }
 
 .modal-desc-text {
   margin: 0;
   font-size: 14px;
   line-height: 1.6;
-  color: #cbd5e1;
+  color: var(--color-text-primary);
 }
 
 .modal-link-btn {
@@ -471,10 +476,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 10px;
-  color: #4ade80;
+  color: var(--color-text-primary);
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
@@ -482,7 +487,7 @@
 }
 
 .modal-link-btn:hover {
-  background: rgba(34, 197, 94, 0.16);
+  background: rgba(var(--color-neutral-rgb), 0.12);
   transform: translateY(-1px);
 }
 
@@ -502,7 +507,7 @@
 
 .skeleton-level-card {
   height: 160px;
-  background: #172a1f;
+  background: var(--color-environment);
   border-radius: 20px;
   animation: skeletonPulse 1.5s infinite ease-in-out;
 }
@@ -510,8 +515,8 @@
 /* Empty Roadmap */
 .empty-roadmap-card {
   padding: 60px 24px;
-  background: #172a1f;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-environment);
+  border: 1px solid var(--color-border);
   border-radius: 20px;
   display: flex;
   flex-direction: column;
@@ -528,16 +533,16 @@
   margin: 0;
   font-size: 20px;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--color-text-primary);
 }
 
 .empty-roadmap-subtitle {
   margin: 0;
   font-size: 14px;
-  color: #a8b5ac;
+  color: var(--color-neutral);
 }
 
 .trainee-home-page :is(button, a, [tabindex]):focus-visible {
-  outline: 2px solid #4ade80;
+  outline: 2px solid var(--color-progress);
   outline-offset: 3px;
 }

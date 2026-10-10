@@ -1,6 +1,21 @@
 :root {
-  --aikido-green: #172A1F;
-  --aikido-red: #d92027;
+  --color-environment: #172A1F;
+    --color-environment2: #88915d;
+
+  --color-environment-rgb: 23, 42, 31;
+  --color-progress: #D6C9A1;
+  --color-progress-rgb: 214, 201, 161;
+  --color-attention: #B86F5A;
+  --color-attention-rgb: 184, 111, 90;
+  --color-neutral: #8B8F87;
+  --color-neutral-rgb: 139, 143, 135;
+  --color-text-primary: #EDF1EB;
+  --color-text-secondary: var(--color-neutral);
+  --color-surface: rgba(0, 0, 0, 0.12);
+  --color-border: rgba(139, 143, 135, 0.24);
+
+  --aikido-green: var(--color-environment);
+  --aikido-red: var(--color-attention);
   --white: #ffffff;
   --black: #000000;
   --white-10: rgba(255, 255, 255, 0.1);
@@ -10,14 +25,7 @@
   --black-80: rgba(0, 0, 0, 0.8);
   --font-heading: 'Inter', sans-serif;
 
-  /* New Theme Variables */
-  --color-primary: #22c55e;
-  /* Green for progress */
-  --color-surface: rgba(255, 255, 255, 0.05);
-  --color-border: rgba(255, 255, 255, 0.1);
-  --color-text-primary: var(--white);
-  --color-text-secondary: var(--white-70);
-  /* Assuming Inter or similar */
+  --color-primary: var(--color-progress);
 }
 
 /* Basic Reset & Base Styles */
@@ -28,7 +36,7 @@ body {
   padding: 0;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: var(--aikido-green);
-  color: var(--white);
+  color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

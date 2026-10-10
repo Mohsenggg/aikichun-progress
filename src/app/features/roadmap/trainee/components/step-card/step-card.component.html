@@ -12,7 +12,7 @@
 <div
   class="step-card"
   [class.step-expanded]="isExpanded()"
-  [style.border-left-color]="stage.priorityStage?.color || '#496353'"
+  [style.border-left-color]="'var(--color-progress)'"
 >
   <!-- Step Card Header (Clickable Accordion Trigger) -->
   <div class="step-card-header" (click)="toggleExpand()">
@@ -76,7 +76,7 @@
         [percentage]="stage.progressPercentage"
         [size]="40"
         [strokeWidth]="3.5"
-        [color]="'#22c55e'"
+        [color]="'var(--color-progress)'"
         [textSize]="'10px'"
       ></app-progress-ring> -->
 

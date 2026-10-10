@@ -83,11 +83,9 @@
 }
 
 .check-btn-active-red {
-    background-color: #22c55e;
-    /* Figma shows GREEN for completed/skill? Screenshot shows green. Swapping from Red to Green. */
-    /* Wait, user request says "Green Squares". */
-    border-color: #22c55e;
-    color: var(--white);
+    background-color: var(--color-progress);
+    border-color: var(--color-progress);
+    color: var(--color-environment);
 }
 
 .step-center {
