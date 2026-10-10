@@ -215,6 +215,82 @@
   color: rgba(var(--color-neutral-rgb), 0.45);
 }
 
+/* Narrow screens: compact header, keep top row on one line to limit vertical height. */
+@media (max-width: 480px) {
+  .global-header-card {
+    border-radius: 16px;
+    padding: 14px 12px;
+    gap: 12px;
+  }
+
+  .header-top-row {
+    gap: 10px;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .header-title-group {
+    min-width: 0;
+    flex: 1 1 auto;
+    gap: 2px;
+  }
+
+  .header-subtitle {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+  }
+
+  .header-roadmap-title {
+    font-size: 16px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .header-user-group {
+    gap: 8px;
+    padding: 4px 10px 4px 5px;
+    flex-shrink: 0;
+  }
+
+  .user-avatar-circle {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+  }
+
+  .user-name {
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .logout-btn {
+    font-size: 10px;
+  }
+
+  .overall-progress-section {
+    gap: 8px;
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .overall-progress-label {
+    font-size: 11px;
+  }
+
+  .overall-progress-percentage {
+    font-size: 15px;
+  }
+
+  .overall-progress-bar-track {
+    height: 8px;
+  }
+
+  .overall-progress-metrics {
+    gap: 6px;
+    font-size: 10px;
+  }
+}
+
 /* Levels Section */
 .levels-section {
   display: flex;

@@ -469,9 +469,9 @@
 }
 
 .level-card {
-  background: #edfff0;
+  background: #ffebd0;
   color: #0f172a;
-  border: 0px solid #dce7de;
+  border: 0px solid var(--color-environment);
   border-radius: 0.875rem;
   padding: 1.35rem 1.5rem;
   display: flex;
@@ -493,7 +493,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding-bottom: 0.85rem;
-  border-bottom: 1px solid #e6eee8;
+  border-bottom: 1px solid var(--color-environment);
 }
 
 .level-title-group {
@@ -725,9 +725,9 @@
 .stage-weight-badge {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #fef08a;
-  background: rgba(234, 179, 8, 0.15);
-  border: 1px solid rgba(234, 179, 8, 0.3);
+  color: #D6C9A1;
+  background: var(--color-environment);
+  border: 1px solid #D6C9A1;
   padding: 0.15rem 0.45rem;
   border-radius: 0.25rem;
   letter-spacing: 0.02em;
@@ -1218,9 +1218,9 @@
   gap: 0.3rem;
   padding: 0.15rem 0.45rem;
   border-radius: 0.35rem;
-  background: rgba(16, 185, 129, 0.18);
-  color: #6ee7b7;
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  background:var(--color-environment);
+  color: #D6C9A1;
+  border: 1px solid #D6C9A1;
   font-size: 0.72rem;
   font-weight: 600;
   text-decoration: none;
@@ -1238,8 +1238,8 @@
 
 .level-header .resource-chip {
   background: #f0fdf4;
-  color: #15803d;
-  border: 1px solid #bbf7d0;
+  color: #D6C9A1;
+  border: 1px solid #D6C9A1;
 }
 
 .level-header .resource-chip:hover {
@@ -1709,9 +1709,9 @@
 .level-weight-badge {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #60a5fa;
+  color: var(--color-environment);
   background: rgba(96, 165, 250, 0.12);
-  border: 1px solid rgba(96, 165, 250, 0.28);
+  border: 1px solid var(--color-environment);
   padding: 0.15rem 0.45rem;
   border-radius: 0.25rem;
   letter-spacing: 0.02em;
@@ -1725,9 +1725,9 @@
 .task-weight-badge {
   font-size: 0.7rem;
   font-weight: 500;
-  color: #c084fc;
-  background: rgba(192, 132, 252, 0.12);
-  border: 1px solid rgba(192, 132, 252, 0.28);
+  color: #B86F5A;
+  background: var(--color-environment);
+  border: 1px solid #B86F5A;
   padding: 0.1rem 0.35rem;
   border-radius: 0.25rem;
   display: inline-flex;
@@ -1739,9 +1739,9 @@
 .task-checks-badge {
   font-size: 0.68rem;
   font-weight: 600;
-  color: #34d399;
-  background: rgba(52, 211, 153, 0.12);
-  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: #799442;
+  background: var(--color-environment);
+  border: 1px solid #799442;
   padding: 0.1rem 0.35rem;
   border-radius: 0.25rem;
   display: inline-flex;
