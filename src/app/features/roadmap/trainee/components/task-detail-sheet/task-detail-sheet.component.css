@@ -229,7 +229,8 @@
 }
 
 .sheet-external-icon {
-  font-size: 16px;
+  font-size: 13px;
+  color: var(--color-neutral);
 }
 
 .sheet-checks-list {

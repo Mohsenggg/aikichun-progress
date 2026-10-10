@@ -12,7 +12,7 @@
   <div class="nav-bar-container">
     <button type="button" class="back-btn" (click)="goBack()">
       <span class="back-arrow">←</span>
-      <span>Back to Curriculum</span>
+      <span>Back to Levels</span>
     </button>
   </div>
 
@@ -38,7 +38,7 @@
                   title="View level information"
                   aria-label="View level information"
                 >
-                  ℹ️
+                  <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
                 </button>
               }
               @if (lvl.link) {
@@ -50,7 +50,7 @@
                   title="Open level curriculum resource"
                   aria-label="Open level curriculum resource"
                 >
-                  ↗
+                  <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
                 </a>
               }
             </div>
@@ -151,7 +151,7 @@
               class="modal-link-btn"
             >
               <span>Open Level Study Guide</span>
-              <span>↗</span>
+              <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
             </a>
           }
         </div>

@@ -66,7 +66,7 @@
   border: 1px solid var(--color-border);
   color: var(--color-neutral);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -93,12 +93,16 @@ a.task-icon-btn:hover {
 
 .task-link-icon {
   background: var(--color-surface);
-  color: var(--color-text-primary);
-  font-weight: 700;
+  color: var(--color-neutral);
 }
 
 .task-link-icon:hover {
   background: rgba(var(--color-neutral-rgb), 0.12);
+  color: var(--color-text-primary);
+}
+
+.task-icon-btn i {
+  line-height: 1;
 }
 
 .task-secondary-cluster app-priority-chip {
@@ -178,7 +182,7 @@ a.task-icon-btn:hover {
     height: 26px;
     min-width: 26px;
     min-height: 26px;
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .task-step-percentage-badge {

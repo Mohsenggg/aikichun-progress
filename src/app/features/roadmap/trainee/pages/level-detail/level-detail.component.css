@@ -182,12 +182,16 @@ a.level-action-btn:hover {
 
 .level-action-link {
   background: var(--color-surface);
-  color: var(--color-text-primary);
-  font-weight: 700;
+  color: var(--color-neutral);
 }
 
 .level-action-link:hover {
   background: rgba(var(--color-neutral-rgb), 0.12);
+  color: var(--color-text-primary);
+}
+
+.level-action-btn i {
+  line-height: 1;
 }
 
 .level-hero-title {
@@ -248,6 +252,10 @@ a.level-action-btn:hover {
 .level-link-btn:hover {
   background: rgba(var(--color-neutral-rgb), 0.12);
   border-color: rgba(var(--color-neutral-rgb), 0.5);
+}
+
+.level-link-btn i {
+  font-size: 11px;
 }
 
 .level-bar-track {
@@ -553,6 +561,10 @@ a.level-action-btn:hover {
 .modal-link-btn:hover {
   background: rgba(var(--color-neutral-rgb), 0.12);
   transform: translateY(-1px);
+}
+
+.modal-link-btn i {
+  font-size: 12px;
 }
 
 /* Skeleton Loading */

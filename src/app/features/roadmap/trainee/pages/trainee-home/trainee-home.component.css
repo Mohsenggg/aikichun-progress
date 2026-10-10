@@ -567,6 +567,10 @@
   transform: translateY(-1px);
 }
 
+.modal-link-btn i {
+  font-size: 12px;
+}
+
 /* Skeleton Loading */
 .skeleton-grid {
   display: grid;

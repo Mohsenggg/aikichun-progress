@@ -95,12 +95,16 @@ a.step-icon-btn:hover {
 
 .step-link-icon {
   background: var(--color-surface);
-  color: var(--color-text-primary);
-  font-weight: 700;
+  color: var(--color-neutral);
 }
 
 .step-link-icon:hover {
   background: rgba(var(--color-neutral-rgb), 0.12);
+  color: var(--color-text-primary);
+}
+
+.step-icon-btn i {
+  line-height: 1;
 }
 
 .step-secondary-cluster app-priority-chip {
