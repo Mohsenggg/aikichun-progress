@@ -104,6 +104,10 @@ a.task-icon-btn:hover {
   flex-shrink: 0;
 }
 
+.task-secondary-cluster:empty {
+  display: none;
+}
+
 .main-star-icon {
   color: #fbbf24;
   font-size: 16px;

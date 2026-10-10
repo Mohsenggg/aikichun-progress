@@ -28,75 +28,36 @@
       <!-- Level Hero Header -->
       <div class="level-hero-card">
         <div class="level-hero-main">
-          <div class="level-actions">
-            @if (lvl.description) {
-              <button
-                type="button"
-                class="level-action-btn"
-                (click)="openLevelInfo(lvl, $event)"
-                title="View level information"
-                aria-label="View level information"
-              >
-                ℹ️
-              </button>
-            } @else {
-              <span
-                class="level-action-btn icon-inactive"
-                aria-disabled="true"
-                title="No level description"
-                aria-label="No level description"
-              >
-                ℹ️
-              </span>
-            }
-            @if (lvl.link) {
-              <a
-                [href]="lvl.link"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="level-action-btn level-action-link"
-                title="Open level curriculum resource"
-                aria-label="Open level curriculum resource"
-              >
-                ↗
-              </a>
-            } @else {
-              <span
-                class="level-action-btn icon-inactive"
-                aria-disabled="true"
-                title="No level resource"
-                aria-label="No level resource"
-              >
-                ↗
-              </span>
-            }
-          </div>
-
-          <div class="level-title-group">
-            <span class="level-badge">Level {{ lvl.position }}</span>
-            <h1 class="level-hero-title" dir="auto">{{ lvl.name }}</h1>
-            @if (lvl.description) {
-              <p class="level-hero-desc" dir="auto">{{ lvl.description }}</p>
-            }
-          </div>
-
-          <div class="level-hero-stats">
-           
-            <div class="level-stats-labels">
-              <span class="level-steps-count">{{ levelTasksCount(lvl) }} Tasks</span>
+          <div class="level-left-cluster">
+            <div class="level-actions">
+              @if (lvl.description) {
+                <button
+                  type="button"
+                  class="level-action-btn"
+                  (click)="openLevelInfo(lvl, $event)"
+                  title="View level information"
+                  aria-label="View level information"
+                >
+                  ℹ️
+                </button>
+              }
               @if (lvl.link) {
                 <a
                   [href]="lvl.link"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="level-link-btn"
+                  class="level-action-btn level-action-link"
                   title="Open level curriculum resource"
+                  aria-label="Open level curriculum resource"
                 >
-                  <span>Level Resource</span>
-                  <span class="ext-icon">↗</span>
+                  ↗
                 </a>
               }
             </div>
+
+            <div class="level-hero-stats">
+           
+         
 
              <app-progress-ring
               [percentage]="lvl.progressPercentage"
@@ -105,7 +66,18 @@
               [color]="'#22c55e'"
               [textSize]="'13px'"
             ></app-progress-ring>
+   <div class="level-stats-labels">
+              <span class="level-steps-count">{{ levelTasksCount(lvl) }} Tasks</span>
+            </div>
+          </div>
+          </div>
 
+          <div class="level-title-group">
+            <span class="level-badge">Level {{ lvl.position }}</span>
+            <h1 class="level-hero-title" dir="auto">{{ lvl.name }}</h1>
+            @if (lvl.description) {
+              <p class="level-hero-desc" dir="auto">{{ lvl.description }}</p>
+            }
           </div>
         </div>
 
@@ -152,4 +124,38 @@
 
   <!-- Task Details Bottom Sheet / Modal -->
   <app-task-detail-sheet [traineeId]="traineeId()"></app-task-detail-sheet>
+
+  <!-- Level Description Info Modal -->
+  @if (activeLevelInfoModal(); as modalLvl) {
+    <div class="modal-backdrop" (click)="closeLevelInfo()">
+      <div class="modal-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <span class="modal-level-badge">Level {{ modalLvl.position }}</span>
+            <h3 class="modal-title" dir="auto">{{ modalLvl.name }}</h3>
+          </div>
+          <button type="button" class="modal-close-btn" (click)="closeLevelInfo()">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <h4 class="modal-section-title">Overview & Objectives</h4>
+          <p class="modal-desc-text" dir="auto">
+            {{ modalLvl.description }}
+          </p>
+
+          @if (modalLvl.link) {
+            <a
+              [href]="modalLvl.link"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="modal-link-btn"
+            >
+              <span>Open Level Study Guide</span>
+              <span>↗</span>
+            </a>
+          }
+        </div>
+      </div>
+    </div>
+  }
 </div>

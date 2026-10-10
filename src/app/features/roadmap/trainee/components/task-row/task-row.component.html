@@ -6,18 +6,21 @@
   <!-- Top Meta & Title Row -->
   <div class="task-header-row">
     <div class="task-secondary-cluster">
-      <button
-        type="button"
-        class="task-icon-btn"
-        [class.icon-inactive]="!hasDescription"
-        (click)="hasDescription ? onDescIconClick($event) : onInactiveIconClick($event)"
-        [attr.aria-disabled]="!hasDescription"
-        [attr.tabindex]="!hasDescription ? -1 : null"
-        title="View task details & resources"
-        aria-label="View task details"
-      >
-        ℹ️
-      </button>
+    @if (priority) {
+        <app-priority-chip [priority]="priority"></app-priority-chip>
+      }
+
+      @if (hasDescription) {
+        <button
+          type="button"
+          class="task-icon-btn"
+          (click)="onDescIconClick($event)"
+          title="View task details & resources"
+          aria-label="View task details"
+        >
+          ℹ️
+        </button>
+      }
 
       @if (hasLink) {
         <a
@@ -31,21 +34,9 @@
         >
           ↗
         </a>
-      } @else {
-        <span
-          class="task-icon-btn icon-inactive"
-          (click)="onInactiveIconClick($event)"
-          aria-disabled="true"
-          title="No task resource"
-          aria-label="No task resource"
-        >
-          ↗
-        </span>
       }
 
-      @if (priority) {
-        <app-priority-chip [priority]="priority"></app-priority-chip>
-      }
+  
 
       @if (!hideStepPercentage) {
         <span class="task-step-percentage-badge">

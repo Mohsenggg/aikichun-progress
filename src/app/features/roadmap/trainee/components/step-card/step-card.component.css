@@ -108,6 +108,10 @@ a.step-icon-btn:hover {
   flex-shrink: 0;
 }
 
+.step-secondary-cluster:empty {
+  display: none;
+}
+
 .step-code-badge {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 11px;

@@ -82,4 +82,13 @@ export class LevelDetailComponent implements OnInit {
       queryParams: { traineeId: this.traineeId() }
     });
   }
+
+  openLevelInfo(level: TraineeLevel, event: MouseEvent): void {
+    event.stopPropagation();
+    this.activeLevelInfoModal.set(level);
+  }
+
+  closeLevelInfo(): void {
+    this.activeLevelInfoModal.set(null);
+  }
 }

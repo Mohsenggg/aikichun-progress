@@ -17,21 +17,25 @@
   <!-- Step Card Header (Clickable Accordion Trigger) -->
   <div class="step-card-header" (click)="toggleExpand()">
     <div class="step-secondary-cluster">
-      <!-- Description Icon -->
-      <button
-        type="button"
-        class="step-icon-btn"
-        [class.icon-inactive]="!hasDescription"
-        (click)="hasDescription ? onDescClick($event) : onInactiveIconClick($event)"
-        [attr.aria-disabled]="!hasDescription"
-        [attr.tabindex]="!hasDescription ? -1 : null"
-        title="View step description"
-        aria-label="View step description"
-      >
-        ℹ️
-      </button>
+         <!-- Priority Chip -->
+      @if (stage.priorityStage) {
+        <app-priority-chip [priority]="stage.priorityStage"></app-priority-chip>
+      }
+     
+      <!-- Description Icon: only visible when step has a description -->
+      @if (hasDescription) {
+        <button
+          type="button"
+          class="step-icon-btn"
+          (click)="onDescClick($event)"
+          title="View step description"
+          aria-label="View step description"
+        >
+          ℹ️
+        </button>
+      }
 
-      <!-- Link Icon -->
+      <!-- Link Icon: only visible when step has a link -->
       @if (hasLink) {
         <a
           [href]="stage.link"
@@ -44,22 +48,9 @@
         >
           ↗
         </a>
-      } @else {
-        <span
-          class="step-icon-btn icon-inactive"
-          (click)="onInactiveIconClick($event)"
-          aria-disabled="true"
-          title="No step resource"
-          aria-label="No step resource"
-        >
-          ↗
-        </span>
       }
 
-      <!-- Priority Chip -->
-      @if (stage.priorityStage) {
-        <app-priority-chip [priority]="stage.priorityStage"></app-priority-chip>
-      }
+  
     </div>
 
     <div class="step-primary-cluster">
