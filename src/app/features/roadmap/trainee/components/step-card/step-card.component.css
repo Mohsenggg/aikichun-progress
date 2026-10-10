@@ -26,17 +26,86 @@
   padding: 16px 20px;
   cursor: pointer;
   user-select: none;
-  gap: 16px;
-  flex-wrap: wrap;
+  gap: 12px;
 }
 
-.step-left-content {
+.step-secondary-cluster {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
+  flex-shrink: 0;
+  max-width: 45%;
+  order: -1;
+}
+
+.step-primary-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex: 1;
-  min-width: 220px;
-  flex-wrap: wrap;
+  min-width: 0;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.step-right-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.step-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+button.step-icon-btn:hover,
+a.step-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
+}
+
+.step-icon-btn.icon-inactive {
+  opacity: 0.35;
+  cursor: default;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.step-icon-btn.icon-inactive:hover {
+  background: rgba(255, 255, 255, 0.02);
+  color: #94a3b8;
+  transform: none;
+}
+
+.step-link-icon {
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+.step-link-icon:hover {
+  background: rgba(56, 189, 248, 0.25);
+  transform: scale(1.05);
+}
+
+.step-secondary-cluster app-priority-chip {
+  flex-shrink: 0;
 }
 
 .step-code-badge {
@@ -48,6 +117,8 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 6px;
   color: #94a3b8;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .step-title {
@@ -56,33 +127,7 @@
   font-weight: 700;
   color: #f8fafc;
   line-height: 1.3;
-}
-
-.step-link-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  background: rgba(56, 189, 248, 0.1);
-  color: #38bdf8;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 700;
-  transition: all 0.2s ease;
-}
-
-.step-link-icon:hover {
-  background: rgba(56, 189, 248, 0.25);
-  transform: scale(1.1);
-}
-
-.step-right-content {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
+  overflow-wrap: anywhere;
 }
 
 .step-level-percentage {
@@ -153,4 +198,44 @@
 .empty-text {
   margin: 0;
   font-size: 13px;
+}
+
+/* Compact clusters on narrow screens — no overlap or tall wrapping. */
+@media (max-width: 480px) {
+  .step-card-header {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .step-secondary-cluster {
+    gap: 4px;
+    max-width: 50%;
+  }
+
+  .step-icon-btn {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    min-height: 26px;
+    font-size: 12px;
+  }
+
+  .step-code-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+
+  .step-title {
+    font-size: 14px;
+  }
+
+  .step-level-percentage {
+    font-size: 10px;
+    padding: 3px 7px;
+  }
+
+  .step-tasks-list {
+    padding: 12px;
+    gap: 8px;
+  }
 }

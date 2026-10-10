@@ -37,6 +37,15 @@
   white-space: nowrap;
 }
 
+@media (max-width: 480px) {
+  .priority-chip-btn {
+    padding: 3px 8px;
+    font-size: 10px;
+    gap: 5px;
+    min-height: 26px;
+  }
+}
+
 /* Popover Modal/Tooltip */
 .priority-popover {
   position: absolute;

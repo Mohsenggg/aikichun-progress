@@ -58,4 +58,24 @@ export class StepCardComponent {
   get activeTasksCount(): number {
     return this.stage?.tasks?.length ?? 0;
   }
+
+  get hasDescription(): boolean {
+    const desc = (this.stage as unknown as { description?: unknown })?.description;
+    return typeof desc === 'string' && desc.trim().length > 0;
+  }
+
+  get hasLink(): boolean {
+    return !!(this.stage?.link && this.stage.link.trim());
+  }
+
+  onDescClick(event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.hasDescription) {
+      this.toggleExpand();
+    }
+  }
+
+  onInactiveIconClick(event: MouseEvent): void {
+    event.stopPropagation();
+  }
 }

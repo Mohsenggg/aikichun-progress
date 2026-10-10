@@ -32,6 +32,26 @@ export class TaskRowComponent {
     return !!(this.stageTask?.progress?.checks && this.stageTask.progress.checks.length > 0);
   }
 
+  get hasDescription(): boolean {
+    const desc = this.stageTask?.task?.description;
+    return typeof desc === 'string' && desc.trim().length > 0;
+  }
+
+  get hasLink(): boolean {
+    return !!(this.stageTask?.task?.link && this.stageTask.task.link.trim());
+  }
+
+  onDescIconClick(event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.hasDescription) {
+      this.openTaskDetails(event);
+    }
+  }
+
+  onInactiveIconClick(event: MouseEvent): void {
+    event.stopPropagation();
+  }
+
   onToggleCheck(checkDefinitionId: number, currentCompleted: boolean, event: MouseEvent): void {
     event.stopPropagation();
     if (!this.traineeId) return;

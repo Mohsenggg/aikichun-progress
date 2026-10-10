@@ -16,12 +16,53 @@
 >
   <!-- Step Card Header (Clickable Accordion Trigger) -->
   <div class="step-card-header" (click)="toggleExpand()">
-    <div class="step-left-content">
+    <div class="step-secondary-cluster">
+      <!-- Description Icon -->
+      <button
+        type="button"
+        class="step-icon-btn"
+        [class.icon-inactive]="!hasDescription"
+        (click)="hasDescription ? onDescClick($event) : onInactiveIconClick($event)"
+        [attr.aria-disabled]="!hasDescription"
+        [attr.tabindex]="!hasDescription ? -1 : null"
+        title="View step description"
+        aria-label="View step description"
+      >
+        ℹ️
+      </button>
+
+      <!-- Link Icon -->
+      @if (hasLink) {
+        <a
+          [href]="stage.link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="step-icon-btn step-link-icon"
+          (click)="$event.stopPropagation()"
+          title="Open step learning resource"
+          aria-label="Open step learning resource"
+        >
+          ↗
+        </a>
+      } @else {
+        <span
+          class="step-icon-btn icon-inactive"
+          (click)="onInactiveIconClick($event)"
+          aria-disabled="true"
+          title="No step resource"
+          aria-label="No step resource"
+        >
+          ↗
+        </span>
+      }
+
       <!-- Priority Chip -->
       @if (stage.priorityStage) {
         <app-priority-chip [priority]="stage.priorityStage"></app-priority-chip>
       }
+    </div>
 
+    <div class="step-primary-cluster">
       <!-- Code Badge -->
       @if (stage.code) {
         <span class="step-code-badge" dir="ltr">{{ stage.code }}</span>
@@ -31,37 +72,22 @@
       <h3 class="step-title" dir="auto">
         {{ displayName }}
       </h3>
-
-      <!-- External Stage Resource Link -->
-      @if (stage.link) {
-        <a
-          [href]="stage.link"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="step-link-icon"
-          (click)="$event.stopPropagation()"
-          title="Open step learning resource"
-          aria-label="Open step learning resource"
-        >
-          ↗
-        </a>
-      }
     </div>
 
-    <!-- Step Right Progress & Actions -->
+    <!-- Step Progress & Expand Controls -->
     <div class="step-right-content">
-      <span class="step-level-percentage">
+      <!-- <span class="step-level-percentage">
         {{ stage.percentageOfLevel | number:'1.0-0' }}% of level
-      </span>
+      </span> -->
 
       <!-- Step Progress Ring -->
-      <app-progress-ring
+      <!-- <app-progress-ring
         [percentage]="stage.progressPercentage"
         [size]="40"
         [strokeWidth]="3.5"
         [color]="'#22c55e'"
         [textSize]="'10px'"
-      ></app-progress-ring>
+      ></app-progress-ring> -->
 
       <!-- Chevron Expand Icon -->
       <div class="step-chevron" [class.rotated]="isExpanded()">

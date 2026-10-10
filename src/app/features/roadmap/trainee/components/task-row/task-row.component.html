@@ -5,38 +5,66 @@
 >
   <!-- Top Meta & Title Row -->
   <div class="task-header-row">
-    <div class="task-title-group" (click)="openTaskDetails($event)">
+    <div class="task-secondary-cluster">
+      <button
+        type="button"
+        class="task-icon-btn"
+        [class.icon-inactive]="!hasDescription"
+        (click)="hasDescription ? onDescIconClick($event) : onInactiveIconClick($event)"
+        [attr.aria-disabled]="!hasDescription"
+        [attr.tabindex]="!hasDescription ? -1 : null"
+        title="View task details & resources"
+        aria-label="View task details"
+      >
+        ℹ️
+      </button>
+
+      @if (hasLink) {
+        <a
+          [href]="stageTask.task.link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="task-icon-btn task-link-icon"
+          (click)="$event.stopPropagation()"
+          title="Open task learning resource"
+          aria-label="Open task learning resource"
+        >
+          ↗
+        </a>
+      } @else {
+        <span
+          class="task-icon-btn icon-inactive"
+          (click)="onInactiveIconClick($event)"
+          aria-disabled="true"
+          title="No task resource"
+          aria-label="No task resource"
+        >
+          ↗
+        </span>
+      }
+
       @if (priority) {
         <app-priority-chip [priority]="priority"></app-priority-chip>
       }
+
+      @if (!hideStepPercentage) {
+        <span class="task-step-percentage-badge">
+          {{ taskPercentOfStep }}% of step
+        </span>
+      }
+    </div>
+
+    <div class="task-primary-cluster" (click)="openTaskDetails($event)">
       @if (stageTask.isMain) {
         <span class="main-star-icon" title="Main Core Task">★</span>
       }
-      <span class="task-title" dir="auto">{{ stageTask.task.title }}</span>
       @if (stageTask.task.code) {
         <span class="task-code-badge" dir="ltr">{{ stageTask.task.code }}</span>
       }
       @if (stepCode && stepCode !== stageTask.task.code) {
         <span class="task-code-badge task-step-code-badge" dir="ltr" title="Step code">{{ stepCode }}</span>
       }
-    </div>
-
-    <div class="task-actions-group">
-      @if (!hideStepPercentage) {
-        <span class="task-step-percentage-badge">
-          {{ taskPercentOfStep }}% of step
-        </span>
-      }
-
-      <button
-        type="button"
-        class="task-info-btn"
-        (click)="openTaskDetails($event)"
-        title="View task details & resources"
-        aria-label="View task details"
-      >
-        ℹ️
-      </button>
+      <span class="task-title" dir="auto">{{ stageTask.task.title }}</span>
     </div>
   </div>
 
