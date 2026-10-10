@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(15, 23, 42, 0.75);
+  background: rgba(11, 22, 16, 0.78);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: flex-end;
@@ -22,7 +22,7 @@
 }
 
 .sheet-dialog {
-  background: #1e293b;
+  background: #172a1f;
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
@@ -101,7 +101,7 @@
 .sheet-close-btn {
   background: rgba(255, 255, 255, 0.08);
   border: none;
-  color: #94a3b8;
+  color: #a8b5ac;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -132,10 +132,10 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 12px;
   padding: 2px 8px;
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(26, 38, 31, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 4px;
-  color: #94a3b8;
+  color: #a8b5ac;
 }
 
 .sheet-status-badge {
@@ -154,15 +154,15 @@
 }
 
 .sheet-status-badge.status-in-progress {
-  background: rgba(56, 189, 248, 0.15);
-  color: #7dd3fc;
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  background: rgba(34, 197, 94, 0.1);
+  color: #a7e8b6;
+  border: 1px solid rgba(34, 197, 94, 0.25);
 }
 
 .sheet-progress-summary {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 12px;
-  color: #94a3b8;
+  color: #a8b5ac;
   margin-left: auto;
 }
 
@@ -174,7 +174,7 @@
 
 .sheet-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #22c55e, #4ade80);
+  background: var(--color-primary);
   transition: width 0.4s ease;
 }
 
@@ -198,7 +198,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #94a3b8;
+  color: #a8b5ac;
 }
 
 .sheet-desc-text {
@@ -214,10 +214,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.25);
   border-radius: 10px;
-  color: #38bdf8;
+  color: #a7e8b6;
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
@@ -225,8 +225,8 @@
 }
 
 .sheet-resource-btn:hover {
-  background: rgba(56, 189, 248, 0.2);
-  border-color: rgba(56, 189, 248, 0.5);
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.4);
   transform: translateY(-1px);
 }
 
@@ -245,7 +245,7 @@
   align-items: flex-start;
   gap: 12px;
   padding: 12px 14px;
-  background: rgba(15, 23, 42, 0.4);
+  background: rgba(26, 38, 31, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   cursor: pointer;
@@ -253,7 +253,7 @@
 }
 
 .sheet-check-card:hover {
-  background: rgba(15, 23, 42, 0.7);
+  background: rgba(26, 38, 31, 0.8);
   border-color: rgba(34, 197, 94, 0.3);
 }
 
@@ -266,8 +266,8 @@
   width: 22px;
   height: 22px;
   border-radius: 6px;
-  border: 2px solid #64748b;
-  background: rgba(15, 23, 42, 0.8);
+  border: 2px solid #718276;
+  background: rgba(26, 38, 31, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -279,9 +279,8 @@
 }
 
 .sheet-check-checkbox.checked {
-  background: #22c55e;
-  border-color: #22c55e;
-  box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .sheet-check-content {
@@ -297,11 +296,16 @@
 
 .sheet-check-desc {
   font-size: 12px;
-  color: #94a3b8;
+  color: #a8b5ac;
   margin-top: 3px;
   line-height: 1.4;
 }
 
 .sheet-zero-checks-box {
   padding: 8px 0;
+}
+
+:is(button, a):focus-visible {
+  outline: 2px solid #4ade80;
+  outline-offset: 2px;
 }

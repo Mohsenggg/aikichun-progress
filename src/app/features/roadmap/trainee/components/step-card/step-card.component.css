@@ -1,7 +1,7 @@
 .step-card {
-  background: #1e293b;
+  background: #172a1f;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-left: 4px solid #38bdf8;
+  border-left: 4px solid #496353;
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -66,7 +66,7 @@
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #94a3b8;
+  color: #a8b5ac;
   cursor: pointer;
   font-size: 13px;
   line-height: 1;
@@ -89,18 +89,18 @@ a.step-icon-btn:hover {
 
 .step-icon-btn.icon-inactive:hover {
   background: rgba(255, 255, 255, 0.02);
-  color: #94a3b8;
+  color: #a8b5ac;
   transform: none;
 }
 
 .step-link-icon {
-  background: rgba(56, 189, 248, 0.1);
-  color: #38bdf8;
+  background: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
   font-weight: 700;
 }
 
 .step-link-icon:hover {
-  background: rgba(56, 189, 248, 0.25);
+  background: rgba(34, 197, 94, 0.16);
   transform: scale(1.05);
 }
 
@@ -117,10 +117,10 @@ a.step-icon-btn:hover {
   font-size: 11px;
   font-weight: 600;
   padding: 3px 8px;
-  background: rgba(15, 23, 42, 0.7);
+  background: rgba(26, 38, 31, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 6px;
-  color: #94a3b8;
+  color: #a8b5ac;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -137,7 +137,7 @@ a.step-icon-btn:hover {
 .step-level-percentage {
   font-size: 12px;
   font-weight: 500;
-  color: #94a3b8;
+  color: #a8b5ac;
   background: rgba(255, 255, 255, 0.05);
   padding: 4px 10px;
   border-radius: 8px;
@@ -149,7 +149,7 @@ a.step-icon-btn:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #94a3b8;
+  color: #a8b5ac;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: 28px;
   height: 28px;
@@ -166,7 +166,7 @@ a.step-icon-btn:hover {
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: rgba(15, 23, 42, 0.35);
+  background: rgba(26, 38, 31, 0.5);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -192,7 +192,7 @@ a.step-icon-btn:hover {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  color: #94a3b8;
+  color: #a8b5ac;
 }
 
 .empty-icon {
@@ -202,6 +202,11 @@ a.step-icon-btn:hover {
 .empty-text {
   margin: 0;
   font-size: 13px;
+}
+
+:is(button, a, [tabindex]):focus-visible {
+  outline: 2px solid #4ade80;
+  outline-offset: 2px;
 }
 
 /* Compact clusters on narrow screens — no overlap or tall wrapping. */
