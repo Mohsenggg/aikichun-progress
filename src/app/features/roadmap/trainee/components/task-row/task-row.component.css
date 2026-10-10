@@ -50,7 +50,7 @@
 }
 
 .task-title {
-  font-size: 14px;
+  font-size: 10.5px;
   font-weight: 600;
   color: #f1f5f9;
   line-height: 1.4;
@@ -69,6 +69,12 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   color: #94a3b8;
+}
+
+.task-step-code-badge {
+  background: rgba(56, 189, 248, 0.1);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: #7dd3fc;
 }
 
 .task-actions-group {

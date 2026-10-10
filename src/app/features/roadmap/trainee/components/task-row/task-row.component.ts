@@ -14,6 +14,8 @@ export class TaskRowComponent {
   @Input({ required: true }) stageTask!: TraineeStageTask;
   @Input() allStageTasks: TraineeStageTask[] = [];
   @Input() traineeId = 0;
+  @Input() hideStepPercentage = false;
+  @Input() stepCode?: string | null;
 
   private traineeRoadmapService = inject(TraineeRoadmapService);
 

@@ -13,12 +13,17 @@
       @if (stageTask.task.code) {
         <span class="task-code-badge" dir="ltr">{{ stageTask.task.code }}</span>
       }
+      @if (stepCode && stepCode !== stageTask.task.code) {
+        <span class="task-code-badge task-step-code-badge" dir="ltr" title="Step code">{{ stepCode }}</span>
+      }
     </div>
 
     <div class="task-actions-group">
-      <span class="task-step-percentage-badge">
-        {{ taskPercentOfStep }}% of step
-      </span>
+      @if (!hideStepPercentage) {
+        <span class="task-step-percentage-badge">
+          {{ taskPercentOfStep }}% of step
+        </span>
+      }
 
       <button
         type="button"

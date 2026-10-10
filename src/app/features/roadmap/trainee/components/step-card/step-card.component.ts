@@ -48,6 +48,13 @@ export class StepCardComponent {
     });
   }
 
+  /** Simplified layout: exactly one task + empty step title. */
+  get isSimplified(): boolean {
+    const hasSingleTask = (this.stage?.tasks?.length ?? 0) === 1;
+    const hasEmptyTitle = !this.stage?.name || !this.stage.name.trim();
+    return hasSingleTask && hasEmptyTitle;
+  }
+
   get activeTasksCount(): number {
     return this.stage?.tasks?.length ?? 0;
   }
