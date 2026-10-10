@@ -1,0 +1,79 @@
+<div
+  class="task-row-container"
+  [class.is-main-task]="stageTask.isMain"
+  [class.is-completed]="stageTask.progress.status === 'COMPLETED'"
+>
+  <!-- Top Meta & Title Row -->
+  <div class="task-header-row">
+    <div class="task-title-group" (click)="openTaskDetails($event)">
+      @if (stageTask.isMain) {
+        <span class="main-star-icon" title="Main Core Task">★</span>
+      }
+      <span class="task-title" dir="auto">{{ stageTask.task.title }}</span>
+      @if (stageTask.task.code) {
+        <span class="task-code-badge" dir="ltr">{{ stageTask.task.code }}</span>
+      }
+    </div>
+
+    <div class="task-actions-group">
+      <span class="task-step-percentage-badge">
+        {{ taskPercentOfStep }}% of step
+      </span>
+
+      <button
+        type="button"
+        class="task-info-btn"
+        (click)="openTaskDetails($event)"
+        title="View task details & resources"
+        aria-label="View task details"
+      >
+        ℹ️
+      </button>
+    </div>
+  </div>
+
+  <!-- Dynamic Checks List -->
+  @if (hasChecks) {
+    <div class="task-checks-grid">
+      @for (chk of stageTask.progress.checks; track chk.checkDefinitionId) {
+        <button
+          type="button"
+          class="check-pill"
+          [class.check-pill-completed]="chk.completed"
+          (click)="onToggleCheck(chk.checkDefinitionId, chk.completed, $event)"
+          [attr.aria-pressed]="chk.completed"
+        >
+          <span class="check-box-icon">
+            @if (chk.completed) {
+              <svg class="check-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            }
+          </span>
+          <span class="check-name">{{ chk.name }}</span>
+        </button>
+      }
+    </div>
+  } @else {
+    <div class="zero-check-row">
+      <span class="zero-check-alert">⚠️ No checks assigned — ask coach</span>
+    </div>
+  }
+
+  <!-- Task Progress Bar -->
+  <div class="task-progress-footer">
+    <div class="task-progress-track">
+      <div
+        class="task-progress-fill"
+        [style.width.%]="stageTask.progress.progressPercentage"
+      ></div>
+    </div>
+    <span class="task-progress-stats">
+      @if (hasChecks) {
+        {{ stageTask.progress.completedChecksCount }}/{{ stageTask.progress.totalChecksCount }} ({{ stageTask.progress.progressPercentage | number:'1.0-0' }}%)
+      } @else {
+        0%
+      }
+    </span>
+  </div>
+</div>

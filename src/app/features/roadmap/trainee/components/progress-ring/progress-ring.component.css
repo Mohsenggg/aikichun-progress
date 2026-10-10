@@ -1,0 +1,33 @@
+.progress-ring-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.progress-ring-svg {
+  display: block;
+  overflow: visible;
+}
+
+.progress-ring-track {
+  transition: stroke 0.3s ease;
+}
+
+.progress-ring-bar {
+  transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease;
+}
+
+.progress-ring-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
+  color: #f8fafc;
+  line-height: 1;
+  text-align: center;
+}

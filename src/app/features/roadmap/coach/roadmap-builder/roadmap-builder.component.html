@@ -249,7 +249,7 @@
             <div class="stage-drag-placeholder" *cdkDragPlaceholder></div>
 
             <!-- Stage Header -->
-            <div class="stage-header">
+            <div class="stage-header" [class.editing]="editingTarget()?.kind === 'stage' && editingTarget()?.id === stage.id">
               <div class="stage-title-group">
                 <!-- Step Drag Handle -->
                 <span class="drag-handle sm" cdkDragHandle title="Drag to reorder step or move to another level">⋮⋮</span>
@@ -305,6 +305,11 @@
                   }
                 </h4>
 
+                }
+              </div>
+
+              @if (!(editingTarget()?.kind === 'stage' && editingTarget()?.id === stage.id)) {
+              <div class="stage-metadata">
                 @if (editingWeightStageId() === stage.id) {
                 <div class="inline-weight-edit-box">
                   <span class="weight-label">w:</span>
@@ -325,8 +330,6 @@
                   w: {{ stage.weight }} <span class="weight-pct">({{ stageWeightPercent(stage, level) }}% of Level)</span>
                 </button>
                 }
-                }
-
                 <!-- Priority Stage Selector Chip -->
                 <div class="priority-selector-wrapper">
                   @if (stage.priorityStage) {
@@ -343,12 +346,13 @@
                   </select>
                 </div>
               </div>
+              }
 
               <div class="stage-actions">
                 <!-- No Up/Down arrows for Steps (DnD only) -->
                 <button type="button" class="btn-text sm" (click)="startEditStage(stage)"
                   title="Edit step name, code, link, and weight">
-                  Edit
+                  ✎
                 </button>
                 <button type="button" class="btn-icon sm btn-danger" (click)="deleteStage(stage.id)"
                   title="Delete step">
@@ -384,39 +388,49 @@
                   <!-- Task Drag Placeholder -->
                   <div class="task-drag-placeholder" *cdkDragPlaceholder></div>
 
-                  <!-- Drag handle -->
-                  <span class="drag-handle xs" cdkDragHandle title="Drag to reorder task or move to another step">⋮⋮</span>
+                  <div class="task-main-column">
+                    <!-- Drag handle -->
+                    <span class="drag-handle xs" cdkDragHandle title="Drag to reorder task or move to another step">⋮⋮</span>
 
-                  <!-- Main Task Star Toggle -->
-                  <button type="button" class="star-btn" [class.is-main]="st.isMain"
-                    (click)="toggleMainTask(stage.id, st)"
-                    [title]="st.isMain ? 'Main task (click to unset)' : 'Set as main task for this step'">
-                    ★
-                  </button>
+                    <!-- Task title and resource link -->
+                    <div class="task-info">
+                      <span class="task-title">{{ st.task.title }}</span>
+                      @if (st.task.link) {
+                      <a [href]="st.task.link" target="_blank" rel="noopener noreferrer" class="resource-chip xs" title="Open task resource: {{ st.task.link }}">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
+                        <span class="external-icon">↗</span>
+                      </a>
+                      }
+                    </div>
+                  </div>
 
-                  <!-- Task Title + Link + Weight + Checks -->
-                  <div class="task-info">
-                    <span class="task-title">{{ st.task.title }}</span>
-                    @if (st.task.link) {
-                    <a [href]="st.task.link" target="_blank" rel="noopener noreferrer" class="resource-chip xs" title="Open task resource: {{ st.task.link }}">
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                      </svg>
-                      <span class="external-icon">↗</span>
-                    </a>
+                  <div class="task-metadata">
+                    
+                     @if (st.isMain) {
+                    <button type="button" class="main-badge" (click)="toggleMainTask(stage.id, st)"
+                      title="Main task (click to unset)">
+                      MAIN
+                    </button>
+                    } @else {
+                    <button type="button" class="star-btn"
+                      (click)="toggleMainTask(stage.id, st)"
+                      title="Set as main task for this step">
+                      ★
+                    </button>
                     }
-                    @if (st.isMain) {
-                    <span class="main-badge">MAIN</span>
-                    }
+                  
                     <span class="task-weight-badge" title="Task Subweight: {{ st.task.weight ?? 1 }}">
                       sw: {{ st.task.weight ?? 1 }} <span class="weight-pct">({{ taskWeightPercent(st, stage) }}% of Step)</span>
                     </span>
-                    @if (st.task.checks && st.task.checks.length > 0) {
+                      @if (st.task.checks && st.task.checks.length > 0) {
                     <span class="task-checks-badge" [title]="st.task.checks.length + ' checks configured'">
                       ✓ {{ st.task.checks.length }}
                     </span>
                     }
+                   
                   </div>
 
                   <!-- Row actions (No Up/Down arrows for Tasks - DnD only) -->

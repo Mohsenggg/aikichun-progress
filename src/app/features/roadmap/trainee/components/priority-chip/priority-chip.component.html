@@ -1,0 +1,43 @@
+@if (priority) {
+  <div class="priority-chip-container">
+    <button
+      type="button"
+      class="priority-chip-btn"
+      (click)="togglePopup($event)"
+      [attr.aria-label]="'Priority info for ' + priority.name"
+    >
+      <span
+        class="priority-dot"
+        [style.background-color]="priority.color || '#22c55e'"
+        [style.box-shadow]="'0 0 6px ' + (priority.color || '#22c55e') + '66'"
+      ></span>
+      <span class="priority-name">{{ priority.name }}</span>
+    </button>
+
+    @if (showPopup()) {
+      <div class="priority-popover" (click)="$event.stopPropagation()">
+        <div class="priority-popover-header">
+          <div class="priority-popover-title-row">
+            <span
+              class="priority-dot-large"
+              [style.background-color]="priority.color || '#22c55e'"
+            ></span>
+            <h4 class="priority-popover-title">{{ priority.name }}</h4>
+          </div>
+          <button
+            type="button"
+            class="priority-popover-close"
+            (click)="closePopup()"
+            aria-label="Close popup"
+          >
+            ✕
+          </button>
+        </div>
+
+        <p class="priority-popover-desc">
+          {{ priority.description || 'Core priority stage in the curriculum.' }}
+        </p>
+      </div>
+    }
+  </div>
+}

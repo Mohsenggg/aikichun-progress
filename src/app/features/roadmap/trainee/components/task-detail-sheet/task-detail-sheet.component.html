@@ -1,0 +1,113 @@
+@if (selectedTask(); as st) {
+  <div class="sheet-backdrop" (click)="close()">
+    <div class="sheet-dialog" (click)="$event.stopPropagation()">
+      <!-- Drag handle (mobile) -->
+      <div class="sheet-drag-handle"></div>
+
+      <!-- Header -->
+      <div class="sheet-header">
+        <div class="sheet-title-row">
+          @if (st.isMain) {
+            <span class="sheet-main-star" title="Main Core Task">★</span>
+          }
+          <h3 class="sheet-title" dir="auto">{{ st.task.title }}</h3>
+        </div>
+        <button
+          type="button"
+          class="sheet-close-btn"
+          (click)="close()"
+          aria-label="Close details"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Code & Status Badge Row -->
+      <div class="sheet-meta-row">
+        @if (st.task.code) {
+          <span class="sheet-code-badge" dir="ltr">{{ st.task.code }}</span>
+        }
+        <span
+          class="sheet-status-badge"
+          [class.status-completed]="st.progress.status === 'COMPLETED'"
+          [class.status-in-progress]="st.progress.status === 'IN_PROGRESS'"
+        >
+          {{ st.progress.status === 'COMPLETED' ? 'Completed' : (st.progress.status === 'IN_PROGRESS' ? 'In Progress' : 'Not Started') }}
+        </span>
+        <span class="sheet-progress-summary">
+          {{ st.progress.completedChecksCount }}/{{ st.progress.totalChecksCount }} checks ({{ st.progress.progressPercentage | number:'1.0-0' }}%)
+        </span>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="sheet-progress-track">
+        <div class="sheet-progress-fill" [style.width.%]="st.progress.progressPercentage"></div>
+      </div>
+
+      <!-- Description Content -->
+      <div class="sheet-body">
+        <div class="sheet-section">
+          <h4 class="sheet-section-title">Description & Objectives</h4>
+          <p class="sheet-desc-text" dir="auto">
+            {{ st.task.description || 'No detailed instructions provided for this task.' }}
+          </p>
+        </div>
+
+        <!-- External Resource Link Button -->
+        @if (st.task.link) {
+          <div class="sheet-section">
+            <a
+              [href]="st.task.link"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="sheet-resource-btn"
+            >
+              <span>Open Task Learning Resource</span>
+              <span class="sheet-external-icon">↗</span>
+            </a>
+          </div>
+        }
+
+        <!-- Dynamic Check Definitions List -->
+        <div class="sheet-section">
+          <h4 class="sheet-section-title">Requirements & Checks</h4>
+          @if (st.progress.checks && st.progress.checks.length > 0) {
+            <div class="sheet-checks-list">
+              @for (chk of st.progress.checks; track chk.checkDefinitionId) {
+                <div
+                  class="sheet-check-card"
+                  [class.sheet-check-done]="chk.completed"
+                  (click)="onToggleCheck(chk.checkDefinitionId, chk.completed, st, $event)"
+                >
+                  <button
+                    type="button"
+                    class="sheet-check-checkbox"
+                    [class.checked]="chk.completed"
+                    [attr.aria-pressed]="chk.completed"
+                  >
+                    @if (chk.completed) {
+                      <svg class="check-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    }
+                  </button>
+
+                  <div class="sheet-check-content">
+                    <div class="sheet-check-name">{{ chk.name }}</div>
+                    @if (chk.description) {
+                      <div class="sheet-check-desc">{{ chk.description }}</div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="sheet-zero-checks-box">
+              <span class="zero-check-alert">⚠️ No checks configured for this task.</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

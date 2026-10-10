@@ -1,0 +1,200 @@
+<div class="trainee-home-page">
+  <!-- Toast Error Notification -->
+  @if (errorMessage()) {
+    <div class="toast-error-banner">
+      <span class="toast-icon">⚠️</span>
+      <span class="toast-msg">{{ errorMessage() }}</span>
+      <button type="button" class="toast-close" (click)="traineeRoadmapService.clearError()">✕</button>
+    </div>
+  }
+
+  <!-- Global Header Card -->
+  <header class="global-header-card">
+    <div class="header-top-row">
+      <div class="header-title-group">
+        <span class="header-subtitle">Trainee Progress Portal</span>
+        <h1 class="header-roadmap-title" dir="auto">
+          {{ roadmap()?.name || 'Curriculum Roadmap' }}
+        </h1>
+      </div>
+
+      <div class="header-user-group">
+        <div class="user-avatar-circle">
+          <span>{{ authService.currentUser()?.name?.charAt(0) || '🥋' }}</span>
+        </div>
+        <div class="user-info-text">
+          <span class="user-name">{{ authService.currentUser()?.name || 'Trainee' }}</span>
+          <button type="button" class="logout-btn" (click)="logout()">Sign Out</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overall Progress Section -->
+    <div class="overall-progress-section">
+      <div class="overall-progress-header">
+        <span class="overall-progress-label">Overall Completion</span>
+        <span class="overall-progress-percentage">
+          {{ roadmap()?.progressSummary?.overallProgressPercentage || 0 | number:'1.0-0' }}%
+        </span>
+      </div>
+
+      <div class="overall-progress-bar-track">
+        <div
+          class="overall-progress-bar-fill"
+          [style.width.%]="roadmap()?.progressSummary?.overallProgressPercentage || 0"
+        ></div>
+      </div>
+
+      @if (roadmap()?.progressSummary; as summary) {
+        <div class="overall-progress-metrics">
+          <span class="metric-item">
+            <strong>{{ summary.completedTasksCount }}</strong> completed
+          </span>
+          <span class="metric-dot">•</span>
+          <span class="metric-item">
+            <strong>{{ summary.inProgressTasksCount }}</strong> in progress
+          </span>
+          <span class="metric-dot">•</span>
+          <span class="metric-item">
+            <strong>{{ summary.totalTasksCount }}</strong> total tasks
+          </span>
+        </div>
+      }
+    </div>
+  </header>
+
+  <!-- Levels Section -->
+  <main class="levels-section">
+    <div class="levels-section-header">
+      <h2 class="levels-title">Curriculum Levels</h2>
+      <span class="levels-count-text">
+        {{ roadmap()?.levels?.length || 0 }} Levels in Roadmap
+      </span>
+    </div>
+
+    @if (isLoading() && !roadmap()) {
+      <!-- Shimmer Skeleton Loading -->
+      <div class="skeleton-grid">
+        <div class="skeleton-level-card"></div>
+        <div class="skeleton-level-card"></div>
+        <div class="skeleton-level-card"></div>
+      </div>
+    } @else if (roadmap()?.levels && roadmap()!.levels.length > 0) {
+      <div class="levels-grid">
+        @for (lvl of roadmap()!.levels; track lvl.id) {
+          <div
+            class="level-card"
+            [class.level-locked]="lvl.isLocked"
+            (click)="openLevel(lvl)"
+            [attr.tabindex]="lvl.isLocked ? -1 : 0"
+            [attr.role]="lvl.isLocked ? 'region' : 'button'"
+            [attr.aria-disabled]="lvl.isLocked"
+          >
+            <!-- Card Top Row -->
+            <div class="level-card-top">
+              <span class="level-number-badge">Level {{ lvl.position }}</span>
+
+              <div class="level-card-actions">
+                @if (lvl.link) {
+                  <a
+                    [href]="lvl.link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="level-card-icon-btn"
+                    (click)="$event.stopPropagation()"
+                    title="Open level learning resource"
+                    aria-label="Open level resource"
+                  >
+                    ↗
+                  </a>
+                }
+                @if (lvl.description) {
+                  <button
+                    type="button"
+                    class="level-card-icon-btn"
+                    (click)="openLevelInfo(lvl, $event)"
+                    title="View level information"
+                    aria-label="View level information"
+                  >
+                    ℹ️
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="level-card-body">
+              <h3 class="level-card-title" dir="auto">{{ lvl.name }}</h3>
+              <p class="level-card-steps-count">{{ lvl.stepsCount }} Steps</p>
+            </div>
+
+            <!-- Card Footer (Progress & Status) -->
+            <div class="level-card-footer">
+              @if (lvl.isLocked) {
+                <div class="level-lock-badge">
+                  <span class="lock-icon">🔒</span>
+                  <span class="lock-text">Complete previous level to unlock</span>
+                </div>
+              } @else {
+                <div class="level-progress-ring-box">
+                  <app-progress-ring
+                    [percentage]="lvl.progressPercentage"
+                    [size]="52"
+                    [strokeWidth]="4.5"
+                    [color]="'#22c55e'"
+                    [textSize]="'11px'"
+                  ></app-progress-ring>
+                </div>
+                <span class="level-enter-cta">
+                  <span>Enter Level</span>
+                  <span class="cta-arrow">→</span>
+                </span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Empty Roadmap State -->
+      <div class="empty-roadmap-card">
+        <span class="empty-roadmap-icon">🥋</span>
+        <h3 class="empty-roadmap-title">No curriculum yet</h3>
+        <p class="empty-roadmap-subtitle">Your coach hasn't published any learning levels yet.</p>
+      </div>
+    }
+  </main>
+
+  <!-- Level Description Info Modal -->
+  @if (activeLevelInfoModal(); as modalLvl) {
+    <div class="modal-backdrop" (click)="closeLevelInfo()">
+      <div class="modal-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <span class="modal-level-badge">Level {{ modalLvl.position }}</span>
+            <h3 class="modal-title" dir="auto">{{ modalLvl.name }}</h3>
+          </div>
+          <button type="button" class="modal-close-btn" (click)="closeLevelInfo()">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <h4 class="modal-section-title">Overview & Objectives</h4>
+          <p class="modal-desc-text" dir="auto">
+            {{ modalLvl.description }}
+          </p>
+
+          @if (modalLvl.link) {
+            <a
+              [href]="modalLvl.link"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="modal-link-btn"
+            >
+              <span>Open Level Study Guide</span>
+              <span>↗</span>
+            </a>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

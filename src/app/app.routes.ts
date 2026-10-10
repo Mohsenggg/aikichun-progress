@@ -28,5 +28,22 @@ export const routes: Routes = [
             import('./features/roadmap/coach/roadmap-builder/roadmap-builder.component')
                 .then(m => m.RoadmapBuilderComponent)
     },
+    {
+        path: 'trainee',
+        children: [
+            {
+                path: '',
+                loadComponent: () =>
+                    import('./features/roadmap/trainee/pages/trainee-home/trainee-home.component')
+                        .then(m => m.TraineeHomeComponent)
+            },
+            {
+                path: 'level/:levelId',
+                loadComponent: () =>
+                    import('./features/roadmap/trainee/pages/level-detail/level-detail.component')
+                        .then(m => m.LevelDetailComponent)
+            }
+        ]
+    },
     { path: '**', redirectTo: '/login' }
 ];

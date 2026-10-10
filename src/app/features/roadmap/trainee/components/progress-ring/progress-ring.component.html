@@ -1,0 +1,39 @@
+<div class="progress-ring-wrapper" [style.width.px]="size" [style.height.px]="size">
+  <svg
+    class="progress-ring-svg"
+    [attr.width]="size"
+    [attr.height]="size"
+    [attr.viewBox]="'0 0 ' + size + ' ' + size"
+  >
+    <!-- Background Track Circle -->
+    <circle
+      class="progress-ring-track"
+      [attr.cx]="center()"
+      [attr.cy]="center()"
+      [attr.r]="radius()"
+      [attr.stroke]="trackColor"
+      [attr.stroke-width]="strokeWidth"
+      fill="transparent"
+    />
+    <!-- Foreground Progress Arc -->
+    <circle
+      class="progress-ring-bar"
+      [attr.cx]="center()"
+      [attr.cy]="center()"
+      [attr.r]="radius()"
+      [attr.stroke]="color"
+      [attr.stroke-width]="strokeWidth"
+      [attr.stroke-dasharray]="circumference()"
+      [attr.stroke-dashoffset]="strokeDashoffset()"
+      stroke-linecap="round"
+      fill="transparent"
+      [style.transform]="'rotate(-90deg)'"
+      [style.transform-origin]="'center'"
+    />
+  </svg>
+  @if (showText) {
+    <span class="progress-ring-text" [style.font-size]="textSize">
+      {{ displayPercentage() }}%
+    </span>
+  }
+</div>

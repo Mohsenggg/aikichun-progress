@@ -1,0 +1,109 @@
+<div class="level-detail-page">
+  <!-- Toast Error Notification -->
+  @if (errorMessage()) {
+    <div class="toast-error-banner">
+      <span class="toast-icon">⚠️</span>
+      <span class="toast-msg">{{ errorMessage() }}</span>
+      <button type="button" class="toast-close" (click)="traineeRoadmapService.clearError()">✕</button>
+    </div>
+  }
+
+  <!-- Navigation Bar -->
+  <div class="nav-bar-container">
+    <button type="button" class="back-btn" (click)="goBack()">
+      <span class="back-arrow">←</span>
+      <span>Back to Curriculum</span>
+    </button>
+  </div>
+
+  @if (isLoading() && !currentLevel()) {
+    <!-- Shimmer Skeleton Loading -->
+    <div class="skeleton-container">
+      <div class="skeleton-header"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+    </div>
+  } @else {
+    @if (currentLevel(); as lvl) {
+      <!-- Level Hero Header -->
+      <div class="level-hero-card">
+        <div class="level-hero-main">
+          <div class="level-title-group">
+            <span class="level-badge">Level {{ lvl.position }}</span>
+            <h1 class="level-hero-title" dir="auto">{{ lvl.name }}</h1>
+            @if (lvl.description) {
+              <p class="level-hero-desc" dir="auto">{{ lvl.description }}</p>
+            }
+          </div>
+
+          <div class="level-hero-stats">
+            <app-progress-ring
+              [percentage]="lvl.progressPercentage"
+              [size]="64"
+              [strokeWidth]="5"
+              [color]="'#22c55e'"
+              [textSize]="'13px'"
+            ></app-progress-ring>
+
+            <div class="level-stats-labels">
+              <span class="level-steps-count">{{ lvl.stepsCount }} Steps</span>
+              @if (lvl.link) {
+                <a
+                  [href]="lvl.link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="level-link-btn"
+                  title="Open level curriculum resource"
+                >
+                  <span>Level Resource</span>
+                  <span class="ext-icon">↗</span>
+                </a>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Linear progress bar -->
+        <div class="level-bar-track">
+          <div class="level-bar-fill" [style.width.%]="lvl.progressPercentage"></div>
+        </div>
+      </div>
+
+      <!-- Steps Timeline Section -->
+      <div class="steps-section">
+        <div class="steps-section-header">
+          <h2 class="steps-section-title">Steps & Competencies</h2>
+          <span class="steps-count-badge">{{ lvl.stages.length }} steps in this level</span>
+        </div>
+
+        @if (lvl.stages.length > 0) {
+          <div class="step-cards-stack">
+            @for (stg of lvl.stages; track stg.id; let first = $first) {
+              <app-step-card
+                [stage]="stg"
+                [traineeId]="traineeId()"
+                [initiallyExpanded]="first"
+              ></app-step-card>
+            }
+          </div>
+        } @else {
+          <div class="empty-steps-card">
+            <span class="empty-steps-icon">🥋</span>
+            <h3 class="empty-steps-title">No steps assigned yet</h3>
+            <p class="empty-steps-subtitle">Your coach hasn't added steps to this level yet.</p>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="not-found-card">
+        <span class="not-found-icon">🔍</span>
+        <h3 class="not-found-title">Level not found</h3>
+        <p class="not-found-subtitle">The requested level could not be located in your roadmap.</p>
+        <button type="button" class="not-found-back-btn" (click)="goBack()">Return to Home</button>
+      </div>
+    }
+  }
+
+  <!-- Task Details Bottom Sheet / Modal -->
+  <app-task-detail-sheet [traineeId]="traineeId()"></app-task-detail-sheet>
+</div>

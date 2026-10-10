@@ -1,0 +1,85 @@
+<div
+  class="step-card"
+  [class.step-expanded]="isExpanded()"
+  [style.border-left-color]="stage.priorityStage?.color || '#38bdf8'"
+>
+  <!-- Step Card Header (Clickable Accordion Trigger) -->
+  <div class="step-card-header" (click)="toggleExpand()">
+    <div class="step-left-content">
+      <!-- Priority Chip -->
+      @if (stage.priorityStage) {
+        <app-priority-chip [priority]="stage.priorityStage"></app-priority-chip>
+      }
+
+      <!-- Code Badge -->
+      @if (stage.code) {
+        <span class="step-code-badge" dir="ltr">{{ stage.code }}</span>
+      }
+
+      <!-- Step Title -->
+      <h3 class="step-title" dir="auto">
+        {{ displayName }}
+      </h3>
+
+      <!-- External Stage Resource Link -->
+      @if (stage.link) {
+        <a
+          [href]="stage.link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="step-link-icon"
+          (click)="$event.stopPropagation()"
+          title="Open step learning resource"
+          aria-label="Open step learning resource"
+        >
+          ↗
+        </a>
+      }
+    </div>
+
+    <!-- Step Right Progress & Actions -->
+    <div class="step-right-content">
+      <span class="step-level-percentage">
+        {{ stage.percentageOfLevel | number:'1.0-0' }}% of level
+      </span>
+
+      <!-- Step Progress Ring -->
+      <app-progress-ring
+        [percentage]="stage.progressPercentage"
+        [size]="40"
+        [strokeWidth]="3.5"
+        [color]="'#22c55e'"
+        [textSize]="'10px'"
+      ></app-progress-ring>
+
+      <!-- Chevron Expand Icon -->
+      <div class="step-chevron" [class.rotated]="isExpanded()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expandable Tasks Dropdown -->
+  <div class="step-dropdown" [class.open]="isExpanded()">
+    <div class="step-dropdown-inner">
+      @if (sortedTasks.length > 0) {
+        <div class="step-tasks-list">
+          @for (st of sortedTasks; track st.id) {
+            <app-task-row
+              [stageTask]="st"
+              [allStageTasks]="sortedTasks"
+              [traineeId]="traineeId"
+            ></app-task-row>
+          }
+        </div>
+      } @else {
+        <div class="step-empty-tasks">
+          <span class="empty-icon">📋</span>
+          <p class="empty-text">No tasks assigned to this step yet.</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>
