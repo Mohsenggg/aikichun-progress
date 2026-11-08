@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TraineeRoadmapService } from '../../../services/trainee-roadmap.service';
@@ -22,6 +22,7 @@ export class TraineeHomeComponent implements OnInit {
   traineeId = signal<string>('');
   activeLevelInfoModal = signal<TraineeLevel | null>(null);
 
+  readonly isSubscriptionInactive = computed(() => this.authService.accountStatus() === 'INACTIVE');
   roadmap = this.traineeRoadmapService.roadmap;
   isLoading = this.traineeRoadmapService.isLoading;
   errorMessage = this.traineeRoadmapService.error;

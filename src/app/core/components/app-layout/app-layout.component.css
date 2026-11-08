@@ -1,0 +1,14 @@
+.app-layout-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--aikido-green, #1a2f23);
+  color: var(--white, #ffffff);
+}
+
+.layout-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+

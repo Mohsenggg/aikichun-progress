@@ -31,6 +31,7 @@ export class LevelDetailComponent implements OnInit {
   traineeId = signal<string>('');
   activeLevelInfoModal = signal<TraineeLevel | null>(null);
 
+  readonly isSubscriptionInactive = computed(() => this.authService.accountStatus() === 'INACTIVE');
   roadmap = this.traineeRoadmapService.roadmap;
   isLoading = this.traineeRoadmapService.isLoading;
   errorMessage = this.traineeRoadmapService.error;

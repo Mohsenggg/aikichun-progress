@@ -8,6 +8,16 @@
     </div>
   }
 
+  <!-- Inactive Subscription Warning Banner -->
+  @if (isSubscriptionInactive()) {
+    <div class="mb-4 p-4 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-200 flex items-center gap-3">
+      <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+      <div>
+        <strong class="font-semibold">Subscription Inactive:</strong> Your subscription is currently inactive. Contact your coach/club to renew your membership to record new progress.
+      </div>
+    </div>
+  }
+
   <!-- Global Header Card -->
   <header class="global-header-card">
     <div class="header-top-row">

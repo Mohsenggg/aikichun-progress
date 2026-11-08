@@ -2,6 +2,7 @@ import { Component, Input, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TraineeStageTask, PriorityStageInfo } from '../../../models/trainee.models';
 import { TraineeRoadmapService } from '../../../services/trainee-roadmap.service';
+import { AuthService } from '../../../../../core/auth/auth.service';
 import { PriorityChipComponent } from '../priority-chip/priority-chip.component';
 
 @Component({
@@ -20,6 +21,9 @@ export class TaskRowComponent {
   @Input() priority: PriorityStageInfo | null = null;
 
   private traineeRoadmapService = inject(TraineeRoadmapService);
+  private authService = inject(AuthService);
+
+  readonly isSubscriptionInactive = computed(() => this.authService.accountStatus() === 'INACTIVE');
 
   get taskPercentOfStep(): number {
     if (!this.allStageTasks || this.allStageTasks.length === 0) return 0;
@@ -54,6 +58,7 @@ export class TaskRowComponent {
 
   onToggleCheck(checkDefinitionId: number, currentCompleted: boolean, event: MouseEvent): void {
     event.stopPropagation();
+    if (this.isSubscriptionInactive()) return;
     if (!this.traineeId) return;
     this.traineeRoadmapService.toggleCheck(
       this.traineeId,

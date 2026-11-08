@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, finalize, tap, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { AuthService } from '../../../core/auth/auth.service';
 import {
   TraineeRoadmapHierarchy,
   TraineeTaskProgress,
@@ -15,6 +16,7 @@ import {
 })
 export class TraineeRoadmapService {
   private http = inject(HttpClient);
+  private authService = inject(AuthService);
   private base = environment.apiUrl + '/trainee';
 
   // Signals
@@ -54,9 +56,10 @@ export class TraineeRoadmapService {
     this.error.set(null);
   }
 
-  getTraineeRoadmap(traineeId: string): Observable<TraineeRoadmapHierarchy> {
+  getTraineeRoadmap(traineeId?: string): Observable<TraineeRoadmapHierarchy> {
+    const id = traineeId || this.authService.currentUserUUID();
     this.isLoading.set(true);
-    return this.http.get<TraineeRoadmapHierarchy>(`${this.base}/${traineeId}/roadmap`).pipe(
+    return this.http.get<TraineeRoadmapHierarchy>(`${this.base}/${id}/roadmap`).pipe(
       tap(data => {
         this.roadmap.set(data);
       }),
@@ -68,7 +71,9 @@ export class TraineeRoadmapService {
     );
   }
 
-  toggleCheck(traineeId: string, taskId: number, checkDefId: number, completed: boolean): void {
+  toggleCheck(traineeId: string | null | undefined, taskId: number, checkDefId: number, completed: boolean): void {
+    const id = traineeId || this.authService.currentUserUUID();
+    if (!id) return;
     const currentRoadmap = this.roadmap();
     if (!currentRoadmap) return;
 
@@ -92,7 +97,7 @@ export class TraineeRoadmapService {
     // 3. Background server sync
     const payload: TraineeCheckToggleRequest = { completed };
     this.http.put<TraineeTaskProgress>(
-      `${this.base}/${traineeId}/tasks/${taskId}/checks/${checkDefId}`,
+      `${this.base}/${id}/tasks/${taskId}/checks/${checkDefId}`,
       payload
     ).subscribe({
       next: (serverProgress) => {

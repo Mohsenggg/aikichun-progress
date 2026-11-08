@@ -1,0 +1,128 @@
+<div class="home-container">
+  <!-- Welcome Hero Header -->
+  <header class="home-hero">
+    <div class="hero-content">
+      <div class="hero-badge-row">
+        <span class="role-badge" [class.badge-admin]="isAdmin()" [class.badge-mod]="isModerator()" [class.badge-trainee]="isTrainee()">
+          {{ getRoleBadgeLabel() }}
+        </span>
+        @if (user()?.accountStatus; as status) {
+          <span class="status-badge" [class.status-active]="status === 'ACTIVE'" [class.status-inactive]="status === 'INACTIVE'">
+            {{ status }}
+          </span>
+        }
+      </div>
+      <h1 class="hero-title">Welcome back, {{ user()?.fullName || 'Aikidoka' }}</h1>
+      <p class="hero-subtitle">
+        @if (isAdmin()) {
+          Complete curriculum administration, weight balancing, and membership management center.
+        } @else if (isModerator()) {
+          Member registry, subscription tracking, and status administration portal.
+        } @else {
+          Track your martial arts journey, master requirements, and level up your techniques.
+        }
+      </p>
+    </div>
+  </header>
+
+  <!-- Inactive Subscription Alert -->
+  @if (isInactive()) {
+    <div class="inactive-alert-banner">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-text">
+        <strong>Membership Notice:</strong> Your subscription is currently expired or inactive.
+        Please renew with your dojo administrator to submit progress updates.
+      </div>
+    </div>
+  }
+
+  <!-- Action Cards Grid -->
+  <section class="cards-grid" aria-label="Portal Navigation Actions">
+
+    <!-- Admin: Coach Roadmap Builder Card -->
+    @if (isAdmin()) {
+      <div class="action-card card-builder">
+        <div class="card-icon-wrapper icon-builder">
+          <i class="fa-solid fa-diagram-project"></i>
+        </div>
+        <div class="card-body">
+          <h2 class="card-title">Coach Roadmap Builder</h2>
+          <p class="card-description">
+            Design and organize curriculum levels, stages, competencies, and 3-tier task checks with drag-and-drop reordering.
+          </p>
+        </div>
+        <div class="card-footer">
+          <a routerLink="/coach/roadmap" class="card-btn btn-red">
+            <span>Open Builder</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    }
+
+    <!-- Admin & Moderator: Users & Subscription Management Card -->
+    @if (isAdmin() || isModerator()) {
+      <div class="action-card card-users">
+        <div class="card-icon-wrapper icon-users">
+          <i class="fa-solid fa-users-gear"></i>
+        </div>
+        <div class="card-body">
+          <h2 class="card-title">Users & Subscriptions</h2>
+          <p class="card-description">
+            Manage member accounts, update subscription validity dates, activate trainees, and review registrations.
+          </p>
+        </div>
+        <div class="card-footer">
+          <a routerLink="/admin/users" class="card-btn btn-secondary">
+            <span>Manage Users</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    }
+
+    <!-- Trainee: My Progress Card -->
+    @if (isTrainee()) {
+      <div class="action-card card-progress">
+        <div class="card-progress-layout">
+          <div class="card-progress-info">
+            <div class="card-icon-wrapper icon-progress">
+              <i class="fa-solid fa-award"></i>
+            </div>
+            <h2 class="card-title">My Curriculum Progress</h2>
+            <p class="card-description">
+              Review current belt requirements, practice technique checks, and monitor your personal mastery metrics.
+            </p>
+            <div class="progress-stats-row">
+              <div class="stat-pill">
+                <span class="stat-label">Tasks Done</span>
+                <span class="stat-num">{{ completedTasks() }} / {{ totalTasks() }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-ring-wrapper">
+            <app-progress-ring
+              [percentage]="overallProgress()"
+              [size]="96"
+              [strokeWidth]="8"
+              color="#22c55e"
+              trackColor="rgba(255, 255, 255, 0.1)"
+              textSize="18px">
+            </app-progress-ring>
+            <span class="ring-label">Curriculum Mastery</span>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <a routerLink="/trainee" class="card-btn btn-green">
+            <span>View Full Roadmap</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    }
+
+  </section>
+</div>
+

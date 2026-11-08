@@ -1,32 +1,49 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
+import { TraineeRoadmapService } from '../roadmap/services/trainee-roadmap.service';
+import { ProgressRingComponent } from '../roadmap/trainee/components/progress-ring/progress-ring.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink],
-  template: `
-    <div class="min-h-screen bg-[#1a2f23] text-white p-8 flex flex-col items-center justify-center">
-      <h1 class="text-3xl font-bold mb-4">Welcome to Aikichun</h1>
-      <p class="text-white/70 mb-6">Signed in as: {{ auth.backendUser()?.fullName }} ({{ auth.role() }})</p>
-      <div class="flex flex-wrap gap-4 justify-center">
-        @if (auth.isAdmin()) {
-          <a routerLink="/coach/roadmap" class="btn bg-[#d92027] text-white px-4 py-2 rounded font-semibold hover:opacity-90">Coach Roadmap Builder</a>
-        }
-        @if (auth.isAdmin() || auth.isModerator()) {
-          <a routerLink="/admin/users" class="btn bg-[#2a3d30] border border-white/20 text-white px-4 py-2 rounded font-semibold hover:bg-white/10">User Management</a>
-        }
-        @if (auth.isTrainee()) {
-          <a routerLink="/trainee" class="btn bg-[#22c55e] text-white px-4 py-2 rounded font-semibold hover:opacity-90">My Progress</a>
-        }
-        <button (click)="auth.logout()" class="btn border border-white/20 text-white/70 px-4 py-2 rounded hover:text-white hover:bg-white/10">Logout</button>
-      </div>
-    </div>
-  `
+  imports: [CommonModule, RouterLink, ProgressRingComponent],
+  templateUrl: './home.component.html',
+  styleUrl: './home.component.css'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   auth = inject(AuthService);
-}
+  traineeRoadmapService = inject(TraineeRoadmapService);
 
+  readonly user = this.auth.backendUser;
+  readonly role = this.auth.role;
+  readonly isAdmin = this.auth.isAdmin;
+  readonly isModerator = this.auth.isModerator;
+  readonly isTrainee = this.auth.isTrainee;
+  readonly isInactive = computed(() => this.auth.accountStatus() === 'INACTIVE');
+
+  readonly roadmap = this.traineeRoadmapService.roadmap;
+  readonly overallProgress = computed(() =>
+    this.roadmap()?.progressSummary?.overallProgressPercentage ?? 0
+  );
+  readonly totalTasks = computed(() =>
+    this.roadmap()?.progressSummary?.totalTasksCount ?? 0
+  );
+  readonly completedTasks = computed(() =>
+    this.roadmap()?.progressSummary?.completedTasksCount ?? 0
+  );
+
+  ngOnInit(): void {
+    if (this.isTrainee()) {
+      this.traineeRoadmapService.getTraineeRoadmap().subscribe();
+    }
+  }
+
+  getRoleBadgeLabel(): string {
+    const r = this.role();
+    if (r === 'admin') return 'ADMINISTRATOR';
+    if (r === 'moderator') return 'MODERATOR';
+    return 'TRAINEE MEMBER';
+  }
+}

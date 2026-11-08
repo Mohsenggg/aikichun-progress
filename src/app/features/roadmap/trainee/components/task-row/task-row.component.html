@@ -67,6 +67,9 @@
           type="button"
           class="check-pill"
           [class.check-pill-completed]="chk.completed"
+          [class.opacity-50]="isSubscriptionInactive()"
+          [disabled]="isSubscriptionInactive()"
+          [title]="isSubscriptionInactive() ? 'Subscription is inactive. Please renew.' : (chk.completed ? 'Mark incomplete' : 'Mark complete')"
           (click)="onToggleCheck(chk.checkDefinitionId, chk.completed, $event)"
           [attr.aria-pressed]="chk.completed"
         >
