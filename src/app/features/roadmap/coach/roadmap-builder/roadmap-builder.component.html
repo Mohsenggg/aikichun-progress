@@ -1,0 +1,769 @@
+<div class="builder-page">
+  <!-- Top Navigation / Header -->
+  <header class="builder-header">
+    <div class="header-brand">
+      <h1 class="page-title">{{ roadmap()?.name || 'Roadmap Builder' }}</h1>
+      <p class="page-subtitle">{{ roadmap()?.description || 'Configure Aikichun progression, levels, steps, and tasks' }}</p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="btn btn-secondary" (click)="toggleChecksPanel()"
+        [class.active]="showChecksPanel()" title="Manage Check Definitions">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 11 12 14 22 4"></polyline>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
+        <span class="action-label">Checks</span>
+        <span class="badge">{{ checkDefinitions().length }}</span>
+      </button>
+
+      <button type="button" class="btn btn-secondary" (click)="togglePriorityPanel()"
+        [class.active]="showPriorityPanel()" title="Manage Priority Stages">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="m4.93 4.93 4.24 4.24"></path>
+          <path d="m14.83 9.17 4.24-4.24"></path>
+          <path d="m14.83 14.83 4.24 4.24"></path>
+          <path d="m9.17 14.83-4.24 4.24"></path>
+        </svg>
+        <span class="action-label">Priorities</span>
+        <span class="badge">{{ priorityStages().length }}</span>
+      </button>
+
+      <button type="button" class="btn btn-primary" (click)="openAddLevel()" title="Add a new Level">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span class="action-label">+ Add Level</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Error Notification Banner -->
+  @if (errorMessage()) {
+  <div class="error-banner">
+    <div class="error-content">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ errorMessage() }}</span>
+    </div>
+    <button type="button" class="banner-close" (click)="dismissError()" aria-label="Dismiss error">
+      ✕
+    </button>
+  </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading() && !roadmap()) {
+  <div class="loading-container">
+    <div class="spinner-lg"></div>
+    <p>Loading roadmap hierarchy...</p>
+  </div>
+  }
+
+  <!-- Main Workspace -->
+  @if (roadmap()) {
+  <main class="builder-container">
+    <!-- Roadmap Meta Card -->
+    <div class="roadmap-meta">
+      @if (editingTarget()?.kind === 'roadmap') {
+      <div class="roadmap-meta-edit-box">
+        <div class="edit-fields-row">
+          <input type="text" class="form-input flex-1" placeholder="Roadmap Title" [value]="inlineEditValue()"
+            (input)="inlineEditValue.set($any($event.target).value)"
+            (keydown)="onInlineKeydown($event, saveEditRoadmap.bind(this))" autofocus />
+          <button type="button" class="btn btn-primary btn-sm" (click)="saveEditRoadmap()">Save</button>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="cancelEdit()">Cancel</button>
+        </div>
+        <textarea class="form-textarea mt-2" placeholder="Roadmap description..." [value]="inlineEditDescription()"
+          (input)="inlineEditDescription.set($any($event.target).value)" rows="2"></textarea>
+        @if (inlineEditError()) {
+        <span class="inline-error">{{ inlineEditError() }}</span>
+        }
+      </div>
+      } @else {
+      <div class="meta-info">
+        <div class="meta-title-row">
+          <h2 class="roadmap-name">{{ roadmap()?.name }}</h2>
+          <button type="button" class="btn-icon sm edit-roadmap-btn" (click)="startEditRoadmap()" title="Edit Roadmap Details">
+            ✎
+          </button>
+        </div>
+        <p class="roadmap-desc">{{ roadmap()?.description || 'Active curriculum structure' }}</p>
+      </div>
+      <div class="meta-stats">
+        <span class="stat-pill">{{ roadmap()?.levels?.length || 0 }} Levels</span>
+      </div>
+      }
+    </div>
+
+    <!-- Inline Add Level Form -->
+    @if (isAddingLevel()) {
+    <div class="inline-add-card level-add-card">
+      <div class="inline-add-header">
+        <h4>Create New Level</h4>
+      </div>
+      <div class="inline-add-body">
+        <div class="form-row">
+          <input type="text" class="form-input flex-1" placeholder="e.g., LEVEL 1 — White Belt (Rokkyu)" [value]="newLevelName()"
+            (input)="newLevelName.set($any($event.target).value)"
+            (keydown)="onInlineKeydown($event, confirmAddLevel.bind(this))" autofocus />
+          <button type="button" class="btn-resource-toggle"
+            [class.has-link]="!!newLevelLink()"
+            (click)="openResourceModal('newLevel', 'Level Resource Link', newLevelLink())"
+            [title]="newLevelLink() ? 'Resource Link: ' + newLevelLink() : 'Add Resource Link (optional)'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            @if (newLevelLink()) {
+              <span class="link-active-indicator"></span>
+              <span class="btn-resource-label">Link Set</span>
+            } @else {
+              <span class="btn-resource-label">+ Link</span>
+            }
+          </button>
+          <input type="number" class="form-input stage-weight-input" placeholder="Weight" min="0.1" step="1"
+            [value]="newLevelWeight()" (input)="newLevelWeight.set(+$any($event.target).value)"
+            (keydown)="onInlineKeydown($event, confirmAddLevel.bind(this))" title="Level Weight" />
+        </div>
+        @if (newLevelError()) {
+        <span class="field-error">{{ newLevelError() }}</span>
+        }
+      </div>
+      <div class="inline-add-actions">
+        <button type="button" class="btn btn-ghost btn-sm" (click)="cancelAddLevel()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" (click)="confirmAddLevel()">
+          Create Level
+        </button>
+      </div>
+    </div>
+    }
+
+    <!-- Empty Levels State -->
+    @if (!roadmap()?.levels?.length && !isAddingLevel()) {
+    <div class="empty-state-card">
+      <div class="empty-icon">⛩️</div>
+      <h3>No levels created yet</h3>
+      <p>Start organizing your Aikichun roadmap by creating your first progression level.</p>
+      <button type="button" class="btn btn-primary" (click)="openAddLevel()">
+        + Add First Level
+      </button>
+    </div>
+    }
+
+    <!-- Levels List -->
+    <div class="levels-list">
+      @for (level of roadmap()?.levels; track level.id; let levelIdx = $index; let isFirstLevel = $first; let
+      isLastLevel = $last) {
+      <section class="level-card">
+        <!-- Level Header -->
+        <div class="level-header">
+          <div class="level-title-group">
+            @if (editingTarget()?.kind === 'level' && editingTarget()?.id === level.id) {
+            <div class="inline-edit-box level-edit-box">
+              <input type="text" class="inline-input flex-1" placeholder="Level Name" [value]="inlineEditValue()"
+                (input)="inlineEditValue.set($any($event.target).value)"
+                (keydown)="onInlineKeydown($event, saveEditLevel.bind(this, level))" autofocus />
+              <button type="button" class="btn-resource-toggle"
+                [class.has-link]="!!inlineEditLink()"
+                (click)="openResourceModal('editLevel', 'Level Resource Link', inlineEditLink())"
+                [title]="inlineEditLink() ? 'Resource Link: ' + inlineEditLink() : 'Add Resource Link (optional)'">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                @if (inlineEditLink()) {
+                  <span class="link-active-indicator"></span>
+                  <span class="btn-resource-label">Link Set</span>
+                } @else {
+                  <span class="btn-resource-label">+ Link</span>
+                }
+              </button>
+              <input type="number" class="inline-input stage-weight-input" placeholder="Weight" min="0.1" step="1"
+                [value]="inlineEditWeight()" (input)="inlineEditWeight.set(+$any($event.target).value)"
+                (keydown)="onInlineKeydown($event, saveEditLevel.bind(this, level))" title="Level Weight" />
+              <button type="button" class="btn-icon btn-save" (click)="saveEditLevel(level)"
+                title="Save level">✓</button>
+              <button type="button" class="btn-icon btn-cancel" (click)="cancelEdit()" title="Cancel">✕</button>
+              @if (inlineEditError()) {
+              <span class="inline-error">{{ inlineEditError() }}</span>
+              }
+            </div>
+            } @else {
+            <h3 class="level-name">
+              {{ level.name }}
+              @if (level.link) {
+              <a [href]="level.link" target="_blank" rel="noopener noreferrer" class="resource-chip" title="Open resource: {{ level.link }}">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                <span>Resource</span>
+                <span class="external-icon">↗</span>
+              </a>
+              }
+              <span class="level-weight-badge" title="Level Weight: {{ level.weight ?? 10 }}">
+                mw: {{ level.weight ?? 10 }} <span class="weight-pct">({{ levelWeightPercent(level) }}% of Roadmap)</span>
+              </span>
+            </h3>
+            }
+          </div>
+
+          <div class="level-actions">
+            <!-- Level Reorder Arrows (Levels ONLY) -->
+            <button type="button" class="btn-icon" [disabled]="isFirstLevel" (click)="moveLevelUp(levelIdx)"
+              title="Move level up">
+              ▲
+            </button>
+            <button type="button" class="btn-icon" [disabled]="isLastLevel" (click)="moveLevelDown(levelIdx)"
+              title="Move level down">
+              ▼
+            </button>
+            <button type="button" class="btn-text" (click)="startEditLevel(level)" title="Edit level properties">
+              Edit
+            </button>
+            <button type="button" class="btn-text btn-danger" (click)="deleteLevel(level.id)" title="Delete level">
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <!-- Steps (Stages) Drop List inside Level -->
+        <div class="stages-container"
+             cdkDropList
+             [id]="'level-steps-' + level.id"
+             [cdkDropListData]="level.stages"
+             [cdkDropListConnectedTo]="allLevelDropListIds()"
+             (cdkDropListDropped)="onStepDrop($event, level)">
+
+          @for (stage of level.stages; track stage.id) {
+          <div class="stage-card" cdkDrag [cdkDragData]="stage">
+            <!-- Stage Drag Placeholder -->
+            <div class="stage-drag-placeholder" *cdkDragPlaceholder></div>
+
+            <!-- Stage Header -->
+            <div class="stage-header" [class.editing]="editingTarget()?.kind === 'stage' && editingTarget()?.id === stage.id">
+              <div class="stage-title-group">
+                <!-- Step Drag Handle -->
+                <span class="drag-handle sm" cdkDragHandle title="Drag to reorder step or move to another level">⋮⋮</span>
+
+                @if (editingTarget()?.kind === 'stage' && editingTarget()?.id === stage.id) {
+                <div class="inline-edit-box stage-edit-box">
+                  <input type="text" class="inline-input stage-code-input" placeholder="Code" [value]="inlineEditCode()"
+                    (input)="inlineEditCode.set($any($event.target).value)"
+                    (keydown)="onInlineKeydown($event, saveEditStage.bind(this, stage))" />
+                  <input type="text" class="inline-input flex-1" placeholder="Step Name (optional)" [value]="inlineEditValue()"
+                    (input)="inlineEditValue.set($any($event.target).value)"
+                    (keydown)="onInlineKeydown($event, saveEditStage.bind(this, stage))" autofocus />
+                  <button type="button" class="btn-resource-toggle"
+                    [class.has-link]="!!inlineEditLink()"
+                    (click)="openResourceModal('editStage', 'Step Resource Link', inlineEditLink())"
+                    [title]="inlineEditLink() ? 'Resource Link: ' + inlineEditLink() : 'Add Resource Link (optional)'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                    @if (inlineEditLink()) {
+                      <span class="link-active-indicator"></span>
+                      <span class="btn-resource-label">Link Set</span>
+                    } @else {
+                      <span class="btn-resource-label">+ Link</span>
+                    }
+                  </button>
+                  <input type="number" class="inline-input stage-weight-input" placeholder="Weight" min="1"
+                    [value]="inlineEditWeight()" (input)="inlineEditWeight.set(+$any($event.target).value)"
+                    (keydown)="onInlineKeydown($event, saveEditStage.bind(this, stage))" />
+                  <button type="button" class="btn-icon btn-save" (click)="saveEditStage(stage)"
+                    title="Save step">✓</button>
+                  <button type="button" class="btn-icon btn-cancel" (click)="cancelEdit()" title="Cancel">✕</button>
+                  @if (inlineEditError()) {
+                  <span class="inline-error">{{ inlineEditError() }}</span>
+                  }
+                </div>
+                } @else {
+                @if (stage.code) {
+                <span class="stage-code-badge">{{ stage.code }}</span>
+                }
+                <h4 class="stage-name" [class.unnamed-step]="!stage.name">
+                  {{ stage.name || 'Unnamed Step' }}
+                  @if (stage.link) {
+                  <a [href]="stage.link" target="_blank" rel="noopener noreferrer" class="resource-chip sm" title="Open step resource: {{ stage.link }}">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                    <span>Resource</span>
+                    <span class="external-icon">↗</span>
+                  </a>
+                  }
+                </h4>
+
+                }
+              </div>
+
+              @if (!(editingTarget()?.kind === 'stage' && editingTarget()?.id === stage.id)) {
+              <div class="stage-metadata">
+                @if (editingWeightStageId() === stage.id) {
+                <div class="inline-weight-edit-box">
+                  <span class="weight-label">w:</span>
+                  <input type="number" class="inline-input weight-quick-input" min="0.1" step="0.5"
+                    [value]="inlineStageWeightValue()" (input)="inlineStageWeightValue.set(+$any($event.target).value)"
+                    (keydown)="onInlineKeydown($event, saveStageWeight.bind(this, stage))" autofocus />
+                  <button type="button" class="btn-icon btn-save sm" (click)="saveStageWeight(stage)"
+                    title="Save weight">✓</button>
+                  <button type="button" class="btn-icon btn-cancel sm" (click)="cancelEditStageWeight()"
+                    title="Cancel">✕</button>
+                  @if (inlineStageWeightError()) {
+                  <span class="inline-error">{{ inlineStageWeightError() }}</span>
+                  }
+                </div>
+                } @else {
+                <button type="button" class="stage-weight-badge clickable" (click)="startEditStageWeight(stage)"
+                  title="Weight: {{ stage.weight }}. Click to edit weight">
+                  w: {{ stage.weight }} <span class="weight-pct">({{ stageWeightPercent(stage, level) }}% of Level)</span>
+                </button>
+                }
+                <!-- Priority Stage Selector Chip -->
+                <div class="priority-selector-wrapper">
+                  @if (stage.priorityStage) {
+                  <span class="priority-dot" [style.background-color]="getPriorityColor(stage.priorityStage)"></span>
+                  }
+                  <select class="priority-select"
+                          [ngModel]="stage.priorityStage?.id ?? null"
+                          (ngModelChange)="onPriorityStageChange(stage, $event)"
+                          title="Assign Priority Stage">
+                    <option [ngValue]="null">No Priority</option>
+                    @for (p of priorityStages(); track p.id) {
+                    <option [ngValue]="p.id">{{ p.name }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
+              }
+
+              <div class="stage-actions">
+                <!-- No Up/Down arrows for Steps (DnD only) -->
+                <button type="button" class="btn-text sm" (click)="startEditStage(stage)"
+                  title="Edit step name, code, link, and weight">
+                  ✎
+                </button>
+                <button type="button" class="btn-icon sm btn-danger" (click)="deleteStage(stage.id)"
+                  title="Delete step">
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <!-- Tasks inside Stage -->
+            <div class="stage-tasks">
+              @if (!stage.tasks.length) {
+              <div class="empty-tasks-row"
+                   cdkDropList
+                   [id]="'stage-tasks-' + stage.id"
+                   [cdkDropListData]="stage.tasks"
+                   [cdkDropListConnectedTo]="allStageDropListIds()"
+                   (cdkDropListDropped)="onTaskDrop($event, stage)">
+                <span class="empty-tasks-text">No tasks yet. Drop tasks here or</span>
+                <button type="button" class="btn-text btn-add-task-link" (click)="openAddTaskDialog(stage.id)">
+                  + Add Task
+                </button>
+              </div>
+              } @else {
+              <div class="tasks-table"
+                   cdkDropList
+                   [id]="'stage-tasks-' + stage.id"
+                   [cdkDropListData]="stage.tasks"
+                   [cdkDropListConnectedTo]="allStageDropListIds()"
+                   (cdkDropListDropped)="onTaskDrop($event, stage)">
+
+                @for (st of stage.tasks; track st.id) {
+                <div class="task-row" [class.main-task-row]="st.isMain" cdkDrag [cdkDragData]="st">
+                  <!-- Task Drag Placeholder -->
+                  <div class="task-drag-placeholder" *cdkDragPlaceholder></div>
+
+                  <div class="task-main-column">
+                    <!-- Drag handle -->
+                    <span class="drag-handle xs" cdkDragHandle title="Drag to reorder task or move to another step">⋮⋮</span>
+
+                    <!-- Task title and resource link -->
+                    <div class="task-info">
+                      <span class="task-title">{{ st.task.title }}</span>
+                      @if (st.task.link) {
+                      <a [href]="st.task.link" target="_blank" rel="noopener noreferrer" class="resource-chip xs" title="Open task resource: {{ st.task.link }}">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
+                        <span class="external-icon">↗</span>
+                      </a>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="task-metadata">
+                    
+                     @if (st.isMain) {
+                    <button type="button" class="main-badge" (click)="toggleMainTask(stage.id, st)"
+                      title="Main task (click to unset)">
+                      MAIN
+                    </button>
+                    } @else {
+                    <button type="button" class="star-btn"
+                      (click)="toggleMainTask(stage.id, st)"
+                      title="Set as main task for this step">
+                      ★
+                    </button>
+                    }
+                  
+                    <span class="task-weight-badge" title="Task Subweight: {{ st.task.weight ?? 1 }}">
+                      sw: {{ st.task.weight ?? 1 }} <span class="weight-pct">({{ taskWeightPercent(st, stage) }}% of Step)</span>
+                    </span>
+                      @if (st.task.checks && st.task.checks.length > 0) {
+                    <span class="task-checks-badge" [title]="st.task.checks.length + ' checks configured'">
+                      ✓ {{ st.task.checks.length }}
+                    </span>
+                    }
+                   
+                  </div>
+
+                  <!-- Row actions (No Up/Down arrows for Tasks - DnD only) -->
+                  <div class="task-row-actions">
+                    <button type="button" class="btn-icon xs" (click)="openEditTaskDialog(st, stage.id)"
+                      title="Edit task properties">
+                      ✎
+                    </button>
+                    <button type="button" class="btn-icon xs btn-danger" (click)="removeTask(stage.id, st.task.id)"
+                      title="Remove task from step">
+                      ✕
+                    </button>
+                  </div>
+                </div>
+                }
+              </div>
+
+              <!-- Add task button at bottom of stage tasks -->
+              <div class="stage-footer">
+                <button type="button" class="btn-text btn-add-task-link" (click)="openAddTaskDialog(stage.id)">
+                  + Add Task
+                </button>
+              </div>
+              }
+            </div>
+          </div>
+          }
+
+          <!-- Inline Add Stage Form or Trigger Button -->
+          @if (addingStageLevelId() === level.id) {
+          <div class="inline-add-card stage-add-card">
+            <div class="inline-add-row">
+              <input type="text" class="form-input stage-code-input" placeholder="Code (e.g. S-01)"
+                [value]="newStageCode()" (input)="newStageCode.set($any($event.target).value)"
+                (keydown)="onInlineKeydown($event, confirmAddStage.bind(this, level.id))" />
+              <input type="text" class="form-input flex-1"
+                placeholder="Step Name (optional)" [value]="newStageName()"
+                (input)="newStageName.set($any($event.target).value)"
+                (keydown)="onInlineKeydown($event, confirmAddStage.bind(this, level.id))" autofocus />
+              <button type="button" class="btn-resource-toggle"
+                [class.has-link]="!!newStageLink()"
+                (click)="openResourceModal('newStage', 'Step Resource Link', newStageLink())"
+                [title]="newStageLink() ? 'Resource Link: ' + newStageLink() : 'Add Resource Link (optional)'">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                @if (newStageLink()) {
+                  <span class="link-active-indicator"></span>
+                  <span class="btn-resource-label">Link Set</span>
+                } @else {
+                  <span class="btn-resource-label">+ Link</span>
+                }
+              </button>
+              <input type="number" class="form-input stage-weight-input" placeholder="Weight" min="1"
+                [value]="newStageWeight()" (input)="newStageWeight.set(+$any($event.target).value)"
+                (keydown)="onInlineKeydown($event, confirmAddStage.bind(this, level.id))" />
+            </div>
+            @if (newStageError()) {
+            <span class="field-error">{{ newStageError() }}</span>
+            }
+            <div class="inline-add-actions">
+              <button type="button" class="btn btn-ghost btn-sm" (click)="cancelAddStage()">
+                Cancel
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" (click)="confirmAddStage(level.id)">
+                Add Step
+              </button>
+            </div>
+          </div>
+          } @else {
+          <button type="button" class="btn-add-stage" (click)="openAddStage(level.id)">
+            + Add Step to {{ level.name }}
+          </button>
+          }
+        </div>
+      </section>
+      }
+    </div>
+  </main>
+  }
+
+  <!-- Mobile Sticky Add Level Bar -->
+  <div class="add-level-sticky-bar">
+    <button type="button" class="btn btn-primary full-width" (click)="openAddLevel()">
+      + Add Level
+    </button>
+  </div>
+
+  <!-- Priority Stages Slide-out Panel -->
+  @if (showPriorityPanel()) {
+  <div class="priority-drawer-backdrop" (click)="closePriorityPanel()">
+    <div class="priority-drawer" (click)="$event.stopPropagation()">
+      <div class="drawer-header">
+        <div class="drawer-title-group">
+          <h3>Priority Stages</h3>
+          <p>Reusable stage classification tags and color codes</p>
+        </div>
+        <button type="button" class="btn-icon" (click)="closePriorityPanel()" aria-label="Close panel">
+          ✕
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <!-- List of existing priorities -->
+        <div class="priorities-list">
+          @if (!priorityStages().length) {
+          <div class="empty-list-note">No priority tags created yet.</div>
+          } @else {
+          @for (p of priorityStages(); track p.id) {
+          <div class="priority-item">
+            @if (editingTarget()?.kind === 'priorityStage' && editingTarget()?.id === p.id) {
+            <div class="inline-edit-priority">
+              <div class="priority-edit-row">
+                <input type="color" class="color-input" [value]="inlineEditColor()"
+                  (input)="inlineEditColor.set($any($event.target).value)" />
+                <input type="text" class="inline-input flex-1" placeholder="Tag name" [value]="inlineEditValue()"
+                  (input)="inlineEditValue.set($any($event.target).value)"
+                  (keydown)="onInlineKeydown($event, saveEditPriority.bind(this, p.id))" />
+                <button type="button" class="btn-icon btn-save" (click)="saveEditPriority(p.id)" title="Save">✓</button>
+                <button type="button" class="btn-icon btn-cancel" (click)="cancelEdit()" title="Cancel">✕</button>
+              </div>
+              <textarea class="form-textarea mt-2" placeholder="Description / notes (optional)..."
+                [value]="inlineEditDescription()" (input)="inlineEditDescription.set($any($event.target).value)" rows="2"></textarea>
+              @if (inlineEditError()) {
+              <span class="inline-error">{{ inlineEditError() }}</span>
+              }
+            </div>
+            } @else {
+            <div class="priority-item-info">
+              <div class="priority-title-row">
+                <span class="priority-color-swatch" [style.background-color]="p.color || '#d92027'"></span>
+                <span class="priority-name">{{ p.name }}</span>
+              </div>
+              @if (p.description) {
+              <p class="priority-desc">{{ p.description }}</p>
+              }
+            </div>
+            <div class="priority-item-actions">
+              <button type="button" class="btn-icon sm" (click)="startEditPriority(p)" title="Edit">
+                ✎
+              </button>
+              <button type="button" class="btn-icon sm btn-danger" (click)="deletePriority(p.id)" title="Delete">
+                ✕
+              </button>
+            </div>
+            }
+          </div>
+          }
+          }
+        </div>
+
+        <!-- Add new Priority Stage form -->
+        <div class="add-priority-section">
+          <h4 class="section-title">Add New Priority Stage</h4>
+          <div class="add-priority-form">
+            <div class="add-priority-row">
+              <input type="color" class="color-input" [value]="newPriorityColor()"
+                (input)="newPriorityColor.set($any($event.target).value)" title="Select tag color" />
+              <input type="text" class="form-input flex-1" placeholder="Tag name (e.g., Foundation)"
+                [value]="newPriorityName()" (input)="newPriorityName.set($any($event.target).value)"
+                (keydown)="onInlineKeydown($event, confirmAddPriority.bind(this))" />
+            </div>
+            <textarea class="form-textarea mt-2" placeholder="Description / usage notes (optional)..."
+              [value]="newPriorityDesc()" (input)="newPriorityDesc.set($any($event.target).value)" rows="2"></textarea>
+            <div class="add-priority-actions mt-2">
+              <button type="button" class="btn btn-primary btn-sm" (click)="confirmAddPriority()"
+                [disabled]="!newPriorityName().trim()">
+                + Add Priority Tag
+              </button>
+            </div>
+          </div>
+          @if (newPriorityError()) {
+          <span class="field-error">{{ newPriorityError() }}</span>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Checks Slide-out Panel -->
+  @if (showChecksPanel()) {
+  <div class="priority-drawer-backdrop" (click)="closeChecksPanel()">
+    <div class="priority-drawer" (click)="$event.stopPropagation()">
+      <div class="drawer-header">
+        <div class="drawer-title-group">
+          <h3>Check Definitions</h3>
+          <p>Reusable criteria for tasks (e.g., Form, Accuracy, Speed)</p>
+        </div>
+        <button type="button" class="btn-icon" (click)="closeChecksPanel()" aria-label="Close panel">
+          ✕
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <!-- List of existing check definitions -->
+        <div class="priorities-list">
+          @if (!checkDefinitions().length) {
+          <div class="empty-list-note">No check definitions created yet.</div>
+          } @else {
+          @for (c of checkDefinitions(); track c.id) {
+          <div class="priority-item">
+            @if (editingCheckId() === c.id) {
+            <div class="inline-edit-priority">
+              <div class="priority-edit-row">
+                <input type="text" class="inline-input flex-1" placeholder="Check name" [value]="editCheckName()"
+                  (input)="editCheckName.set($any($event.target).value)"
+                  (keydown)="onInlineKeydown($event, saveEditCheck.bind(this))" autofocus />
+                <button type="button" class="btn-icon btn-save" (click)="saveEditCheck()" [disabled]="isUpdatingCheck()" title="Save">✓</button>
+                <button type="button" class="btn-icon btn-cancel" (click)="cancelEditCheck()" title="Cancel">✕</button>
+              </div>
+              <textarea class="form-textarea mt-2" placeholder="Description / criteria (optional)..."
+                [value]="editCheckDesc()" (input)="editCheckDesc.set($any($event.target).value)" rows="2"></textarea>
+              @if (editCheckError()) {
+              <span class="inline-error">{{ editCheckError() }}</span>
+              }
+            </div>
+            } @else {
+            <div class="priority-item-info">
+              <div class="priority-title-row">
+                <span class="check-icon-chip">✓</span>
+                <span class="priority-name">{{ c.name }}</span>
+                @if (c.assignedTaskCount !== undefined && c.assignedTaskCount > 0) {
+                  <span class="usage-count-badge">{{ c.assignedTaskCount }} tasks</span>
+                }
+              </div>
+              @if (c.description) {
+              <p class="priority-desc">{{ c.description }}</p>
+              }
+            </div>
+            <div class="priority-item-actions">
+              <button type="button" class="btn-icon sm" (click)="startEditCheck(c)" title="Edit">
+                ✎
+              </button>
+              <button type="button" class="btn-icon sm btn-danger" (click)="deleteCheck(c.id)" [disabled]="isDeletingCheckId() === c.id" title="Delete">
+                ✕
+              </button>
+            </div>
+            }
+          </div>
+          }
+          }
+        </div>
+
+        <!-- Add new Check Definition form -->
+        <div class="add-priority-section">
+          <h4 class="section-title">Add New Check Definition</h4>
+          <div class="add-priority-form">
+            <div class="add-priority-row">
+              <input type="text" class="form-input flex-1" placeholder="Check name (e.g., Form & Precision)"
+                [value]="newCheckName()" (input)="newCheckName.set($any($event.target).value)"
+                (keydown)="onInlineKeydown($event, confirmAddCheck.bind(this))" />
+            </div>
+            <textarea class="form-textarea mt-2" placeholder="Description / evaluation criteria (optional)..."
+              [value]="newCheckDesc()" (input)="newCheckDesc.set($any($event.target).value)" rows="2"></textarea>
+            <div class="add-priority-actions mt-2">
+              <button type="button" class="btn btn-primary btn-sm" (click)="confirmAddCheck()"
+                [disabled]="!newCheckName().trim() || isSavingCheck()">
+                @if (isSavingCheck()) {
+                  <span class="spinner-xs"></span>
+                }
+                + Add Check Definition
+              </button>
+            </div>
+          </div>
+          @if (newCheckError()) {
+          <span class="field-error">{{ newCheckError() }}</span>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Resource Link Modal / Popup -->
+  @if (resourceModalTarget()) {
+  <div class="resource-modal-backdrop" (click)="closeResourceModal()">
+    <div class="resource-modal-card" (click)="$event.stopPropagation()">
+      <div class="resource-modal-header">
+        <div class="resource-modal-title-group">
+          <div class="resource-modal-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+          </div>
+          <div>
+            <h4 class="resource-modal-title">{{ resourceModalTarget()?.title || 'Resource Link' }}</h4>
+            <p class="resource-modal-subtitle">Add or edit reference documentation, video, or URL</p>
+          </div>
+        </div>
+        <button type="button" class="btn-icon sm" (click)="closeResourceModal()" aria-label="Close modal">✕</button>
+      </div>
+      <div class="resource-modal-body">
+        <label class="resource-form-label">Resource URL</label>
+        <div class="resource-input-wrapper">
+          <input type="url" class="form-input resource-url-input"
+            placeholder="https://example.com/reference-or-guide"
+            [value]="resourceModalUrl()"
+            (input)="resourceModalUrl.set($any($event.target).value)"
+            (keydown.enter)="saveResourceModal()" autofocus />
+        </div>
+        @if (resourceModalUrl()) {
+          <div class="resource-preview-row">
+            <span class="resource-preview-label">Active Link:</span>
+            <a [href]="resourceModalUrl()" target="_blank" rel="noopener noreferrer" class="resource-preview-link">
+              {{ resourceModalUrl() }} ↗
+            </a>
+          </div>
+        }
+      </div>
+      <div class="resource-modal-footer">
+        <div>
+          @if (resourceModalUrl()) {
+            <button type="button" class="btn btn-ghost btn-sm btn-danger" (click)="clearResourceModal()">
+              Remove Link
+            </button>
+          }
+        </div>
+        <div class="modal-action-group">
+          <button type="button" class="btn btn-ghost btn-sm" (click)="closeResourceModal()">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" (click)="saveResourceModal()">
+            Save Link
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Task Form Dialog -->
+  <app-task-form-dialog [mode]="dialogMode()" (closed)="dialogMode.set(null)" />
+</div>

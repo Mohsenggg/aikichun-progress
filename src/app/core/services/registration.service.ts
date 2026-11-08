@@ -9,7 +9,7 @@ import { RegisterPayload } from '../models/registration-types';
 })
 export class RegistrationService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.backendApiUrl}/api/v1/auth/register`;
+  private apiUrl = `${environment.apiUrl}/auth/register`;
 
   register(payload: RegisterPayload, profilePhoto: File | null, idPhoto: File | null): Observable<unknown> {
     const fd = new FormData();

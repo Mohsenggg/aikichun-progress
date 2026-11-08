@@ -1,0 +1,128 @@
+.priority-chip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.priority-chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  color: var(--color-text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 28px;
+  user-select: none;
+}
+
+.priority-chip-btn:hover {
+  background: rgba(var(--color-neutral-rgb), 0.1);
+  border-color: rgba(var(--color-neutral-rgb), 0.5);
+}
+
+.priority-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.priority-name {
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .priority-chip-btn {
+    padding: 3px 8px;
+    font-size: 10px;
+    gap: 5px;
+    min-height: 26px;
+  }
+}
+
+/* Popover Modal/Tooltip */
+.priority-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 100;
+  width: 260px;
+  background: var(--color-environment);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+  animation: popoverFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popoverFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.priority-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.priority-popover-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.priority-dot-large {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.priority-popover-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.priority-popover-close {
+  background: transparent;
+  border: none;
+  color: var(--color-neutral);
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 14px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.priority-popover-close:hover {
+  color: var(--color-text-primary);
+  background: rgba(var(--color-neutral-rgb), 0.12);
+}
+
+.priority-popover-desc {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+.priority-chip-btn:focus-visible,
+.priority-popover-close:focus-visible {
+  outline: 2px solid var(--color-progress);
+  outline-offset: 2px;
+}

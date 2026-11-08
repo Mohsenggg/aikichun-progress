@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { AuthResponse, SendOtpRequest, VerifyOtpRequest } from '../models/auth.models';
 import {environment} from '../../../environments/environment';
 
-const API_BASE_URL = `${environment.backendApiUrl}/api/v1/auth`;
+const API_BASE_URL = `${environment.apiUrl}/auth`;
 
 @Injectable({
   providedIn: 'root'

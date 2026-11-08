@@ -46,11 +46,7 @@ export class LoginComponent {
         return;
       }
 
-      if (this.auth.role() === 'admin') {
-        this.router.navigate(['/admin']);
-      } else {
-        this.router.navigate(['/roadmap']);
-      }
+      this.router.navigate(['/home']);
     } catch (err: any) {
       this.errorMessage.set(err.error?.message || 'Invalid email or password.');
     } finally {
@@ -60,10 +56,6 @@ export class LoginComponent {
 
   onAccountVerified() {
     this.showActivatePopup.set(false);
-    if (this.auth.role() === 'admin') {
-      this.router.navigate(['/admin']);
-    } else {
-      this.router.navigate(['/roadmap']);
-    }
+    this.router.navigate(['/home']);
   }
 }

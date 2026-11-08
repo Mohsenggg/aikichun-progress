@@ -1,0 +1,114 @@
+@if (isSimplified) {
+  <!-- Simplified layout: single task + empty step title → show task directly -->
+  <app-task-row
+    [stageTask]="sortedTasks[0]"
+    [allStageTasks]="sortedTasks"
+    [traineeId]="traineeId"
+    [hideStepPercentage]="true"
+    [stepCode]="stage.code"
+    [priority]="stage.priorityStage || null"
+  ></app-task-row>
+} @else {
+<div
+  class="step-card"
+  [class.step-expanded]="isExpanded()"
+  [style.border-left-color]="'var(--color-progress)'"
+>
+  <!-- Step Card Header (Clickable Accordion Trigger) -->
+  <div class="step-card-header" (click)="toggleExpand()">
+    <div class="step-secondary-cluster">
+         <!-- Priority Chip -->
+      @if (stage.priorityStage) {
+        <app-priority-chip [priority]="stage.priorityStage"></app-priority-chip>
+      }
+     
+      <!-- Description Icon: only visible when step has a description -->
+      @if (hasDescription) {
+        <button
+          type="button"
+          class="step-icon-btn"
+          (click)="onDescClick($event)"
+          title="View step description"
+          aria-label="View step description"
+        >
+          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+        </button>
+      }
+
+      <!-- Link Icon: only visible when step has a link -->
+      @if (hasLink) {
+        <a
+          [href]="stage.link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="step-icon-btn step-link-icon"
+          (click)="$event.stopPropagation()"
+          title="Open step learning resource"
+          aria-label="Open step learning resource"
+        >
+          <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+        </a>
+      }
+
+  
+    </div>
+
+    <div class="step-primary-cluster">
+      <!-- Step Title -->
+      <h3 class="step-title" dir="auto">
+        {{ displayName }}
+      </h3>
+
+      <!-- Code Badge (far right) -->
+      @if (stage.code) {
+        <span class="step-code-badge" dir="ltr">{{ stage.code }}</span>
+      }
+    </div>
+
+    <!-- Step Progress & Expand Controls -->
+    <div class="step-right-content">
+      <!-- <span class="step-level-percentage">
+        {{ stage.percentageOfLevel | number:'1.0-0' }}% of level
+      </span> -->
+
+      <!-- Step Progress Ring -->
+      <!-- <app-progress-ring
+        [percentage]="stage.progressPercentage"
+        [size]="40"
+        [strokeWidth]="3.5"
+        [color]="'var(--color-progress)'"
+        [textSize]="'10px'"
+      ></app-progress-ring> -->
+
+      <!-- Chevron Expand Icon -->
+      <div class="step-chevron" [class.rotated]="isExpanded()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expandable Tasks Dropdown -->
+  <div class="step-dropdown" [class.open]="isExpanded()">
+    <div class="step-dropdown-inner">
+      @if (sortedTasks.length > 0) {
+        <div class="step-tasks-list">
+          @for (st of sortedTasks; track st.id) {
+            <app-task-row
+              [stageTask]="st"
+              [allStageTasks]="sortedTasks"
+              [traineeId]="traineeId"
+            ></app-task-row>
+          }
+        </div>
+      } @else {
+        <div class="step-empty-tasks">
+          <span class="empty-icon">📋</span>
+          <p class="empty-text">No tasks assigned to this step yet.</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+}

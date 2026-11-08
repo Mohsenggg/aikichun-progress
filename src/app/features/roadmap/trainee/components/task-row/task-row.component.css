@@ -1,0 +1,314 @@
+.task-row-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.task-row-container:hover {
+  border-color: rgba(var(--color-neutral-rgb), 0.45);
+}
+
+.task-row-container.is-main-task {
+  border-left: 3px solid var(--color-attention);
+}
+
+.task-row-container.is-completed {
+  border-left-color: var(--color-progress);
+}
+
+.task-row-container.is-completed.is-main-task .main-star-icon {
+  color: var(--color-progress);
+}
+
+.task-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.task-secondary-cluster {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  max-width: 55%;
+  order: -1;
+}
+
+.task-primary-cluster {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
+  text-align: right;
+  cursor: pointer;
+}
+
+.task-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  border-radius: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-neutral);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+button.task-icon-btn:hover,
+a.task-icon-btn:hover {
+  background: rgba(var(--color-neutral-rgb), 0.12);
+  color: var(--color-text-primary);
+}
+
+.task-icon-btn.icon-inactive {
+  opacity: 0.35;
+  cursor: default;
+  background: transparent;
+}
+
+.task-icon-btn.icon-inactive:hover {
+  background: transparent;
+  color: var(--color-neutral);
+  transform: none;
+}
+
+.task-link-icon {
+  background: var(--color-surface);
+  color: var(--color-neutral);
+}
+
+.task-link-icon:hover {
+  background: rgba(var(--color-neutral-rgb), 0.12);
+  color: var(--color-text-primary);
+}
+
+.task-icon-btn i {
+  line-height: 1;
+}
+
+.task-secondary-cluster app-priority-chip {
+  flex-shrink: 0;
+}
+
+.task-secondary-cluster:empty {
+  display: none;
+}
+
+.main-star-icon {
+  color: var(--color-attention);
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.task-title {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  transition: color 0.2s ease;
+  overflow-wrap: anywhere;
+}
+
+.task-primary-cluster:hover .task-title {
+  color: var(--color-text-primary);
+}
+
+.task-code-badge {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  padding: 2px 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-neutral);
+}
+
+.task-step-code-badge {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.task-step-percentage-badge {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--color-neutral);
+  background: var(--color-surface);
+  padding: 3px 7px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Compact clusters on narrow screens — no overlap or tall wrapping. */
+@media (max-width: 480px) {
+  .task-row-container {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .task-header-row {
+    gap: 8px;
+  }
+
+  .task-secondary-cluster {
+    gap: 4px;
+    max-width: 50%;
+  }
+
+  .task-icon-btn {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    min-height: 26px;
+    font-size: 12px;
+  }
+
+  .task-step-percentage-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+
+  .task-code-badge {
+    font-size: 10px;
+    padding: 1px 5px;
+  }
+}
+
+/* Dynamic Checks Grid */
+.task-checks-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.check-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 36px;
+  user-select: none;
+}
+
+.check-pill:hover {
+  background: rgba(var(--color-neutral-rgb), 0.08);
+  border-color: rgba(var(--color-neutral-rgb), 0.5);
+}
+
+.check-box-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid var(--color-neutral);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--color-environment);
+  flex-shrink: 0;
+}
+
+.check-svg {
+  width: 12px;
+  height: 12px;
+  stroke: var(--color-environment);
+  animation: checkPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes checkPop {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.check-pill.check-pill-completed {
+  background: rgba(var(--color-progress-rgb), 0.08);
+  border-color: rgba(var(--color-progress-rgb), 0.3);
+  color: var(--color-text-primary);
+}
+
+.check-pill.check-pill-completed .check-box-icon {
+  background: var(--color-progress);
+  border-color: var(--color-progress);
+}
+
+.zero-check-row {
+  padding: 4px 0;
+}
+
+.zero-check-alert {
+  font-size: 12px;
+  color: var(--color-text-primary);
+  background: rgba(var(--color-attention-rgb), 0.12);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(var(--color-attention-rgb), 0.35);
+  display: inline-block;
+}
+
+/* Progress Footer */
+/* Temporarily hidden — keep HTML/CSS so the bar can be restored easily. */
+.task-progress-footer {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.task-progress-track {
+  flex: 1;
+  height: 5px;
+  background: rgba(var(--color-neutral-rgb), 0.2);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.task-progress-fill {
+  height: 100%;
+  background: var(--color-progress);
+  border-radius: 9999px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.task-progress-stats {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  color: var(--color-neutral);
+  white-space: nowrap;
+}
+
+:is(button, a):focus-visible {
+  outline: 2px solid var(--color-progress);
+  outline-offset: 2px;
+}

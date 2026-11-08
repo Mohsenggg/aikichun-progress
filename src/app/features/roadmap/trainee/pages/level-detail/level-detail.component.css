@@ -1,0 +1,600 @@
+.level-detail-page {
+  min-height: 100vh;
+  background: var(--color-environment);
+  color: var(--color-text-primary);
+  padding: 20px 16px 80px;
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .level-detail-page {
+    padding: 32px 24px 80px;
+    gap: 28px;
+  }
+}
+
+/* Toast Error Banner */
+.toast-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(var(--color-attention-rgb), 0.14);
+  border: 1px solid rgba(var(--color-attention-rgb), 0.4);
+  border-radius: 12px;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  animation: slideDownToast 0.3s ease;
+}
+
+@keyframes slideDownToast {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.toast-close {
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  margin-left: auto;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 14px;
+}
+
+/* Navigation Bar */
+.nav-bar-container {
+  display: flex;
+  align-items: center;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-text-primary);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 40px;
+}
+
+.back-btn:hover {
+  background: rgba(var(--color-neutral-rgb), 0.12);
+  border-color: rgba(var(--color-neutral-rgb), 0.5);
+  transform: translateX(-2px);
+}
+
+.back-arrow {
+  font-size: 16px;
+}
+
+/* Level Hero Card */
+.level-hero-card {
+  background: var(--color-environment);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.level-hero-main {
+  padding: 24px 24px 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.level-title-group {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  order: 2;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.level-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  order: -1;
+}
+
+.level-actions:empty {
+  display: none;
+}
+
+.level-left-cluster {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  order: -1;
+  min-width: 0;
+}
+
+.level-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-neutral);
+  background: var(--color-surface);
+  padding: 4px 10px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.level-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  border-radius: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-neutral);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+button.level-action-btn:hover,
+a.level-action-btn:hover {
+  background: rgba(var(--color-neutral-rgb), 0.12);
+  color: var(--color-text-primary);
+}
+
+.level-action-btn.icon-inactive {
+  opacity: 0.35;
+  cursor: default;
+  background: transparent;
+}
+
+.level-action-btn.icon-inactive:hover {
+  background: transparent;
+  color: var(--color-neutral);
+  transform: none;
+}
+
+.level-action-link {
+  background: var(--color-surface);
+  color: var(--color-neutral);
+}
+
+.level-action-link:hover {
+  background: rgba(var(--color-neutral-rgb), 0.12);
+  color: var(--color-text-primary);
+}
+
+.level-action-btn i {
+  line-height: 1;
+}
+
+.level-hero-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+}
+
+@media (min-width: 768px) {
+  .level-hero-title {
+    font-size: 26px;
+  }
+}
+
+.level-hero-desc {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-neutral);
+  line-height: 1.5;
+}
+
+.level-hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.level-stats-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.level-steps-count {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.level-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.level-link-btn:hover {
+  background: rgba(var(--color-neutral-rgb), 0.12);
+  border-color: rgba(var(--color-neutral-rgb), 0.5);
+}
+
+.level-link-btn i {
+  font-size: 11px;
+}
+
+.level-bar-track {
+  height: 6px;
+  background: rgba(var(--color-neutral-rgb), 0.2);
+  width: 100%;
+}
+
+.level-bar-fill {
+  height: 100%;
+  background: var(--color-progress);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Narrow screens: keep hero elements on one row, compact to avoid overlap/wrap. */
+@media (max-width: 460px) {
+  .level-detail-page {
+    padding: 16px 10px 64px;
+    gap: 14px;
+  }
+
+  .level-hero-card {
+    border-radius: 14px;
+  }
+
+  .level-hero-main {
+    padding: 12px 12px 10px;
+    gap: 10px;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .level-title-group {
+    min-width: 0;
+    flex: 1 1 auto;
+    gap: 5px;
+  }
+
+  .level-left-cluster {
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .level-actions {
+    gap: 4px;
+  }
+
+  .level-action-btn {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    min-height: 26px;
+    font-size: 12px;
+  }
+
+  .level-badge {
+    font-size: 10px;
+    padding: 2px 7px;
+    letter-spacing: 0.04em;
+  }
+
+  .level-hero-title {
+    font-size: 15px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .level-hero-desc {
+    font-size: 12px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .level-hero-stats {
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  /* Shrink the fixed 64px ring so title + stats fit on one row. */
+  .level-hero-stats app-progress-ring {
+    transform: scale(0.75);
+    margin: -8px;
+  }
+
+  .level-stats-labels {
+    gap: 4px;
+  }
+
+  .level-steps-count {
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .level-link-btn {
+    font-size: 10px;
+    padding: 4px 8px;
+    gap: 3px;
+    white-space: nowrap;
+  }
+}
+
+/* Steps Section */
+.steps-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.steps-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.steps-section-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.steps-count-badge {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-neutral);
+}
+
+.step-cards-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Empty State */
+.empty-steps-card, .not-found-card {
+  padding: 48px 24px;
+  background: var(--color-environment);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.empty-steps-icon, .not-found-icon {
+  font-size: 40px;
+}
+
+.empty-steps-title, .not-found-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.empty-steps-subtitle, .not-found-subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-neutral);
+}
+
+.not-found-back-btn {
+  margin-top: 8px;
+  padding: 10px 20px;
+  background: var(--color-progress);
+  border: none;
+  border-radius: 8px;
+  color: var(--color-environment);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.not-found-back-btn:hover {
+  background: color-mix(in srgb, var(--color-progress) 90%, var(--color-environment));
+}
+
+/* Level Description Info Modal (same pattern as trainee-home) */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(var(--color-environment-rgb), 0.82);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: backdropFade 0.2s ease;
+}
+
+@keyframes backdropFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-dialog {
+  background: var(--color-environment);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  animation: modalPopDesktop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+@keyframes modalPopDesktop {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 12px;
+}
+
+.modal-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal-level-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-neutral);
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.modal-close-btn {
+  background: var(--color-surface);
+  border: none;
+  color: var(--color-neutral);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.modal-close-btn:hover {
+  background: rgba(var(--color-neutral-rgb), 0.16);
+  color: var(--color-text-primary);
+}
+
+.modal-body {
+  padding: 12px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-section-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-neutral);
+}
+
+.modal-desc-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+}
+
+.modal-link-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.modal-link-btn:hover {
+  background: rgba(var(--color-neutral-rgb), 0.12);
+  transform: translateY(-1px);
+}
+
+.modal-link-btn i {
+  font-size: 12px;
+}
+
+/* Skeleton Loading */
+.skeleton-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skeleton-header {
+  height: 140px;
+  background: var(--color-environment);
+  border-radius: 20px;
+  animation: skeletonPulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-card {
+  height: 80px;
+  background: var(--color-environment);
+  border-radius: 16px;
+  animation: skeletonPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes skeletonPulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 0.3; }
+  100% { opacity: 0.6; }
+}
+
+.level-detail-page :is(button, a, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-progress);
+  outline-offset: 3px;
+}

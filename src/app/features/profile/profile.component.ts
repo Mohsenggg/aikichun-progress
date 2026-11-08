@@ -6,7 +6,6 @@ import {
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../core/auth/auth.service';
-import { RoadmapService } from '../../core/roadmap/roadmap.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -23,7 +22,6 @@ export class ProfileComponent implements OnInit, OnChanges, AfterViewInit, OnDes
 
     private auth = inject(AuthService);
     private fb = inject(FormBuilder);
-    private roadmapService = inject(RoadmapService);
     private apiUrl = environment.backendApiUrl;
 
     backendUser = this.auth.backendUser;
@@ -86,7 +84,8 @@ export class ProfileComponent implements OnInit, OnChanges, AfterViewInit, OnDes
         const s = this.accountStatusLabel();
         if (s === 'ACTIVE') return 'badge-success';
         if (s === 'PENDING_VERIFICATION') return 'badge-warning';
-        if (s === 'SUSPENDED' || s === 'BANNED') return 'badge-error';
+        if (s === 'INACTIVE') return 'badge-warning';
+        if (s === 'BLOCKED' || s === 'SUSPENDED' || s === 'BANNED') return 'badge-error';
         return 'badge-ghost';
     });
 
@@ -102,39 +101,29 @@ export class ProfileComponent implements OnInit, OnChanges, AfterViewInit, OnDes
         return 'progress-success';
     }
 
-    learningProgress = computed(() => this.clampProgress(this.computeProgress('learning')));
-    developedProgress = computed(() => this.clampProgress(this.computeProgress('developed')));
-    skilledProgress = computed(() => this.clampProgress(this.computeProgress('skilled')));
+    learningProgress = computed(() => 0);
+    developedProgress = computed(() => 0);
+    skilledProgress = computed(() => 0);
 
     learningColor = computed(() => this.progressColor(this.learningProgress()));
     developedColor = computed(() => this.progressColor(this.developedProgress()));
     skilledColor = computed(() => this.progressColor(this.skilledProgress()));
 
-    totalSteps = computed(() => this.roadmapService.allSteps().length);
+    totalSteps = computed(() => 0);
 
     lastUpdateFormatted = computed(() => {
-        const dateStr = this.fullProfile()?.last_update_date;
-        if (!dateStr) return '\u2014';
+        const dateStr = this.fullProfile()?.last_update_date || this.fullProfile()?.updatedAt;
+        if (!dateStr) return '—';
         try {
             return new Date(dateStr).toLocaleDateString('en-US', {
                 year: 'numeric', month: 'short', day: 'numeric'
             });
         } catch {
-            return '\u2014';
+            return '—';
         }
     });
 
     updatesUsed = computed(() => this.fullProfile()?.['updates_count'] ?? 0);
-
-    private computeProgress(type: 'learning' | 'developed' | 'skilled'): number {
-        const status = this.fullProfile()?.['status'];
-        const steps = this.roadmapService.allSteps();
-        if (!status || steps.length === 0) return 0;
-        const pointer = status[type];
-        if (!pointer) return 0;
-        const idx = steps.findIndex(s => s.stepNumber === pointer);
-        return idx >= 0 ? ((idx + 1) / steps.length) * 100 : 0;
-    }
 
     ngOnInit() {
         this.loadProfile();

@@ -1,4 +1,4 @@
-export type AccountStatus = 'PENDING_VERIFICATION' | 'ACTIVE' | 'SUSPENDED' | 'BANNED';
+export type AccountStatus = 'PENDING_VERIFICATION' | 'ACTIVE' | 'INACTIVE' | 'BLOCKED';
 
 export interface PublicUserDto {
   id: string;
